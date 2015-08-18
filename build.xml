@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="create_run_jar" name="Create Runnable Jar for Project JavaSim">
+    <target name="create_run_jar">
+        <jar destfile="dist/JavaSim.jar" manifest="MANIFEST.MF" filesetmanifest="mergewithoutmain">
+            <!--<manifest>
+                <attribute name="Main-Class" value="com.marklalor.javasim.JavaSimMain"/>
+                <attribute name="Class-Path" value="lib/*"/>
+            </manifest>-->
+        	<fileset dir="bin"/>
+            <zipfileset excludes="META-INF/*.SF" src="lib/JSON-java.jar"/>
+        </jar>
+    </target>
+	<target name="run_java" depends="create_run_jar">
+	   <java jar="/Users/mark/packr/packr.jar" fork="true">
+	      <arg value="packr-mac.json"/>
+	   </java>
+	</target>
+	<target name="set_icon" depends="run_java">
+		<copy file="icons.icns" tofile="dist/JavaSim.app/Contents/Resources/icons.icns" overwrite="true" />
+		<copy file="info.plist" tofile="dist/JavaSim.app/Contents/info.plist" overwrite="true" />
+		<exec executable="touch">
+		    <arg value="dist/JavaSim.app"/>
+		</exec>
+		<exec executable="touch">
+		    <arg value="dist/JavaSim.app/Contents/info.plist"/>
+		</exec>
+		<exec executable="open">
+		    <arg value="dist"/>
+		</exec>
+	</target>
+</project>

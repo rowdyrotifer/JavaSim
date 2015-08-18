@@ -1,0 +1,15 @@
+{
+    "platform": "mac",
+    "jdk": "/Users/mark/packr/openjdk-1.7.0-u80-unofficial-macosx-x86_64-image.zip",
+    "executable": "JavaSim",
+    "appjar": "/Users/mark/git/JavaSim/JavaSim/dist/JavaSim.jar",
+    "mainclass": "com/marklalor/javasim/JavaSimMain",
+    "vmargs": [
+    	"-Xmx1G"
+    ],
+    "resources": [
+        "/Users/mark/git/JavaSim/JavaSim/lib"
+    ],
+    "minimizejre": "soft",
+    "outdir": "/Users/mark/git/JavaSim/JavaSim/dist/JavaSim.app"
+}
