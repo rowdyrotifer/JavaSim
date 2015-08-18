@@ -1,4 +1,4 @@
-package com.marklalor.javasim;
+package com.marklalor.javasim.imaging;
 
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;

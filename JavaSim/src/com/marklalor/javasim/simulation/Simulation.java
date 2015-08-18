@@ -41,8 +41,8 @@ import org.json.JSONObject;
 import apple.dts.samplecode.osxadapter.OSXAdapter;
 
 import com.marklalor.javasim.Home;
-import com.marklalor.javasim.TransferableImage;
 import com.marklalor.javasim.imaging.GifSequenceWriter;
+import com.marklalor.javasim.imaging.TransferableImage;
 import com.marklalor.javasim.simulation.frames.Image;
 import com.marklalor.javasim.simulation.frames.subframes.Animate;
 import com.marklalor.javasim.simulation.frames.subframes.Control;
@@ -124,12 +124,10 @@ public abstract class Simulation implements ActionListener, ClipboardOwner
 		
 		image = new Image(this);
 		refreshTitle();
-		image.pack();
 		image.setSize(DEFAULT_IMAGE_WIDTH, DEFAULT_IMAGE_HEIGHT);
 		image.setLocationRelativeTo(null);
 		
 		control = new Control(image);
-		control.pack();
 		control.setSize(DEFAULT_CONTROL_WIDTH, DEFAULT_CONTROL_HEIGHT);
 		control.setLocationRelativeTo(this.getImage());
 		control.setLocation(this.getControl().getLocation().x - (this.getImage().getWidth() / 2) - (this.getControl().getWidth() / 2), this.getControl().getY());
@@ -174,8 +172,6 @@ public abstract class Simulation implements ActionListener, ClipboardOwner
 					delay = animate.getFrameDelay();
 				if  (getN() == animate.getStopFrame() || !animationTimer.isRunning())
 					delay = animate.getStopDelay();
-				
-				//System.out.println(animationTimer.isRunning());
 				
 				if (getN() % animate.getSaveEvery() == 0 || 
 						getN() == animate.getStartFrame() || 
@@ -406,7 +402,6 @@ public abstract class Simulation implements ActionListener, ClipboardOwner
 		
 		menuBar.add(simulation);
 		
-		getControl().setJMenuBar(menuBar);
 		getImage().setJMenuBar(menuBar);
 	}
 	
@@ -616,8 +611,6 @@ public abstract class Simulation implements ActionListener, ClipboardOwner
 		combinedGraphics.drawImage(temporaryImage, 0, 0, null, null);
 		
 		image.paintImage(combinedImage);
-		
-		combinedGraphics.dispose();
 	}
 	
 	public BufferedImage getCurrentImage()
