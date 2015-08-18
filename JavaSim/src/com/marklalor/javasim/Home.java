@@ -1,11 +1,9 @@
 package com.marklalor.javasim;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -13,7 +11,6 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.URL;
@@ -24,11 +21,9 @@ import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -44,7 +39,7 @@ public class Home extends JFrame implements ListSelectionListener
 {
 	private static final long serialVersionUID = 6321955323521519657L;
 	
-	private File location;
+	public static File homeDirectory;
 	
 	private List<Simulation> simulations;
 	private JList simulationList;
@@ -55,7 +50,7 @@ public class Home extends JFrame implements ListSelectionListener
 	
 	public Home(File location)
 	{
-		this.location = location;
+		Home.homeDirectory = location;
 		loadSimulations();
 		setupLayout();
 		simulationList.setSelectedIndex(0);
@@ -70,14 +65,14 @@ public class Home extends JFrame implements ListSelectionListener
 	private void loadSimulations()
 	{
 		simulations = new ArrayList<Simulation>();
-		for (File file : location.listFiles(jarFilter))
+		for (File file : homeDirectory.listFiles(jarFilter))
 		{
 			try
 			{
-				Class simClass = processJar(file);
+				Class<? extends Simulation> simClass = findSimClassFromJar(file);
 				try
 				{
-					simulations.add((Simulation) simClass.newInstance());
+					simulations.add(simClass.newInstance());
 				}
 				catch(InstantiationException e)
 				{
@@ -99,10 +94,11 @@ public class Home extends JFrame implements ListSelectionListener
 		}
 	}
 
-	private Class processJar(File file) throws IOException, ClassNotFoundException
+	@SuppressWarnings("unchecked")
+	private Class<? extends Simulation> findSimClassFromJar(File file) throws IOException, ClassNotFoundException
 	{
 		JarFile jarFile = new JarFile(file);
-		Enumeration e = jarFile.entries();
+		Enumeration<JarEntry> e = jarFile.entries();
 
 		URL[] urls = { new URL("jar:file:" + file.getAbsolutePath() +"!/") };
 		URLClassLoader cl = URLClassLoader.newInstance(urls);
@@ -117,11 +113,10 @@ public class Home extends JFrame implements ListSelectionListener
 		    className = className.replace('/', '.');
 		    
 		    
-		    Class simClass = cl.loadClass(className);
+		    //Load it and return it if it's a simulation.
+		    Class<?> simClass = cl.loadClass(className);
 		    if (Simulation.class.isAssignableFrom(simClass))
-		    {
-		    	return simClass;
-		    }
+		    	return (Class<? extends Simulation>) simClass;
 	    }
 	    
 	    
@@ -228,7 +223,7 @@ public class Home extends JFrame implements ListSelectionListener
 		{
 			System.out.println("Initializing " + c.toString());
 			sim = c.newInstance();
-			sim.setContentDirectory(new File(location, sim.getName()));
+			//sim.setContentDirectory(new File(location, sim.getName()));
 			sim.setHome(this);
 			sim.initialize();
 			sim.resetAction();

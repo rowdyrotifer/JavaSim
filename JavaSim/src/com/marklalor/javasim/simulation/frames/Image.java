@@ -3,14 +3,13 @@ package com.marklalor.javasim.simulation.frames;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
-
 import com.marklalor.javasim.component.SimulationJFrame;
 import com.marklalor.javasim.simulation.Simulation;
 
 public class Image extends SimulationJFrame
 {
+	private static final long serialVersionUID = 7211460258372253616L;
+	
 	private Simulation simulation;
 	public Image(Simulation simulation)
 	{
