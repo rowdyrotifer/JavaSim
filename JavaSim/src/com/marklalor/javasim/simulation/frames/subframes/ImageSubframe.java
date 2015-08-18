@@ -8,8 +8,8 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.text.PlainDocument;
 
-import com.marklalor.javasim.IntegerFilter;
 import com.marklalor.javasim.simulation.frames.Image;
+import com.marklalor.javasim.text.filter.IntegerFilter;
 
 public class ImageSubframe extends JDialog
 {	
@@ -20,6 +20,7 @@ public class ImageSubframe extends JDialog
 	public ImageSubframe(Image image)
 	{
 		super(image);
+		setAutoRequestFocus(false);
 		this.image = image;
 	}
 	

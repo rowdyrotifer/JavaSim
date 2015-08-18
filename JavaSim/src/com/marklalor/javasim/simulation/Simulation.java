@@ -56,8 +56,8 @@ public abstract class Simulation implements ActionListener, ClipboardOwner
 	public static boolean IS_MAC_OS_X = System.getProperty("os.name").toLowerCase().startsWith("mac os x");
 	
 	private Home home;
+	private SimulationInfo info;
 	
-	private String name, date, author, version, description;
 	private File contentDirectory;
 	
 	// Main Frames
@@ -110,16 +110,11 @@ public abstract class Simulation implements ActionListener, ClipboardOwner
 		this.n++;
 	}
 	
-	public Simulation()
+	public Simulation(SimulationInfo info)
 	{
-		JSONObject metadata = loadMetadata(getClass());
-		this.name = metadata.getString("name");
-		this.date = metadata.getString("date");
-		this.author = metadata.getString("author");
-		this.version = metadata.getString("version");
-		this.description = metadata.getString("description");
+		this.info = info;
 		
-		contentDirectory = new File(Home.homeDirectory, getName());
+		contentDirectory = new File(Home.homeDirectory, info.getName());
 		contentDirectory.mkdirs();
 		
 		image = new Image(this);
@@ -130,7 +125,7 @@ public abstract class Simulation implements ActionListener, ClipboardOwner
 		control = new Control(image);
 		control.setSize(DEFAULT_CONTROL_WIDTH, DEFAULT_CONTROL_HEIGHT);
 		control.setLocationRelativeTo(this.getImage());
-		control.setLocation(this.getControl().getLocation().x - (this.getImage().getWidth() / 2) - (this.getControl().getWidth() / 2), this.getControl().getY());
+		control.setLocation(this.getControl().getLocation().x - (this.getImage().getWidth() / 2) - (this.getControl().getWidth() / 2), this.getImage().getY());
 		
 		animate = new Animate(image);
 		
@@ -195,6 +190,7 @@ public abstract class Simulation implements ActionListener, ClipboardOwner
 		});
 		
 		setupMenu();
+		
 		setWidth(DEFAULT_IMAGE_WIDTH);
 		setHeight(DEFAULT_IMAGE_HEIGHT);
 		setupGraphics();
@@ -224,7 +220,7 @@ public abstract class Simulation implements ActionListener, ClipboardOwner
 	
 	private void refreshTitle()
 	{
-		image.setTitle(name + " – " + author + " at " + (hertz == -1 ? "?" : hertz) + " Hz");
+		image.setTitle(info.getName() + " – " + info.getAuthor() + " at " + (hertz == -1 ? "?" : hertz) + " Hz");
 	}
 	
 	private void setupGraphics()
@@ -243,14 +239,14 @@ public abstract class Simulation implements ActionListener, ClipboardOwner
 	private JMenu simulation;
 	private JMenuItem reset, resize;
 	
-	private void setupMenu()
+	public void setupMenu()
 	{
 		menuBar = new JMenuBar();
 		
 		file = new JMenu("File");
 		
 		// New Simulation – Command + N
-		newSimulation = new JMenuItem("New " + getName());
+		newSimulation = new JMenuItem("New " + info.getName());
 		newSimulation.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		newSimulation.addActionListener(this);
 		file.add(newSimulation);
@@ -412,7 +408,7 @@ public abstract class Simulation implements ActionListener, ClipboardOwner
 		
 		if(e.getSource() == newSimulation)
 		{
-			getHome().run(this);
+			getHome().run(info);
 		}
 		else if(e.getSource() == saveImage)
 		{
@@ -631,32 +627,6 @@ public abstract class Simulation implements ActionListener, ClipboardOwner
 		System.out.println("Image No Longer On Clipboard");
 	}
 	
-	private static JSONObject loadMetadata(Class<? extends Simulation> c)
-	{
-		InputStream in = c.getResourceAsStream("/info.json");
-		BufferedReader input = new BufferedReader(new InputStreamReader(in));
-		String data = "", line = null;
-		try
-		{
-			while((line = input.readLine()) != null)
-				data += line;
-		}
-		catch(IOException e)
-		{
-			e.printStackTrace();
-		}
-		try
-		{
-			input.close();
-		}
-		catch(IOException e)
-		{
-			e.printStackTrace();
-		}
-		
-		return new JSONObject(data);
-	}
-	
 	public void delete()
 	{
 		getImage().dispose();
@@ -667,6 +637,16 @@ public abstract class Simulation implements ActionListener, ClipboardOwner
 	{
 		if(stopForBreakpoint)
 			stop();
+	}
+	
+	public void setInfo(SimulationInfo info)
+	{
+		this.info = info;
+	}
+	
+	public SimulationInfo getInfo()
+	{
+		return info;
 	}
 	
 	public Home getHome()
@@ -687,31 +667,6 @@ public abstract class Simulation implements ActionListener, ClipboardOwner
 	public Control getControl()
 	{
 		return control;
-	}
-	
-	public String getName()
-	{
-		return name;
-	}
-	
-	public String getDate()
-	{
-		return date;
-	}
-	
-	public String getAuthor()
-	{
-		return author;
-	}
-	
-	public String getDescription()
-	{
-		return description;
-	}
-	
-	public String getVersion()
-	{
-		return version;
 	}
 	
 	public File getContentDirectory()
@@ -744,11 +699,5 @@ public abstract class Simulation implements ActionListener, ClipboardOwner
 	public static String getTimestamp()
 	{
 		return dateFormat.format(new Date());
-	}
-	
-	@Override
-	public String toString()
-	{
-		return name;
 	}
 }

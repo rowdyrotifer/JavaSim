@@ -13,6 +13,7 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
@@ -34,6 +35,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import com.marklalor.javasim.simulation.Simulation;
+import com.marklalor.javasim.simulation.SimulationInfo;
 
 public class Home extends JFrame implements ListSelectionListener
 {
@@ -41,7 +43,7 @@ public class Home extends JFrame implements ListSelectionListener
 	
 	public static File homeDirectory;
 	
-	private List<Simulation> simulations;
+	private List<SimulationInfo> simulations;
 	private JList simulationList;
 	private JPanel simulationInfoPanel;
 	
@@ -64,66 +66,14 @@ public class Home extends JFrame implements ListSelectionListener
 	
 	private void loadSimulations()
 	{
-		simulations = new ArrayList<Simulation>();
-		for (File file : homeDirectory.listFiles(jarFilter))
+		simulations = new ArrayList<SimulationInfo>();
+		for (File jar : homeDirectory.listFiles(jarFilter))
 		{
-			try
-			{
-				Class<? extends Simulation> simClass = findSimClassFromJar(file);
-				try
-				{
-					simulations.add(simClass.newInstance());
-				}
-				catch(InstantiationException e)
-				{
-					e.printStackTrace();
-				}
-				catch(IllegalAccessException e)
-				{
-					e.printStackTrace();
-				}
-			}
-			catch(ClassNotFoundException e)
-			{
-				e.printStackTrace();
-			}
-			catch(IOException e)
-			{
-				e.printStackTrace();
-			}
+			SimulationInfo info = new SimulationInfo(jar);
+			simulations.add(info);
 		}
 	}
 
-	@SuppressWarnings("unchecked")
-	private Class<? extends Simulation> findSimClassFromJar(File file) throws IOException, ClassNotFoundException
-	{
-		JarFile jarFile = new JarFile(file);
-		Enumeration<JarEntry> e = jarFile.entries();
-
-		URL[] urls = { new URL("jar:file:" + file.getAbsolutePath() +"!/") };
-		URLClassLoader cl = URLClassLoader.newInstance(urls);
-
-	    while (e.hasMoreElements())
-	    {
-	        JarEntry entry = (JarEntry) e.nextElement();
-	        if(entry.isDirectory() || !entry.getName().endsWith(".class"))
-	            continue;
-		    // -6 because of .class
-		    String className = entry.getName().substring(0,entry.getName().length()-6);
-		    className = className.replace('/', '.');
-		    
-		    
-		    //Load it and return it if it's a simulation.
-		    Class<?> simClass = cl.loadClass(className);
-		    if (Simulation.class.isAssignableFrom(simClass))
-		    	return (Class<? extends Simulation>) simClass;
-	    }
-	    
-	    
-	    System.out.println(file.getAbsolutePath() + " did not contain a Simulation!");
-	    jarFile.close();
-		return null;
-	}
 
 	private void setupLayout()
 	{
@@ -138,8 +88,8 @@ public class Home extends JFrame implements ListSelectionListener
 		
 		DefaultListModel model = new DefaultListModel();
 		if (simulations != null)
-			for(Simulation simulation : simulations)
-				model.addElement(simulation);
+			for(SimulationInfo info : simulations)
+				model.addElement(info);
 		
 		simulationList = new JList(model);
 		Font listFont = simulationList.getFont();
@@ -211,22 +161,43 @@ public class Home extends JFrame implements ListSelectionListener
 	
 	private void runSelected()
 	{
-		run((Simulation) simulationList.getSelectedValue());
+		run((SimulationInfo) simulationList.getSelectedValue());
 	}
 	
-	public void run(Simulation s)
+	public void run(SimulationInfo info)
 	{
-		System.out.println("Running " + s.getName());
-		Class<? extends Simulation> c = s.getClass();
-		Simulation sim;
+		System.out.println("Running " + info.getName());
+		
+		Class<? extends Simulation> simClass = null;
+		
 		try
 		{
-			System.out.println("Initializing " + c.toString());
-			sim = c.newInstance();
-			//sim.setContentDirectory(new File(location, sim.getName()));
-			sim.setHome(this);
-			sim.initialize();
-			sim.resetAction();
+			simClass = SimulationInfo.loadSimulationClass(info.getFile());
+		}
+		catch(ClassNotFoundException e)
+		{
+			e.printStackTrace();
+		}
+		catch(IOException e)
+		{
+			e.printStackTrace();
+		}
+		
+		try
+		{
+			System.out.println("Initializing " + simClass.toString());
+			try
+			{
+				final Simulation simulation = simClass.getDeclaredConstructor(SimulationInfo.class).newInstance(info);
+				
+				simulation.setHome(this);
+				simulation.initialize();
+				simulation.resetAction();
+			}
+			catch(IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e)
+			{
+				e.printStackTrace();
+			}
 		}
 		catch(InstantiationException e)
 		{
@@ -242,12 +213,11 @@ public class Home extends JFrame implements ListSelectionListener
 	public void valueChanged(ListSelectionEvent e)
 	{
 		this.run.setVisible(true);
-		Simulation s = (Simulation) simulationList.getSelectedValue();
-		this.name.setText(s.getName());
-		this.date.setText(s.getDate());
-		this.author.setText(s.getAuthor());
-		this.version.setText("v" + s.getVersion());
-		//this.description.setMaximumSize(new Dimension(100, 1000));
-		this.description.setText("<html><p>" + s.getDescription() + "</p></html>");
+		SimulationInfo info = (SimulationInfo) simulationList.getSelectedValue();
+		this.name.setText(info.getName());
+		this.date.setText(info.getDate());
+		this.author.setText(info.getAuthor());
+		this.version.setText("Version " + info.getVersion());
+		this.description.setText("<html><p>" + info.getDescription() + "</p></html>");
 	}
 }

@@ -8,7 +8,7 @@
     	"-Xmx1G"
     ],
     "resources": [
-        "/Users/mark/git/JavaSim/JavaSim/assets"
+        "/Users/mark/git/JavaSim/JavaSim/lib"
     ],
     "minimizejre": "soft",
     "outdir": "/Users/mark/git/JavaSim/JavaSim/dist/JavaSim.app"

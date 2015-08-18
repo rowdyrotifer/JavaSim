@@ -1,4 +1,4 @@
-package com.marklalor.javasim;
+package com.marklalor.javasim.text.filter;
 
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
