@@ -1,6 +1,7 @@
 package com.marklalor.javasim.simulation.frames.subframes;
 
 import com.marklalor.javasim.simulation.frames.Image;
+import com.marklalor.javasim.simulation.frames.ImageSubframe;
 
 public class Preferences extends ImageSubframe
 {

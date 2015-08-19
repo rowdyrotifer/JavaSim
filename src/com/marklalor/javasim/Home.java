@@ -14,13 +14,8 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -44,7 +39,7 @@ public class Home extends JFrame implements ListSelectionListener
 	public static File homeDirectory;
 	
 	private List<SimulationInfo> simulations;
-	private JList simulationList;
+	private JList<SimulationInfo> simulationList;
 	private JPanel simulationInfoPanel;
 	
 	private JLabel name, date, author, version, description;
@@ -86,12 +81,12 @@ public class Home extends JFrame implements ListSelectionListener
 		constraints.weighty = 1;
 		constraints.gridwidth = 2;
 		
-		DefaultListModel model = new DefaultListModel();
+		DefaultListModel<SimulationInfo> model = new DefaultListModel<SimulationInfo>();
 		if (simulations != null)
 			for(SimulationInfo info : simulations)
 				model.addElement(info);
 		
-		simulationList = new JList(model);
+		simulationList = new JList<SimulationInfo>(model);
 		Font listFont = simulationList.getFont();
 		simulationList.setFont(new Font(listFont.getName(), listFont.getStyle(), (int) (listFont.getSize()*1.50)));
 		simulationList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);

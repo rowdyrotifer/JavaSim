@@ -15,6 +15,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.marklalor.javasim.simulation.Simulation;
 import com.marklalor.javasim.simulation.frames.Image;
+import com.marklalor.javasim.simulation.frames.ImageSubframe;
 
 public class Animate extends ImageSubframe
 {
@@ -193,6 +194,8 @@ public class Animate extends ImageSubframe
 		this.add(p6);
 		
 		pack();
+		
+		this.setResizable(false);
 
 		getRootPane().setDefaultButton(animate);
 		animate.requestFocus();

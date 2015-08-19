@@ -46,6 +46,7 @@ import com.marklalor.javasim.imaging.TransferableImage;
 import com.marklalor.javasim.simulation.frames.Image;
 import com.marklalor.javasim.simulation.frames.subframes.Animate;
 import com.marklalor.javasim.simulation.frames.subframes.Control;
+import com.marklalor.javasim.simulation.frames.subframes.Resize;
 
 public abstract class Simulation implements ActionListener, ClipboardOwner
 {
@@ -66,6 +67,7 @@ public abstract class Simulation implements ActionListener, ClipboardOwner
 	
 	// Other Frames
 	private Animate animate;
+	private Resize resize;
 	
 	// Relating to the image
 	private BufferedImage permanentImage, temporaryImage, combinedImage;
@@ -119,15 +121,17 @@ public abstract class Simulation implements ActionListener, ClipboardOwner
 		
 		image = new Image(this);
 		refreshTitle();
+		image.pack();
 		image.setSize(DEFAULT_IMAGE_WIDTH, DEFAULT_IMAGE_HEIGHT);
 		image.setLocationRelativeTo(null);
 		
 		control = new Control(image);
 		control.setSize(DEFAULT_CONTROL_WIDTH, DEFAULT_CONTROL_HEIGHT);
-		control.setLocationRelativeTo(this.getImage());
-		control.setLocation(this.getControl().getLocation().x - (this.getImage().getWidth() / 2) - (this.getControl().getWidth() / 2), this.getImage().getY());
+		control.setLocationRelativeTo(getImage());
+		control.setLocation(getControl().getLocation().x - (getImage().getWidth() / 2) - (getControl().getWidth() / 2), getImage().getY());
 		
-		animate = new Animate(image);
+		animate = new Animate(getImage());
+		resize = new Resize(getImage());
 		
 		timer = new Timer(10, new ActionListener()
 		{
@@ -231,13 +235,13 @@ public abstract class Simulation implements ActionListener, ClipboardOwner
 	// Menu Items
 	private JMenuBar menuBar;
 	private JMenu file;
-	private JMenuItem newSimulation, saveImage, saveImageAs, createGif, openHomeFolder, openContentFolder, closeSimulation, openProperties;
+	private JMenuItem newSimulation, saveImage, saveImageAs, animateMenuItem, openHomeFolder, openContentFolder, closeSimulation, openProperties;
 	private JMenu edit;
 	private JMenuItem copy;
 	private JMenu animation;
 	private JMenuItem play, playUntilBreakpoint, stop, nextFrame, decreaseSpeed, increaseSpeed;
 	private JMenu simulation;
-	private JMenuItem reset, resize;
+	private JMenuItem reset, resizeMenuItem;
 	
 	public void setupMenu()
 	{
@@ -266,10 +270,10 @@ public abstract class Simulation implements ActionListener, ClipboardOwner
 		file.add(saveImageAs);
 		
 		// Create Animated Gif – Command + I
-		createGif = new JMenuItem("Created Animated Gif");
-		createGif.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_I, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-		createGif.addActionListener(this);
-		file.add(createGif);
+		animateMenuItem = new JMenuItem("Created Animated Gif");
+		animateMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_I, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+		animateMenuItem.addActionListener(this);
+		file.add(animateMenuItem);
 		
 		file.addSeparator();
 		
@@ -390,11 +394,11 @@ public abstract class Simulation implements ActionListener, ClipboardOwner
 		simulation.addSeparator();
 		
 		// Resize – No Shortcut
-		resize = new JMenuItem("Resize");
+		resizeMenuItem = new JMenuItem("Resize");
 		// resize.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R,
 		// Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-		resize.addActionListener(this);
-		simulation.add(resize);
+		resizeMenuItem.addActionListener(this);
+		simulation.add(resizeMenuItem);
 		
 		menuBar.add(simulation);
 		
@@ -418,7 +422,7 @@ public abstract class Simulation implements ActionListener, ClipboardOwner
 		{
 			
 		}
-		else if(e.getSource() == createGif)
+		else if(e.getSource() == animateMenuItem)
 		{
 			animate.setLocationRelativeTo(getImage());
 			animate.setVisible(true);
@@ -493,6 +497,11 @@ public abstract class Simulation implements ActionListener, ClipboardOwner
 		else if(e.getSource() == reset)
 		{
 			resetAction();
+		}
+		else if (e.getSource() == resizeMenuItem)
+		{
+			resize.setLocationRelativeTo(getImage());
+			resize.setVisible(true);
 		}
 	}
 	
