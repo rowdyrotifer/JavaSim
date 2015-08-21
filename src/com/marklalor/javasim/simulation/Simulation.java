@@ -16,12 +16,9 @@ import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.WritableRaster;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -35,8 +32,6 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.KeyStroke;
 import javax.swing.Timer;
-
-import org.json.JSONObject;
 
 import apple.dts.samplecode.osxadapter.OSXAdapter;
 
@@ -235,7 +230,7 @@ public abstract class Simulation implements ActionListener, ClipboardOwner
 	// Menu Items
 	private JMenuBar menuBar;
 	private JMenu file;
-	private JMenuItem newSimulation, saveImage, saveImageAs, animateMenuItem, openHomeFolder, openContentFolder, closeSimulation, openProperties;
+	private JMenuItem newSimulation, reloadSimulation, saveImage, saveImageAs, animateMenuItem, openHomeFolder, openContentFolder, closeSimulation, openProperties;
 	private JMenu edit;
 	private JMenuItem copy;
 	private JMenu animation;
@@ -391,6 +386,12 @@ public abstract class Simulation implements ActionListener, ClipboardOwner
 		reset.addActionListener(this);
 		simulation.add(reset);
 		
+		// Reload Simulation – F5
+		reloadSimulation = new JMenuItem("Reload");
+		reloadSimulation.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F5, 0));
+		reloadSimulation.addActionListener(this);
+		simulation.add(reloadSimulation);
+		
 		simulation.addSeparator();
 		
 		// Resize – No Shortcut
@@ -498,6 +499,11 @@ public abstract class Simulation implements ActionListener, ClipboardOwner
 		{
 			resetAction();
 		}
+		else if(e.getSource() == reloadSimulation)
+		{
+			getHome().run(info);
+			delete();
+		}
 		else if (e.getSource() == resizeMenuItem)
 		{
 			resize.setLocationRelativeTo(getImage());
@@ -518,7 +524,8 @@ public abstract class Simulation implements ActionListener, ClipboardOwner
 	{
 		setN(0);
 		reset();
-		getImage().paintImage(permanentImage);
+		combinedImage = permanentImage;
+		getImage().paintImage();
 	}
 	
 	private void calculateHertz()
@@ -615,7 +622,7 @@ public abstract class Simulation implements ActionListener, ClipboardOwner
 		combinedGraphics.drawImage(permanentImage, 0, 0, null, null);
 		combinedGraphics.drawImage(temporaryImage, 0, 0, null, null);
 		
-		image.paintImage(combinedImage);
+		image.paintImage();
 	}
 	
 	public BufferedImage getCurrentImage()

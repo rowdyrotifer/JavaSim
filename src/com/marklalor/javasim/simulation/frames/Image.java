@@ -6,7 +6,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.geom.Point2D;
-import java.awt.image.BufferedImage;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -22,7 +21,6 @@ public class Image extends JFrame
 	//Draggable behavior
 	private boolean draggable = false;
 	private Point2D origin = null;
-	private BufferedImage paintImage;
 	
 	private ImageJPanel imagePanel;
 	
@@ -84,7 +82,7 @@ public class Image extends JFrame
 		super.setSize(width, height + getInsets().top);
 	}
 	
-	public void paintImage(BufferedImage paintImage)
+	public void paintImage()
 	{
 		repaint();
 	}
