@@ -267,7 +267,7 @@ public abstract class Simulation implements ActionListener, ClipboardOwner
 		file.add(saveImageAs);
 		
 		// Create Animated Gif – Command + I
-		animateMenuItem = new JMenuItem("Created Animated Gif");
+		animateMenuItem = new JMenuItem("Create Animated Gif");
 		animateMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_I, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		animateMenuItem.addActionListener(this);
 		file.add(animateMenuItem);
