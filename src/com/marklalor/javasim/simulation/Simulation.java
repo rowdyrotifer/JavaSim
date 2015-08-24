@@ -26,12 +26,14 @@ import javax.imageio.IIOException;
 import javax.imageio.ImageIO;
 import javax.imageio.stream.FileImageOutputStream;
 import javax.imageio.stream.ImageOutputStream;
+import javax.swing.JFileChooser;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.KeyStroke;
 import javax.swing.Timer;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import apple.dts.samplecode.osxadapter.OSXAdapter;
 
@@ -417,11 +419,11 @@ public abstract class Simulation implements ActionListener, ClipboardOwner
 		}
 		else if(e.getSource() == saveImage)
 		{
-			save(new File(getContentDirectory(), "frame_" + getTimestamp() + ".png"));
+			save(getDefaultFile());
 		}
 		else if(e.getSource() == saveImageAs)
 		{
-			
+			saveAs();
 		}
 		else if(e.getSource() == animateMenuItem)
 		{
@@ -536,6 +538,25 @@ public abstract class Simulation implements ActionListener, ClipboardOwner
 	
 	private static final int changeInSpeed = 10; // TODO: maybe make this scale in some way to accommodate for the 1/x behavior.
 	
+	private File getDefaultFile()
+	{
+		return new File(getContentDirectory(), "frame_" + getTimestamp() + ".png");
+	}
+	
+	private void saveAs()
+	{
+		JFileChooser chooser = new JFileChooser();
+		chooser.setFileFilter(new FileNameExtensionFilter("PNG Images", "png"));
+		chooser.setSelectedFile(getDefaultFile());
+        if (chooser.showSaveDialog(getImage()) == JFileChooser.APPROVE_OPTION)
+        {
+        	String file = chooser.getSelectedFile().getAbsolutePath();
+        	if (!chooser.getSelectedFile().getName().contains("."))
+        		file += ".png";
+            save(new File(file));
+        }
+	}
+	
 	private void save(File file)
 	{
 		try
@@ -623,6 +644,16 @@ public abstract class Simulation implements ActionListener, ClipboardOwner
 		combinedGraphics.drawImage(temporaryImage, 0, 0, null, null);
 		
 		image.paintImage();
+	}
+	
+	public BufferedImage getPermanentImage()
+	{
+		return permanentImage;
+	}
+	
+	public BufferedImage getTemporaryImage()
+	{
+		return temporaryImage;
 	}
 	
 	public BufferedImage getCurrentImage()

@@ -50,6 +50,7 @@ public class SimulationInfo implements Serializable
 
 		URL[] urls = { new URL("jar:file:" + file.getAbsolutePath() +"!/") };
 		URLClassLoader cl = URLClassLoader.newInstance(urls);
+		Class<? extends Simulation> returnClass = null;
 
 	    while (e.hasMoreElements())
 	    {
@@ -62,19 +63,16 @@ public class SimulationInfo implements Serializable
 		    
 		    //Load it and return it if it's a simulation.
 		    Class<?> simClass = cl.loadClass(className);
+		    
 		    if (Simulation.class.isAssignableFrom(simClass))
 		    {
-		    	jarFile.close();
-		    	cl.close();
-		    	return (Class<? extends Simulation>) simClass;
+		    	returnClass = (Class<? extends Simulation>) simClass;
 		    }
 	    }
 	    
-	    
-	    System.out.println(file.getAbsolutePath() + " did not contain a Simulation!");
 	    cl.close();
 	    jarFile.close();
-		return null;
+		return returnClass;
 	}
 	
 	private void setData(File file, String main, String name, String date, String author, String version, String description)
