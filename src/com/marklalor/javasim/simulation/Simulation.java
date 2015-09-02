@@ -44,11 +44,14 @@ import com.marklalor.javasim.simulation.frames.Image;
 import com.marklalor.javasim.simulation.frames.subframes.Animate;
 import com.marklalor.javasim.simulation.frames.subframes.Control;
 import com.marklalor.javasim.simulation.frames.subframes.Resize;
+import com.marklalor.javasim.text.Console;
 
 public abstract class Simulation implements ActionListener, ClipboardOwner
 {
 	public static final int DEFAULT_IMAGE_WIDTH = 500, DEFAULT_IMAGE_HEIGHT = 500;
 	public static final int DEFAULT_CONTROL_WIDTH = 100, DEFAULT_CONTROL_HEIGHT = 500;
+	public static final int DEFAULT_CONSOLE_WIDTH = 400, DEFAULT_CONSOLE_HEIGHT = 500;
+	
 	public int imgType = BufferedImage.TYPE_INT_ARGB;
 	
 	public static boolean IS_MAC_OS_X = System.getProperty("os.name").toLowerCase().startsWith("mac os x");
@@ -71,7 +74,7 @@ public abstract class Simulation implements ActionListener, ClipboardOwner
 	private int width, height;
 	
 	// Timer
-	private Timer timer;
+	private Timer timerManual;
 	// For finding refresh rate
 	private int hertz = 0;
 	private long startTime;
@@ -83,54 +86,60 @@ public abstract class Simulation implements ActionListener, ClipboardOwner
 	private boolean stopForBreakpoint = false;
 	
 	// Animation
-	private Timer animationTimer;
+	private Timer timerAnimation;
 	private ImageOutputStream animationOut;
 	private GifSequenceWriter animationWriter;
 	
+	//Simulation features.
 	public abstract void initialize();
 	public abstract void reset(Graphics2D permanent);
 	public abstract void draw(Graphics2D permanent, Graphics2D temporary);
 	public abstract void click(Point point);
 	
+	//Simulation N (frame) variable.
 	private int n = 0;
+	public int getN() { return this.n; }
+	public void setN(int n) { this.n = n; }
+	public void incrementN() { this.n++; }
 	
-	public int getN()
+	public void javaSimInitialize(SimulationInfo info)
 	{
-		return n;
-	}
-	
-	public void setN(int n)
-	{
-		this.n = n;
-	}
-	
-	public void incrementN()
-	{
-		this.n++;
-	}
-	
-	public Simulation(SimulationInfo info)
-	{
+		//Don't allow anyone to use this method a second time… just, no.
+		if (this.info != null)
+			throw new RuntimeException("Do not call method com.marklalor.javasim.simulation.Simulation#javaSimInitialize more than once (it is called once automatically by JavaSim Home)");
+		
+		//Inherit the info read from its file earlier.
 		this.info = info;
 		
+		//Set the simulation's content directory and (make sure it exists)
 		contentDirectory = new File(Home.homeDirectory, info.getName());
 		contentDirectory.mkdirs();
 		
+		//Create and set up the main image that goes with this simulation.
 		image = new Image(this);
-		refreshTitle();
 		image.pack();
 		image.setSize(DEFAULT_IMAGE_WIDTH, DEFAULT_IMAGE_HEIGHT);
 		image.setLocationRelativeTo(null);
+		refreshTitle();
 		
-		control = new Control(image);
+		//Create and set up the main control panel for this simulation.
+		control = new Control(getImage());
 		control.setSize(DEFAULT_CONTROL_WIDTH, DEFAULT_CONTROL_HEIGHT);
 		control.setLocationRelativeTo(getImage());
 		control.setLocation(getControl().getLocation().x - (getImage().getWidth() / 2) - (getControl().getWidth() / 2), getImage().getY());
 		
+		//Main console setup.
+		getHome().getConsole().getFrame().setSize(DEFAULT_CONSOLE_WIDTH, DEFAULT_CONSOLE_HEIGHT);
+		getHome().getConsole().getFrame().setLocationRelativeTo(getImage());
+		getHome().getConsole().getFrame().setLocation(getHome().getConsole().getFrame().getLocation().x + (getImage().getWidth() / 2) + (getHome().getConsole().getFrame().getWidth() / 2), getImage().getY());
+		
+		
+		//Other dialogs.
 		animate = new Animate(getImage());
 		resize = new Resize(getImage());
 		
-		timer = new Timer(10, new ActionListener()
+		//Make the general, manual animation timer.
+		timerManual = new Timer(10, new ActionListener()
 		{
 			@Override
 			public void actionPerformed(ActionEvent e)
@@ -138,6 +147,42 @@ public abstract class Simulation implements ActionListener, ClipboardOwner
 				incrementN();
 				draw();
 				hertzCheck();
+			}
+		});
+		
+		//Make the special, animation window timer.
+		timerAnimation = new Timer(0, new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{	
+				draw();
+				hertzCheck();
+				int delay = 0;
+				if (getN() == animate.getStartFrame())
+					delay = animate.getStartDelay();
+				if (getN() != animate.getStopFrame() && getN() != animate.getStartFrame())
+					delay = animate.getFrameDelay();
+				if  (getN() == animate.getStopFrame() || !timerAnimation.isRunning())
+					delay = animate.getStopDelay();
+				
+				if (getN() % animate.getSaveEvery() == 0 || 
+						getN() == animate.getStartFrame() || 
+						getN() == animate.getStopFrame() || 
+						!timerAnimation.isRunning())
+					try
+					{
+						animationWriter.writeToSequence(combinedImage, delay);
+					}
+					catch(IOException e1)
+					{
+						e1.printStackTrace();
+					}
+				
+				if (getN() == animate.getStopFrame())
+					stop();
+				
+				incrementN();
 			}
 		});
 		
@@ -154,46 +199,14 @@ public abstract class Simulation implements ActionListener, ClipboardOwner
 			}
 		});
 		
-		animationTimer = new Timer(0, new ActionListener()
-		{
-			@Override
-			public void actionPerformed(ActionEvent e)
-			{	
-				draw();
-				hertzCheck();
-				int delay = 0;
-				if (getN() == animate.getStartFrame())
-					delay = animate.getStartDelay();
-				if (getN() != animate.getStopFrame() && getN() != animate.getStartFrame())
-					delay = animate.getFrameDelay();
-				if  (getN() == animate.getStopFrame() || !animationTimer.isRunning())
-					delay = animate.getStopDelay();
-				
-				if (getN() % animate.getSaveEvery() == 0 || 
-						getN() == animate.getStartFrame() || 
-						getN() == animate.getStopFrame() || 
-						!animationTimer.isRunning())
-					try
-					{
-						animationWriter.writeToSequence(combinedImage, delay);
-					}
-					catch(IOException e1)
-					{
-						e1.printStackTrace();
-					}
-				
-				if (getN() == animate.getStopFrame())
-					stop();
-				
-				
-				incrementN();
-			}
-		});
-		
+		//Set up the JMenuBar
 		setupMenu();
 		
+		//Set sizes to the default dimensions
 		setWidth(DEFAULT_IMAGE_WIDTH);
 		setHeight(DEFAULT_IMAGE_HEIGHT);
+		
+		//
 		setupGraphics();
 	}
 	
@@ -238,7 +251,7 @@ public abstract class Simulation implements ActionListener, ClipboardOwner
 	private JMenu animation;
 	private JMenuItem play, playUntilBreakpoint, stop, nextFrame, decreaseSpeed, increaseSpeed;
 	private JMenu simulation;
-	private JMenuItem reset, resizeMenuItem;
+	private JMenuItem reset, resizeMenuItem, showConsole;
 	
 	public void setupMenu()
 	{
@@ -403,6 +416,12 @@ public abstract class Simulation implements ActionListener, ClipboardOwner
 		resizeMenuItem.addActionListener(this);
 		simulation.add(resizeMenuItem);
 		
+		// Show Console – Command + J
+		showConsole = new JMenuItem("Show Console");
+		showConsole.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_J, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+		showConsole.addActionListener(this);
+		simulation.add(showConsole);
+		
 		menuBar.add(simulation);
 		
 		getImage().setJMenuBar(menuBar);
@@ -411,11 +430,11 @@ public abstract class Simulation implements ActionListener, ClipboardOwner
 	@Override
 	public void actionPerformed(ActionEvent e)
 	{
-		System.out.println(((JMenu) ((JPopupMenu) ((JMenuItem) e.getSource()).getParent()).getInvoker()).getText() + " → " + ((JMenuItem) e.getSource()).getText());
+		System.out.println("[MENU] " + ((JMenu) ((JPopupMenu) ((JMenuItem) e.getSource()).getParent()).getInvoker()).getText() + " → " + ((JMenuItem) e.getSource()).getText());
 		
 		if(e.getSource() == newSimulation)
 		{
-			getHome().run(info);
+			Home.run(getHome(), info);
 		}
 		else if(e.getSource() == saveImage)
 		{
@@ -485,17 +504,17 @@ public abstract class Simulation implements ActionListener, ClipboardOwner
 		}
 		else if(e.getSource() == decreaseSpeed)
 		{
-			timer.setDelay(timer.getDelay() + changeInSpeed);
+			timerManual.setDelay(timerManual.getDelay() + changeInSpeed);
 			hertz = -1;
 			calculateHertz();
-			System.out.println(timer.getDelay());
+			System.out.println(timerManual.getDelay());
 		}
 		else if(e.getSource() == increaseSpeed)
 		{
-			timer.setDelay(timer.getDelay() - changeInSpeed >= 1 ? timer.getDelay() - changeInSpeed : 1);
+			timerManual.setDelay(timerManual.getDelay() - changeInSpeed >= 1 ? timerManual.getDelay() - changeInSpeed : 1);
 			hertz = -1;
 			calculateHertz();
-			System.out.println(timer.getDelay());
+			System.out.println(timerManual.getDelay());
 		}
 		else if(e.getSource() == reset)
 		{
@@ -503,13 +522,17 @@ public abstract class Simulation implements ActionListener, ClipboardOwner
 		}
 		else if(e.getSource() == reloadSimulation)
 		{
-			getHome().run(info);
+			Home.run(getHome(), info);
 			delete();
 		}
 		else if (e.getSource() == resizeMenuItem)
 		{
 			resize.setLocationRelativeTo(getImage());
 			resize.setVisible(true);
+		}
+		else if (e.getSource() == showConsole)
+		{
+			getHome().getConsole().setVisible(true);
 		}
 	}
 	
@@ -592,7 +615,7 @@ public abstract class Simulation implements ActionListener, ClipboardOwner
 			e.printStackTrace();
 		}
 		
-		animationTimer.start();
+		timerAnimation.start();
 	}
 	
 	public void animationComplete()
@@ -607,8 +630,8 @@ public abstract class Simulation implements ActionListener, ClipboardOwner
 	
 	public void play()
 	{
-		if(!timer.isRunning())
-			timer.start();
+		if(!timerManual.isRunning())
+			timerManual.start();
 	}
 	
 	public void stop()
@@ -618,12 +641,12 @@ public abstract class Simulation implements ActionListener, ClipboardOwner
 		hertz = 0;
 		refreshTitle();
 		//Things for the user-controlled timer.
-		if(timer.isRunning())
-			timer.stop();
+		if(timerManual.isRunning())
+			timerManual.stop();
 		//Things for the animator-controlled timer.
-		if (animationTimer.isRunning())
+		if (timerAnimation.isRunning())
 		{
-			animationTimer.stop();
+			timerAnimation.stop();
 			animationComplete();
 		}
 	}
@@ -678,6 +701,7 @@ public abstract class Simulation implements ActionListener, ClipboardOwner
 	{
 		getImage().dispose();
 		getControl().dispose();
+		getHome().getConsole().getFrame().setVisible(false);
 	}
 	
 	public void breakpoint()
@@ -721,21 +745,43 @@ public abstract class Simulation implements ActionListener, ClipboardOwner
 		return contentDirectory;
 	}
 	
+	/**
+	 * Sets the width of the simulation so that the
+	 * image becomes the specified size (not the window).
+	 * @param width The desired image width, in pixels.
+	 */
 	public void setWidth(int width)
 	{
+		getImage().setSize(width, getImage().getHeight());
 		this.width = width;
 	}
 	
+	/**
+	 * Gets the width of the underlying
+	 * image for the simulation.
+	 * @return The simulation image width, in pixels.
+	 */
 	public int getWidth()
 	{
 		return width;
 	}
 	
+	/**
+	 * Sets the height of the simulation so that the
+	 * image becomes the specified size (not the window).
+	 * @param width The desired image height, in pixels.
+	 */
 	public void setHeight(int height)
 	{
+		getImage().setSize(getImage().getWidth(), height);
 		this.height = height;
 	}
 	
+	/**
+	 * Gets the height of the underlying
+	 * image for the simulation.
+	 * @return The simulation image height, in pixels.
+	 */
 	public int getHeight()
 	{
 		return height;

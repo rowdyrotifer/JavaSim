@@ -28,6 +28,7 @@ public class ImageSubframe extends JDialog
 		return image;
 	}
 	
+	
 	public static final int FILTER_NONE = -1;
 	public static final int FILTER_INTEGER = 0;
 	

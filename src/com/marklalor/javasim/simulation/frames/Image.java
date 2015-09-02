@@ -76,6 +76,7 @@ public class Image extends JFrame
 		return draggable;
 	}
 	
+	//Set size making sure the top inset is considered.
 	@Override
 	public void setSize(int width, int height)
 	{
@@ -87,6 +88,7 @@ public class Image extends JFrame
 		repaint();
 	}
 	
+	//Drawing panel:
 	private class ImageJPanel extends JPanel
 	{
 		private static final long serialVersionUID = -6540125631576837932L;

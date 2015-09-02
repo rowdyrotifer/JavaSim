@@ -13,7 +13,6 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,12 +30,13 @@ import javax.swing.event.ListSelectionListener;
 
 import com.marklalor.javasim.simulation.Simulation;
 import com.marklalor.javasim.simulation.SimulationInfo;
+import com.marklalor.javasim.text.Console;
 
 public class Home extends JFrame implements ListSelectionListener
 {
 	private static final long serialVersionUID = 6321955323521519657L;
 	
-	public static File homeDirectory;
+	public static File homeDirectory; //TODO: just make this un-static, shouldn't be needed
 	
 	private List<SimulationInfo> simulations;
 	private JList<SimulationInfo> simulationList;
@@ -45,9 +45,12 @@ public class Home extends JFrame implements ListSelectionListener
 	private JLabel name, date, author, version, description;
 	private JButton run;
 	
+	private Console console;
+	
 	public Home(File location)
 	{
 		Home.homeDirectory = location;
+		console = new Console();
 		loadSimulations();
 		setupLayout();
 		simulationList.setSelectedIndex(0);
@@ -156,10 +159,10 @@ public class Home extends JFrame implements ListSelectionListener
 	
 	private void runSelected()
 	{
-		run((SimulationInfo) simulationList.getSelectedValue());
+		run(this, (SimulationInfo) simulationList.getSelectedValue());
 	}
 	
-	public void run(SimulationInfo info)
+	public static void run(Home home, SimulationInfo info)
 	{
 		System.out.println("Running " + info.getName());
 		
@@ -183,13 +186,14 @@ public class Home extends JFrame implements ListSelectionListener
 			System.out.println("Initializing " + simClass.toString());
 			try
 			{
-				final Simulation simulation = simClass.getDeclaredConstructor(SimulationInfo.class).newInstance(info);
-				
-				simulation.setHome(this);
+				//final Simulation simulation = simClass.getDeclaredConstructor(SimulationInfo.class).newInstance(info);
+				final Simulation simulation = simClass.newInstance();
+				simulation.setHome(home);
+				simulation.javaSimInitialize(info);
 				simulation.initialize();
 				simulation.resetAction();
 			}
-			catch(IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e)
+			catch(IllegalArgumentException |  SecurityException e)//InvocationTargetException | NoSuchMethodException |
 			{
 				e.printStackTrace();
 			}
@@ -202,6 +206,11 @@ public class Home extends JFrame implements ListSelectionListener
 		{
 			e.printStackTrace();
 		}
+	}
+	
+	public Console getConsole()
+	{
+		return console;
 	}
 	
 	@Override
