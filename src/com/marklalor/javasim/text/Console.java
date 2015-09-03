@@ -5,9 +5,12 @@ package com.marklalor.javasim.text;
 //
 // Disclaimer the use of this source is at your own risk. 
 //
-// Permision to use and distribute into your own applications
+// Permission to use and distribute into your own applications
 //
 // RJHM van den Bergh , rvdb@comweb.nl
+//
+// Modified by Mark Lalor
+//
 
 import java.io.*;
 import java.awt.*;

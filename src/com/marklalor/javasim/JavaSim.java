@@ -1,14 +1,9 @@
 package com.marklalor.javasim;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.logging.ConsoleHandler;
 
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
-
-import com.marklalor.javasim.simulation.SimulationInfo;
-import com.marklalor.javasim.text.Console;
 
 public class JavaSim
 {

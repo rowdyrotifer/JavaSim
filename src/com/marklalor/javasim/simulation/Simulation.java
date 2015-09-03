@@ -1,6 +1,5 @@
 package com.marklalor.javasim.simulation;
 
-import java.awt.Desktop;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Toolkit;
@@ -11,8 +10,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.WritableRaster;
@@ -20,23 +19,21 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.imageio.IIOException;
 import javax.imageio.ImageIO;
 import javax.imageio.stream.FileImageOutputStream;
 import javax.imageio.stream.ImageOutputStream;
 import javax.swing.JFileChooser;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
-import javax.swing.KeyStroke;
+import javax.swing.JFrame;
 import javax.swing.Timer;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import apple.dts.samplecode.osxadapter.OSXAdapter;
-
+import com.apple.eawt.Application;
+import com.apple.eawt.FullScreenUtilities;
 import com.marklalor.javasim.Home;
 import com.marklalor.javasim.imaging.GifSequenceWriter;
 import com.marklalor.javasim.imaging.TransferableImage;
@@ -44,9 +41,8 @@ import com.marklalor.javasim.simulation.frames.Image;
 import com.marklalor.javasim.simulation.frames.subframes.Animate;
 import com.marklalor.javasim.simulation.frames.subframes.Control;
 import com.marklalor.javasim.simulation.frames.subframes.Resize;
-import com.marklalor.javasim.text.Console;
 
-public abstract class Simulation implements ActionListener, ClipboardOwner
+public abstract class Simulation implements ClipboardOwner
 {
 	public static final int DEFAULT_IMAGE_WIDTH = 500, DEFAULT_IMAGE_HEIGHT = 500;
 	public static final int DEFAULT_CONTROL_WIDTH = 100, DEFAULT_CONTROL_HEIGHT = 500;
@@ -60,6 +56,11 @@ public abstract class Simulation implements ActionListener, ClipboardOwner
 	private SimulationInfo info;
 	
 	private File contentDirectory;
+	
+	private boolean fullscreen = false;
+	
+	//Misc Main stucture;
+	private List<Menu> menus; //give every window a copy of the menu, this gets around issues with JDialog's incapability to properly handle its parent menu's accelerators…
 	
 	// Main Frames
 	private Image image;
@@ -128,11 +129,10 @@ public abstract class Simulation implements ActionListener, ClipboardOwner
 		control.setLocationRelativeTo(getImage());
 		control.setLocation(getControl().getLocation().x - (getImage().getWidth() / 2) - (getControl().getWidth() / 2), getImage().getY());
 		
-		//Main console setup.
+		//Reposition the console.
 		getHome().getConsole().getFrame().setSize(DEFAULT_CONSOLE_WIDTH, DEFAULT_CONSOLE_HEIGHT);
 		getHome().getConsole().getFrame().setLocationRelativeTo(getImage());
 		getHome().getConsole().getFrame().setLocation(getHome().getConsole().getFrame().getLocation().x + (getImage().getWidth() / 2) + (getHome().getConsole().getFrame().getWidth() / 2), getImage().getY());
-		
 		
 		//Other dialogs.
 		animate = new Animate(getImage());
@@ -194,20 +194,73 @@ public abstract class Simulation implements ActionListener, ClipboardOwner
 				super.componentResized(e);
 				height = getImage().getHeight() - getImage().getInsets().top;
 				width = getImage().getWidth();
-				setupGraphics();
+				setUpGraphics();
 				resetAction();
 			}
 		});
 		
-		//Set up the JMenuBar
-		setupMenu();
+//		//Set up the JMenuBar
+//		menu = new Menu(this);
+//		getImage().setJMenuBar(menu.getMenuBar());
+//		
+//		menu2 = new Menu(this);
+//		getAnimate().setJMenuBar(menu2.getMenuBar());
+		
+		menus = new ArrayList<Menu>();
+		addMenuTo(getImage());
+		addMenuTo(getAnimate());
+		addMenuTo(getResize());
+		addMenuTo(home.getConsole().getFrame());
 		
 		//Set sizes to the default dimensions
 		setWidth(DEFAULT_IMAGE_WIDTH);
 		setHeight(DEFAULT_IMAGE_HEIGHT);
 		
-		//
-		setupGraphics();
+		//OS X fullscreen support:
+		FullScreenUtilities.setWindowCanFullScreen(getImage(),true);
+		//Allow esc key to... well... escape fullscreen
+		getImage().addKeyListener(new KeyListener()
+		{	
+			@Override public void keyTyped(KeyEvent e) { }
+			@Override public void keyReleased(KeyEvent e) { }
+			
+			@Override
+			public void keyPressed(KeyEvent e)
+			{
+				if (e.getKeyCode() == KeyEvent.VK_ESCAPE)
+					Simulation.this.setFullscreen(false);
+			}
+		});
+	
+		//Set up graphics.
+		setUpGraphics();
+	}
+	
+
+	private void setFullscreen(boolean fullscreen)
+	{
+		if (this.fullscreen != fullscreen)
+		{
+			if (Simulation.IS_MAC_OS_X)
+				Application.getApplication().requestToggleFullScreen(getImage());
+			
+			this.fullscreen = fullscreen;
+		}
+	}
+	
+	public void toggleFullscreen()
+	{	
+		if (Simulation.IS_MAC_OS_X)
+			Application.getApplication().requestToggleFullScreen(getImage());
+		
+		this.fullscreen = !this.fullscreen;
+	}
+	
+	private void addMenuTo(JFrame frame)
+	{
+		Menu menu = new Menu(this, frame);
+		menus.add(menu);
+		frame.setJMenuBar(menu.getMenuBar());
 	}
 	
 	private void hertzCheck()
@@ -237,306 +290,12 @@ public abstract class Simulation implements ActionListener, ClipboardOwner
 		image.setTitle(info.getName() + " – " + info.getAuthor() + " at " + (hertz == -1 ? "?" : hertz) + " Hz");
 	}
 	
-	private void setupGraphics()
+	private void setUpGraphics()
 	{
 		permanentImage = new BufferedImage(width, height, imgType);
 	}
 	
-	// Menu Items
-	private JMenuBar menuBar;
-	private JMenu file;
-	private JMenuItem newSimulation, reloadSimulation, saveImage, saveImageAs, animateMenuItem, openHomeFolder, openContentFolder, closeSimulation, openProperties;
-	private JMenu edit;
-	private JMenuItem copy;
-	private JMenu animation;
-	private JMenuItem play, playUntilBreakpoint, stop, nextFrame, decreaseSpeed, increaseSpeed;
-	private JMenu simulation;
-	private JMenuItem reset, resizeMenuItem, showConsole;
-	
-	public void setupMenu()
-	{
-		menuBar = new JMenuBar();
-		
-		file = new JMenu("File");
-		
-		// New Simulation – Command + N
-		newSimulation = new JMenuItem("New " + info.getName());
-		newSimulation.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-		newSimulation.addActionListener(this);
-		file.add(newSimulation);
-		
-		file.addSeparator();
-		
-		// Save – Command + S
-		saveImage = new JMenuItem("Save Current Image");
-		saveImage.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-		saveImage.addActionListener(this);
-		file.add(saveImage);
-		
-		// Save As – Command + Shift + S
-		saveImageAs = new JMenuItem("Save Current Image As…");
-		saveImageAs.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, (Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | InputEvent.SHIFT_MASK)));
-		saveImageAs.addActionListener(this);
-		file.add(saveImageAs);
-		
-		// Create Animated Gif – Command + I
-		animateMenuItem = new JMenuItem("Create Animated Gif");
-		animateMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_I, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-		animateMenuItem.addActionListener(this);
-		file.add(animateMenuItem);
-		
-		file.addSeparator();
-		
-		// Open Content Folder – Command + M
-		openContentFolder = new JMenuItem("Open Content Folder");
-		openContentFolder.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-		openContentFolder.addActionListener(this);
-		file.add(openContentFolder);
-		
-		// Open Home Folder – Command + Shift + M
-		openHomeFolder = new JMenuItem("Open Home Folder");
-		openHomeFolder.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, (Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | InputEvent.SHIFT_MASK)));
-		openHomeFolder.addActionListener(this);
-		file.add(openHomeFolder);
-		
-		file.addSeparator();
-		
-		// Close – Command + W
-		closeSimulation = new JMenuItem("Close Simulation");
-		closeSimulation.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-		closeSimulation.addActionListener(this);
-		file.add(closeSimulation);
-		
-		if(IS_MAC_OS_X)
-		{
-			try
-			{
-				// for (Method f : getClass().getMethods())
-				// System.out.println(f.getName());
-				OSXAdapter.setPreferencesHandler(this, getClass().getMethod("openPreferences", (Class[]) null));
-				OSXAdapter.setQuitHandler(this, getClass().getMethod("delete", (Class[]) null));
-			}
-			catch(SecurityException e)
-			{
-				e.printStackTrace();
-			}
-			catch(NoSuchMethodException e)
-			{
-				e.printStackTrace();
-			}
-		}
-		else
-		{
-			file.addSeparator();
-			
-			// Properties – No Shortcut
-			openProperties = new JMenuItem("Properties");
-			// openProperties.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W,
-			// Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() ));
-			openProperties.addActionListener(this);
-			file.add(openProperties);
-		}
-		
-		menuBar.add(file);
-		
-		edit = new JMenu("Edit");
-		
-		// Copy – Command + C
-		copy = new JMenuItem("Copy");
-		copy.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-		copy.addActionListener(this);
-		edit.add(copy);
-		
-		menuBar.add(edit);
-		
-		animation = new JMenu("Animation");
-		
-		// Play – Command + P
-		play = new JMenuItem("Play");
-		play.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-		play.addActionListener(this);
-		animation.add(play);
-		
-		// Play Until Breakpoint – Command + Shift + P
-		playUntilBreakpoint = new JMenuItem("Play Until Breakpoint");
-		playUntilBreakpoint.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, (Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() + InputEvent.SHIFT_MASK)));
-		playUntilBreakpoint.addActionListener(this);
-		animation.add(playUntilBreakpoint);
-		
-		// Pause – Command + .
-		stop = new JMenuItem("Stop");
-		stop.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_PERIOD, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-		stop.addActionListener(this);
-		animation.add(stop);
-		
-		animation.addSeparator();
-		
-		// Next Frame – Space
-		nextFrame = new JMenuItem("Next Frame");
-		nextFrame.setAccelerator(KeyStroke.getKeyStroke(' '));
-		nextFrame.addActionListener(this);
-		animation.add(nextFrame);
-		
-		animation.addSeparator();
-		
-		// Decrease Speed – [
-		decreaseSpeed = new JMenuItem("Decrease Speed");
-		decreaseSpeed.setAccelerator(KeyStroke.getKeyStroke('['));
-		decreaseSpeed.addActionListener(this);
-		animation.add(decreaseSpeed);
-		
-		// Increase Speed – ]
-		increaseSpeed = new JMenuItem("Increase Speed");
-		increaseSpeed.setAccelerator(KeyStroke.getKeyStroke(']'));
-		increaseSpeed.addActionListener(this);
-		animation.add(increaseSpeed);
-		
-		menuBar.add(animation);
-		
-		simulation = new JMenu("Simulation");
-		
-		// Reset – Command + R
-		reset = new JMenuItem("Reset");
-		reset.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-		reset.addActionListener(this);
-		simulation.add(reset);
-		
-		// Reload Simulation – F5
-		reloadSimulation = new JMenuItem("Reload");
-		reloadSimulation.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F5, 0));
-		reloadSimulation.addActionListener(this);
-		simulation.add(reloadSimulation);
-		
-		simulation.addSeparator();
-		
-		// Resize – No Shortcut
-		resizeMenuItem = new JMenuItem("Resize");
-		// resize.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R,
-		// Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-		resizeMenuItem.addActionListener(this);
-		simulation.add(resizeMenuItem);
-		
-		// Show Console – Command + J
-		showConsole = new JMenuItem("Show Console");
-		showConsole.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_J, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-		showConsole.addActionListener(this);
-		simulation.add(showConsole);
-		
-		menuBar.add(simulation);
-		
-		getImage().setJMenuBar(menuBar);
-	}
-	
-	@Override
-	public void actionPerformed(ActionEvent e)
-	{
-		System.out.println("[MENU] " + ((JMenu) ((JPopupMenu) ((JMenuItem) e.getSource()).getParent()).getInvoker()).getText() + " → " + ((JMenuItem) e.getSource()).getText());
-		
-		if(e.getSource() == newSimulation)
-		{
-			Home.run(getHome(), info);
-		}
-		else if(e.getSource() == saveImage)
-		{
-			save(getDefaultFile());
-		}
-		else if(e.getSource() == saveImageAs)
-		{
-			saveAs();
-		}
-		else if(e.getSource() == animateMenuItem)
-		{
-			animate.setLocationRelativeTo(getImage());
-			animate.setVisible(true);
-		}
-		else if(e.getSource() == openContentFolder)
-		{
-			try
-			{
-				Desktop.getDesktop().open(contentDirectory);
-			}
-			catch(IOException e1)
-			{
-				e1.printStackTrace();
-			}
-		}
-		else if(e.getSource() == openHomeFolder)
-		{
-			try
-			{
-				Desktop.getDesktop().open(contentDirectory.getParentFile());
-			}
-			catch(IOException e1)
-			{
-				e1.printStackTrace();
-			}
-		}
-		else if(e.getSource() == closeSimulation)
-		{
-			delete();
-		}
-		else if(e.getSource() == openProperties)
-		{
-			openPreferences();
-		}
-		else if(e.getSource() == copy)
-		{
-			copyImageToClipboard();
-		}
-		else if(e.getSource() == play)
-		{
-			stopForBreakpoint = false;
-			play();
-		}
-		else if(e.getSource() == playUntilBreakpoint)
-		{
-			stopForBreakpoint = true;
-			play();
-		}
-		else if(e.getSource() == stop)
-		{
-			stop();
-		}
-		else if(e.getSource() == nextFrame)
-		{
-			incrementN();
-			draw();
-		}
-		else if(e.getSource() == decreaseSpeed)
-		{
-			timerManual.setDelay(timerManual.getDelay() + changeInSpeed);
-			hertz = -1;
-			calculateHertz();
-			System.out.println(timerManual.getDelay());
-		}
-		else if(e.getSource() == increaseSpeed)
-		{
-			timerManual.setDelay(timerManual.getDelay() - changeInSpeed >= 1 ? timerManual.getDelay() - changeInSpeed : 1);
-			hertz = -1;
-			calculateHertz();
-			System.out.println(timerManual.getDelay());
-		}
-		else if(e.getSource() == reset)
-		{
-			resetAction();
-		}
-		else if(e.getSource() == reloadSimulation)
-		{
-			Home.run(getHome(), info);
-			delete();
-		}
-		else if (e.getSource() == resizeMenuItem)
-		{
-			resize.setLocationRelativeTo(getImage());
-			resize.setVisible(true);
-		}
-		else if (e.getSource() == showConsole)
-		{
-			getHome().getConsole().setVisible(true);
-		}
-	}
-	
-	private void copyImageToClipboard()
+	public void copyImageToClipboard()
 	{
 		if(combinedImage != null)
 		{
@@ -561,12 +320,12 @@ public abstract class Simulation implements ActionListener, ClipboardOwner
 	
 	private static final int changeInSpeed = 10; // TODO: maybe make this scale in some way to accommodate for the 1/x behavior.
 	
-	private File getDefaultFile()
+	public File getDefaultFile()
 	{
 		return new File(getContentDirectory(), "frame_" + getTimestamp() + ".png");
 	}
 	
-	private void saveAs()
+	public void saveAs()
 	{
 		JFileChooser chooser = new JFileChooser();
 		chooser.setFileFilter(new FileNameExtensionFilter("PNG Images", "png"));
@@ -580,7 +339,7 @@ public abstract class Simulation implements ActionListener, ClipboardOwner
         }
 	}
 	
-	private void save(File file)
+	public void save(File file)
 	{
 		try
 		{
@@ -793,4 +552,30 @@ public abstract class Simulation implements ActionListener, ClipboardOwner
 	{
 		return dateFormat.format(new Date());
 	}
+	public Animate getAnimate()
+	{
+		return animate;
+	}
+	public void setStopForBreakpoint(boolean stopForBreakpoint)
+	{
+		this.stopForBreakpoint = stopForBreakpoint;
+	}
+	public void decreaseAnimationSpeed()
+	{
+		timerManual.setDelay(timerManual.getDelay() + changeInSpeed);
+		hertz = -1;
+		calculateHertz();
+	}
+	public void increaseAnimationSpeed()
+	{
+		timerManual.setDelay(timerManual.getDelay() - changeInSpeed >= 1 ? timerManual.getDelay() - changeInSpeed : 1);
+		hertz = -1;
+		calculateHertz();	
+	}
+	
+	public Resize getResize()
+	{
+		return resize;
+	}
+	
 }
