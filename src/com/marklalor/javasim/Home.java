@@ -36,7 +36,7 @@ public class Home extends JFrame implements ListSelectionListener
 {
 	private static final long serialVersionUID = 6321955323521519657L;
 	
-	public static File homeDirectory; //TODO: just make this un-static, shouldn't be needed
+	public File homeDirectory; //TODO: just make this un-static, shouldn't be needed
 	
 	private List<SimulationInfo> simulations;
 	private JList<SimulationInfo> simulationList;
@@ -49,7 +49,7 @@ public class Home extends JFrame implements ListSelectionListener
 	
 	public Home(File location)
 	{
-		Home.homeDirectory = location;
+		homeDirectory = location;
 		console = new Console();
 		loadSimulations();
 		setupLayout();
@@ -211,6 +211,11 @@ public class Home extends JFrame implements ListSelectionListener
 	public Console getConsole()
 	{
 		return console;
+	}
+	
+	public File getHomeDirectory()
+	{
+		return homeDirectory;
 	}
 	
 	@Override

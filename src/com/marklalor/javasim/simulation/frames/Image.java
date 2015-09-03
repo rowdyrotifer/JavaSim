@@ -99,6 +99,9 @@ public class Image extends JFrame
 		{
 			super(true);
 			this.parent = parent;
+			this.addMouseMotionListener(this.parent.getSimulation());
+			this.addMouseListener(this.parent.getSimulation());
+			this.addMouseWheelListener(this.parent.getSimulation());
 		}
 
 		@Override

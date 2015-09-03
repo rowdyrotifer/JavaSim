@@ -1,7 +1,6 @@
 package com.marklalor.javasim.simulation;
 
 import java.awt.Graphics2D;
-import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.ClipboardOwner;
@@ -12,6 +11,11 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.WritableRaster;
@@ -42,7 +46,7 @@ import com.marklalor.javasim.simulation.frames.subframes.Animate;
 import com.marklalor.javasim.simulation.frames.subframes.Control;
 import com.marklalor.javasim.simulation.frames.subframes.Resize;
 
-public abstract class Simulation implements ClipboardOwner
+public abstract class Simulation implements ClipboardOwner, MouseListener, MouseWheelListener, MouseMotionListener
 {
 	public static final int DEFAULT_IMAGE_WIDTH = 500, DEFAULT_IMAGE_HEIGHT = 500;
 	public static final int DEFAULT_CONTROL_WIDTH = 100, DEFAULT_CONTROL_HEIGHT = 500;
@@ -83,6 +87,7 @@ public abstract class Simulation implements ClipboardOwner
 	private int calculateCount = 0;
 	private static final int calculateCountMax = 10;
 	private static final int autoRefreshTime = 1; // seconds;
+	
 	// Breakpoint
 	private boolean stopForBreakpoint = false;
 	
@@ -95,7 +100,6 @@ public abstract class Simulation implements ClipboardOwner
 	public abstract void initialize();
 	public abstract void reset(Graphics2D permanent);
 	public abstract void draw(Graphics2D permanent, Graphics2D temporary);
-	public abstract void click(Point point);
 	
 	//Simulation N (frame) variable.
 	private int n = 0;
@@ -105,7 +109,7 @@ public abstract class Simulation implements ClipboardOwner
 	
 	public void javaSimInitialize(SimulationInfo info)
 	{
-		//Don't allow anyone to use this method a second time… just, no.
+		//Don't allow anyone to use this method a second time… just… no.
 		if (this.info != null)
 			throw new RuntimeException("Do not call method com.marklalor.javasim.simulation.Simulation#javaSimInitialize more than once (it is called once automatically by JavaSim Home)");
 		
@@ -113,7 +117,7 @@ public abstract class Simulation implements ClipboardOwner
 		this.info = info;
 		
 		//Set the simulation's content directory and (make sure it exists)
-		contentDirectory = new File(Home.homeDirectory, info.getName());
+		contentDirectory = new File(getHome().getHomeDirectory(), info.getName());
 		contentDirectory.mkdirs();
 		
 		//Create and set up the main image that goes with this simulation.
@@ -578,4 +582,47 @@ public abstract class Simulation implements ClipboardOwner
 		return resize;
 	}
 	
+	//Mouse Adapter Capabilities – Same as java.awt.event.MouseAdapter
+	/**
+     * {@inheritDoc}
+     */
+    public void mouseClicked(MouseEvent e) {}
+
+    /**
+     * {@inheritDoc}
+     */
+    public void mousePressed(MouseEvent e) {}
+
+    /**
+     * {@inheritDoc}
+     */
+    public void mouseReleased(MouseEvent e) {}
+
+    /**
+     * {@inheritDoc}
+     */
+    public void mouseEntered(MouseEvent e) {}
+
+    /**
+     * {@inheritDoc}
+     */
+    public void mouseExited(MouseEvent e) {}
+
+    /**
+     * {@inheritDoc}
+     * @since 1.6
+     */
+    public void mouseWheelMoved(MouseWheelEvent e){}
+
+    /**
+     * {@inheritDoc}
+     * @since 1.6
+     */
+    public void mouseDragged(MouseEvent e){}
+
+    /**
+     * {@inheritDoc}
+     * @since 1.6
+     */
+    public void mouseMoved(MouseEvent e){}
 }

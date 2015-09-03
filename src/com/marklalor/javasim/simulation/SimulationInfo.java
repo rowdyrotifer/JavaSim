@@ -23,23 +23,23 @@ public class SimulationInfo implements Serializable
 	private static final long serialVersionUID = -4872104954414842342L;
 	
 	private File file;
-	private String main, name, date, author, version, description;
+	private String name, date, author, version, description;
 
-	public SimulationInfo(File file, String main, String name, String date, String author, String version, String description)
+	public SimulationInfo(File file, String name, String date, String author, String version, String description)
 	{
-		setData(file, main, name, date, author, version, description);
+		setData(file, name, date, author, version, description);
 	}
 	
 	public SimulationInfo(File jar)
 	{
 		JSONObject metadata = loadMetadata(jar);
-		setData(jar, metadata.getString("main"), metadata.getString("name"), metadata.getString("date"), metadata.getString("author"), metadata.getString("version"), metadata.getString("description"));
+		setData(jar, metadata.getString("name"), metadata.getString("date"), metadata.getString("author"), metadata.getString("version"), metadata.getString("description"));
 	}
 	
 	public SimulationInfo(Class<? extends Simulation> simulationClass)
 	{
 		JSONObject metadata = loadMetadata(simulationClass);
-		setData(new File(SimulationInfo.findPathJar(simulationClass)), metadata.getString("main"), metadata.getString("name"), metadata.getString("date"), metadata.getString("author"), metadata.getString("version"), metadata.getString("description"));
+		setData(new File(SimulationInfo.findPathJar(simulationClass)), metadata.getString("name"), metadata.getString("date"), metadata.getString("author"), metadata.getString("version"), metadata.getString("description"));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -75,10 +75,9 @@ public class SimulationInfo implements Serializable
 		return returnClass;
 	}
 	
-	private void setData(File file, String main, String name, String date, String author, String version, String description)
+	private void setData(File file,String name, String date, String author, String version, String description)
 	{
 		this.file = file;
-		this.main = main;
 		this.name = name;
 		this.date = date;
 		this.author = author;
@@ -176,16 +175,6 @@ public class SimulationInfo implements Serializable
 	public void setFile(File file)
 	{
 		this.file = file;
-	}
-
-	public String getMain()
-	{
-		return main;
-	}
-
-	public void setMain(String main)
-	{
-		this.main = main;
 	}
 
 	public String getName()
