@@ -28,6 +28,7 @@ public class ImageSubframe extends JFrame
 	}
 	
 	
+	//TODO: remove and use the controls instead
 	//Utilities for program dialogs.
 	public static final int FILTER_NONE = -1;
 	public static final int FILTER_INTEGER = 0;

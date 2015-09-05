@@ -206,9 +206,9 @@ public class Menu implements ActionListener
 		simulation.add(resizeMenuItem);
 		
 		// Fullscreen – Command + Shift + F (OSX) F11 (Windows)
-		fullscreen = new JMenuItem("Fullscreen");
+		fullscreen = new JMenuItem("Enter Full Screen");
 		if (Simulation.IS_MAC_OS_X)
-			fullscreen.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, (Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | InputEvent.SHIFT_MASK)));
+			fullscreen.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, (Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | InputEvent.CTRL_MASK)));
 		else
 			fullscreen.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F11, 0));
 		fullscreen.addActionListener(this);

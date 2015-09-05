@@ -34,6 +34,8 @@ import javax.imageio.stream.ImageOutputStream;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.Timer;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.apple.eawt.Application;
@@ -43,7 +45,7 @@ import com.marklalor.javasim.imaging.GifSequenceWriter;
 import com.marklalor.javasim.imaging.TransferableImage;
 import com.marklalor.javasim.simulation.frames.Image;
 import com.marklalor.javasim.simulation.frames.subframes.Animate;
-import com.marklalor.javasim.simulation.frames.subframes.Control;
+import com.marklalor.javasim.simulation.frames.subframes.Controls;
 import com.marklalor.javasim.simulation.frames.subframes.Resize;
 
 public abstract class Simulation implements ClipboardOwner, MouseListener, MouseWheelListener, MouseMotionListener
@@ -68,7 +70,7 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 	
 	// Main Frames
 	private Image image;
-	private Control control;
+	private Controls controls;
 	
 	// Other Frames
 	private Animate animate;
@@ -101,6 +103,16 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 	public abstract void reset(Graphics2D permanent);
 	public abstract void draw(Graphics2D permanent, Graphics2D temporary);
 	
+	//Predefined listeners
+	private class AggregateListner implements ActionListener, ChangeListener
+	{
+		@Override public void stateChanged(ChangeEvent e) { resetAction(); }
+		@Override public void actionPerformed(ActionEvent e) { resetAction(); }	
+	}
+	AggregateListner resetAction = new AggregateListner();
+	public AggregateListner getResetAction() { return resetAction; }
+	
+	
 	//Simulation N (frame) variable.
 	private int n = 0;
 	public int getN() { return this.n; }
@@ -128,10 +140,10 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 		refreshTitle();
 		
 		//Create and set up the main control panel for this simulation.
-		control = new Control(getImage());
-		control.setSize(DEFAULT_CONTROL_WIDTH, DEFAULT_CONTROL_HEIGHT);
-		control.setLocationRelativeTo(getImage());
-		control.setLocation(getControl().getLocation().x - (getImage().getWidth() / 2) - (getControl().getWidth() / 2), getImage().getY());
+		controls = new Controls(getImage());
+		controls.setSize(DEFAULT_CONTROL_WIDTH, DEFAULT_CONTROL_HEIGHT);
+		controls.setLocationRelativeTo(getImage());
+		controls.setLocation(getControls().getLocation().x - (getImage().getWidth() / 2) - (getControls().getWidth() / 2), getImage().getY());
 		
 		//Reposition the console.
 		getHome().getConsole().getFrame().setSize(DEFAULT_CONSOLE_WIDTH, DEFAULT_CONSOLE_HEIGHT);
@@ -212,6 +224,7 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 		
 		menus = new ArrayList<Menu>();
 		addMenuTo(getImage());
+		addMenuTo(getControls());
 		addMenuTo(getAnimate());
 		addMenuTo(getResize());
 		addMenuTo(home.getConsole().getFrame());
@@ -463,7 +476,7 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 	public void delete()
 	{
 		getImage().dispose();
-		getControl().dispose();
+		getControls().dispose();
 		getHome().getConsole().getFrame().setVisible(false);
 	}
 	
@@ -498,9 +511,9 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 		return image;
 	}
 	
-	public Control getControl()
+	public Controls getControls()
 	{
-		return control;
+		return controls;
 	}
 	
 	public File getContentDirectory()
@@ -581,6 +594,9 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 	{
 		return resize;
 	}
+	
+	//Wrapper for the control window.
+	
 	
 	//Mouse Adapter Capabilities – Same as java.awt.event.MouseAdapter
 	/**
