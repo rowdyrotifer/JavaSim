@@ -44,4 +44,11 @@ public class CheckboxControl extends Control<Boolean>
 	{
 		return checkbox.isSelected();
 	}
+	
+	@Override
+	public boolean setValue(Boolean value)
+	{
+		checkbox.setSelected(value);
+		return true;
+	}
 }

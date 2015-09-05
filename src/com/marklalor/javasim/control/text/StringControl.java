@@ -12,4 +12,11 @@ public class StringControl extends TextFieldControl<String>
 	{
 		return textField.getText();
 	}
+
+	@Override
+	public boolean setValue(String value)
+	{
+		textField.setText(value);
+		return true;
+	}
 }

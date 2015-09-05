@@ -12,6 +12,15 @@ public class IntegerControl extends TextFieldControl<Integer>
 	@Override
 	public Integer getValue()
 	{
+		if (textField.getText().isEmpty())
+			return 0;
 		return Integer.parseInt(textField.getText());
+	}
+	
+	@Override
+	public boolean setValue(Integer value)
+	{
+		textField.setText(String.valueOf(value));
+		return true;
 	}
 }

@@ -14,16 +14,18 @@ import com.marklalor.javasim.control.Control;
 public class SliderControl extends Control<Double>
 {
 	private double min, max;
+	private double defaultValue;
 	private String label;
 	private JLabel jLabel;
 	private JSlider slider;
 	
 	private final int SLIDER_MAX = 10000; //10k different possible slider values, definitely enough to accomadate the screen pixels.
 	
-	public SliderControl(double min, double max, String label)
+	public SliderControl(double min, double max, double value, String label)
 	{
 		this.min = min;
 		this.max = max;
+		this.defaultValue = value;
 		this.label = label;
 	}
 	
@@ -43,9 +45,10 @@ public class SliderControl extends Control<Double>
 	    labelTable.put(new Integer(SLIDER_MAX), new JLabel(String.valueOf(max)));
 	    slider.setLabelTable(labelTable);
 	    slider.setPaintLabels(true);
+	    slider.setValue((int)Math.round((defaultValue / (max-min))*SLIDER_MAX));
 	    panel.add(slider, BorderLayout.CENTER);
 	    
-	    panel.setMaximumSize(new Dimension(10000, (int) panel.getPreferredSize().getHeight()));
+	    panel.setMaximumSize(new Dimension(SLIDER_MAX, (int) panel.getPreferredSize().getHeight()));
 	    
 	    return panel;
 	}
@@ -59,5 +62,15 @@ public class SliderControl extends Control<Double>
 	public Double getValue()
 	{
 		return Double.valueOf(min +((slider.getValue() / (double)SLIDER_MAX) * (max-min))); //min + %*range
+	}
+	
+	@Override
+	public boolean setValue(Double value)
+	{
+		if (value < min || value > max)
+			return false;
+		
+		slider.setValue((int)Math.round((value / (max-min))*SLIDER_MAX));
+		return true;
 	}
 }

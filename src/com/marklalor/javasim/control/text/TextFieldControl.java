@@ -12,28 +12,50 @@ import com.marklalor.javasim.control.Control;
 
 public abstract class TextFieldControl<T> extends Control<T>
 {
-	private String label;
-	private String initialValue;
+	private String defaultLabel;
+	private String defaultValue;
+	private int defaultColumns;
 	private Class<? extends DocumentFilter> filter;
 	
-	private JLabel jLabel;
+	private JLabel label;
 	protected JTextField textField;
 	
-	public TextFieldControl(String label, String initialValue, Class<? extends DocumentFilter> filter)
+	public TextFieldControl()
 	{
-		this.label = label;
-		this.initialValue = initialValue;
+		this("");
+	}
+	
+	public TextFieldControl(String label)
+	{
+		this(label, "");
+	}
+	
+	public TextFieldControl(String label, String value)
+	{
+		this(label, value, null);
+	}
+	
+	public TextFieldControl(String label, String value, Class<? extends DocumentFilter> filter)
+	{
+		this(label, value, filter, 2);
+	}
+	
+	public TextFieldControl(String label, String value, Class<? extends DocumentFilter> filter, int columns)
+	{
+		this.defaultLabel = label;
+		this.defaultValue = value;
 		this.filter = filter;
+		this.defaultColumns = columns;
 	}
 	
 	@Override
 	public JPanel createPanel()
 	{	
 		JPanel panel = new JPanel(new BorderLayout());
-		jLabel = new JLabel(label);
-		panel.add(jLabel, BorderLayout.WEST);
+		label = new JLabel(defaultLabel);
+		panel.add(label, BorderLayout.WEST);
 		
-		textField = new JTextField(initialValue);
+		textField = new JTextField(defaultValue, defaultColumns);
 		
 		if (filter != null)
 		{
@@ -69,5 +91,10 @@ public abstract class TextFieldControl<T> extends Control<T>
 		getTextField().setColumns(columns);
 		getPanel().setMaximumSize(getPanel().getPreferredSize());
 		getTextField().revalidate();
+	}
+	
+	public int getTextFieldWidth()
+	{
+		return getTextField().getColumns();
 	}
 }

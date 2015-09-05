@@ -48,4 +48,19 @@ public class RadioButtonControl extends Control<String>
 	{
 		return group.getSelection().getActionCommand();
 	}
+	
+	@Override
+	public boolean setValue(String value)
+	{
+		for (JRadioButton button : buttons)
+		{
+			if (button.getActionCommand().equals(value))
+			{
+				button.setSelected(true);
+				return true;
+			}
+		}
+		
+		return true;
+	}
 }

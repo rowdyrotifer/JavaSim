@@ -17,4 +17,5 @@ public abstract class Control<T>
 	}
 	
 	public abstract T getValue();
+	public abstract boolean setValue(T value);
 }
