@@ -14,8 +14,9 @@ public class CheckboxControl extends Control<Boolean>
 	private String defaultLabel;
 	private JCheckBox checkbox;
 	
-	public CheckboxControl(String label, boolean checked)
+	public CheckboxControl(String name, String label, boolean checked)
 	{
+		super(name);
 		defaultLabel = label;
 		defaultChecked = checked;
 	}
@@ -46,9 +47,26 @@ public class CheckboxControl extends Control<Boolean>
 	}
 	
 	@Override
-	public boolean setValue(Boolean value)
+	public boolean setValue(Object value)
 	{
-		checkbox.setSelected(value);
+		if (!value.getClass().equals(Boolean.class))
+			throw new RuntimeException("Tried to set value of " + getClass().getSimpleName() + " to a " + value.getClass().getSimpleName());
+		
+		checkbox.setSelected((Boolean)value);
 		return true;
+	}
+
+	@Override
+	public JPanel createAnimatePanel()
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Boolean[] getAnimateValues()
+	{
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

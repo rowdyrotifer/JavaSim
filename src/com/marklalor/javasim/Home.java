@@ -189,8 +189,9 @@ public class Home extends JFrame implements ListSelectionListener
 				//final Simulation simulation = simClass.getDeclaredConstructor(SimulationInfo.class).newInstance(info);
 				final Simulation simulation = simClass.newInstance();
 				simulation.setHome(home);
-				simulation.javaSimInitialize(info);
+				simulation.preInitialize(info);
 				simulation.initialize();
+				simulation.postInitialize();
 				simulation.resetAction();
 			}
 			catch(IllegalArgumentException |  SecurityException e)//InvocationTargetException | NoSuchMethodException |

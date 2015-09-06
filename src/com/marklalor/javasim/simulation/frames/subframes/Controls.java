@@ -30,17 +30,17 @@ public class Controls extends ImageSubframe
 	{
 		super.setSize(width, height + getInsets().top);
 	}
-	
+
 	public <T> void add(Control<T> control)
 	{
-		add(control, "__control" + (autoKeyN++));
-	}
-
-	public <T> void add(Control<T> control, String key)
-	{
-		controls.put(key, control);
+		controls.put(control.getName(), control);
 		JPanel controlPanel = control.getPanel();
 		getContentPane().add(controlPanel);
+	}
+	
+	public Map<String, Control<?>> getControls()
+	{
+		return controls;
 	}
 	
 	public void addSeparator()

@@ -4,7 +4,21 @@ import javax.swing.JPanel;
 
 public abstract class Control<T>
 {
+	private static int controlCount = 0;
 	private JPanel panel;
+	private String name;
+	
+	public Control()
+	{
+		this(null);
+	}
+	
+	public Control(String name)
+	{
+		if (name == null)
+			name = "_control_" + (controlCount++);
+		this.name = name;
+	}
 	
 	protected abstract JPanel createPanel();
 	
@@ -16,6 +30,14 @@ public abstract class Control<T>
 		return this.panel;
 	}
 	
+	public String getName()
+	{
+		return name;
+	}
+	
 	public abstract T getValue();
-	public abstract boolean setValue(T value);
+	public abstract boolean setValue(Object value);
+	
+	public abstract JPanel createAnimatePanel();
+	public abstract Object[] getAnimateValues();
 }

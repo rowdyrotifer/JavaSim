@@ -24,6 +24,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -41,6 +42,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import com.apple.eawt.Application;
 import com.apple.eawt.FullScreenUtilities;
 import com.marklalor.javasim.Home;
+import com.marklalor.javasim.control.Control;
 import com.marklalor.javasim.imaging.GifSequenceWriter;
 import com.marklalor.javasim.imaging.TransferableImage;
 import com.marklalor.javasim.simulation.frames.Image;
@@ -65,8 +67,11 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 	
 	private boolean fullscreen = false;
 	
-	//Misc Main stucture;
-	private List<Menu> menus; //give every window a copy of the menu, this gets around issues with JDialog's incapability to properly handle its parent menu's accelerators…
+	// Misc Main stucture;
+	private List<Menu> menus; // give every window a copy of the menu, this gets
+								// around issues with JDialog's incapability to
+								// properly handle its parent menu's
+								// accelerators…
 	
 	// Main Frames
 	private Image image;
@@ -95,66 +100,101 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 	
 	// Animation
 	private Timer timerAnimation;
+	private Timer timerAnimationVariable;
+	
+	private List<Control<?>> animationControls;
+	private Control<?> currentAnimationControl;
+	private List<Object> currentAnimationControlValueQueue;
+	private int variableAnimationN = 0;
+	
 	private ImageOutputStream animationOut;
 	private GifSequenceWriter animationWriter;
 	
-	//Simulation features.
+	// Simulation features.
 	public abstract void initialize();
+	
 	public abstract void reset(Graphics2D permanent);
+	
 	public abstract void draw(Graphics2D permanent, Graphics2D temporary);
 	
-	//Predefined listeners
+	// Predefined listeners
 	private class AggregateListner implements ActionListener, ChangeListener
 	{
-		@Override public void stateChanged(ChangeEvent e) { resetAction(); }
-		@Override public void actionPerformed(ActionEvent e) { resetAction(); }	
+		@Override
+		public void stateChanged(ChangeEvent e)
+		{
+			resetAction();
+		}
+		
+		@Override
+		public void actionPerformed(ActionEvent e)
+		{
+			resetAction();
+		}
 	}
+	
 	AggregateListner resetAction = new AggregateListner();
-	public AggregateListner getResetAction() { return resetAction; }
 	
-	
-	//Simulation N (frame) variable.
-	private int n = 0;
-	public int getN() { return this.n; }
-	public void setN(int n) { this.n = n; }
-	public void incrementN() { this.n++; }
-	
-	public void javaSimInitialize(SimulationInfo info)
+	public AggregateListner getResetAction()
 	{
-		//Don't allow anyone to use this method a second time… just… no.
-		if (this.info != null)
+		return resetAction;
+	}
+	
+	// Simulation N (frame) variable.
+	private int n = 0;
+	
+	public int getN()
+	{
+		return this.n;
+	}
+	
+	public void setN(int n)
+	{
+		this.n = n;
+	}
+	
+	public void incrementN()
+	{
+		this.n++;
+	}
+	
+	public void preInitialize(SimulationInfo info)
+	{
+		getHome().getConsole().setVisible(true);
+		// Don't allow anyone to use this method a second time… just… no.
+		if(this.info != null)
 			throw new RuntimeException("Do not call method com.marklalor.javasim.simulation.Simulation#javaSimInitialize more than once (it is called once automatically by JavaSim Home)");
 		
-		//Inherit the info read from its file earlier.
+		// Inherit the info read from its file earlier.
 		this.info = info;
 		
-		//Set the simulation's content directory and (make sure it exists)
+		// Set the simulation's content directory and (make sure it exists)
 		contentDirectory = new File(getHome().getHomeDirectory(), info.getName());
 		contentDirectory.mkdirs();
 		
-		//Create and set up the main image that goes with this simulation.
+		// Create and set up the main image that goes with this simulation.
 		image = new Image(this);
 		image.pack();
 		image.setSize(DEFAULT_IMAGE_WIDTH, DEFAULT_IMAGE_HEIGHT);
 		image.setLocationRelativeTo(null);
 		refreshTitle();
 		
-		//Create and set up the main control panel for this simulation.
+		// Create and set up the main control panel for this simulation.
 		controls = new Controls(getImage());
 		controls.setSize(DEFAULT_CONTROL_WIDTH, DEFAULT_CONTROL_HEIGHT);
 		controls.setLocationRelativeTo(getImage());
 		controls.setLocation(getControls().getLocation().x - (getImage().getWidth() / 2) - (getControls().getWidth() / 2), getImage().getY());
 		
-		//Reposition the console.
+		// Reposition the console.
 		getHome().getConsole().getFrame().setSize(DEFAULT_CONSOLE_WIDTH, DEFAULT_CONSOLE_HEIGHT);
 		getHome().getConsole().getFrame().setLocationRelativeTo(getImage());
-		getHome().getConsole().getFrame().setLocation(getHome().getConsole().getFrame().getLocation().x + (getImage().getWidth() / 2) + (getHome().getConsole().getFrame().getWidth() / 2), getImage().getY());
+		getHome().getConsole().getFrame()
+				.setLocation(getHome().getConsole().getFrame().getLocation().x + (getImage().getWidth() / 2) + (getHome().getConsole().getFrame().getWidth() / 2), getImage().getY());
 		
-		//Other dialogs.
-		animate = new Animate(getImage());
+		// Other dialogs.
 		resize = new Resize(getImage());
 		
-		//Make the general, manual animation timer.
+		// Make the general, manual animation timer.
 		timerManual = new Timer(10, new ActionListener()
 		{
 			@Override
@@ -166,25 +206,25 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 			}
 		});
 		
-		//Make the special, animation window timer.
+		// Make the special, animation window timer.
 		timerAnimation = new Timer(0, new ActionListener()
 		{
 			@Override
 			public void actionPerformed(ActionEvent e)
-			{	
+			{
 				draw();
 				hertzCheck();
 				int delay = 0;
-				if (getN() == animate.getStartFrame())
+				if(getN() == animate.getStartFrame())
 					delay = animate.getStartDelay();
-				if (getN() != animate.getStopFrame() && getN() != animate.getStartFrame())
+				if(getN() != animate.getStopFrame() && getN() != animate.getStartFrame())
 					delay = animate.getFrameDelay();
-				if  (getN() == animate.getStopFrame() || !timerAnimation.isRunning())
+				if(getN() == animate.getStopFrame() || !timerAnimation.isRunning())
 					delay = animate.getStopDelay();
 				
-				if (getN() % animate.getSaveEvery() == 0 || 
-						getN() == animate.getStartFrame() || 
-						getN() == animate.getStopFrame() || 
+				if(getN() % animate.getSaveEvery() == 0 ||
+						getN() == animate.getStartFrame() ||
+						getN() == animate.getStopFrame() ||
 						!timerAnimation.isRunning())
 					try
 					{
@@ -195,10 +235,63 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 						e1.printStackTrace();
 					}
 				
-				if (getN() == animate.getStopFrame())
+				if(getN() == animate.getStopFrame())
 					stop();
 				
 				incrementN();
+			}
+		});
+		
+		// Make the special, animation window timer.
+		timerAnimationVariable = new Timer(0, new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				if (currentAnimationControl == null || currentAnimationControlValueQueue.size() == 0)
+				{
+					currentAnimationControl = animationControls.remove(0);
+					
+//					System.out.println(currentAnimationControl.getName());
+//					System.out.println(Arrays.asList(currentAnimationControl.getAnimateValues()));
+					
+					currentAnimationControlValueQueue = new ArrayList<Object>(Arrays.asList(currentAnimationControl.getAnimateValues())); //??? gross cast
+				}
+				
+				Object value = currentAnimationControlValueQueue.remove(0);
+				currentAnimationControl.setValue(value);
+
+				resetAction();
+				hertzCheck();
+				
+				int delay = 0;
+				if (variableAnimationN == 0)
+					delay = animate.getStartDelay();
+				else
+					delay = animate.getFrameDelay();
+				
+				boolean last = (animationControls.isEmpty() && currentAnimationControlValueQueue.size() == 1);
+				
+				if (last)
+					delay = animate.getStopDelay();
+				
+				if(variableAnimationN % animate.getSaveEvery() == 0 ||
+						variableAnimationN == 0 ||
+						last ||
+						!timerAnimation.isRunning())
+					try
+					{
+						animationWriter.writeToSequence(combinedImage, delay);
+					}
+					catch(IOException e1)
+					{
+						e1.printStackTrace();
+					}
+				
+				if(last)
+					stop();
+				
+				variableAnimationN++;
 			}
 		});
 		
@@ -215,50 +308,62 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 			}
 		});
 		
-//		//Set up the JMenuBar
-//		menu = new Menu(this);
-//		getImage().setJMenuBar(menu.getMenuBar());
-//		
-//		menu2 = new Menu(this);
-//		getAnimate().setJMenuBar(menu2.getMenuBar());
+		// //Set up the JMenuBar
+		// menu = new Menu(this);
+		// getImage().setJMenuBar(menu.getMenuBar());
+		//
+		// menu2 = new Menu(this);
+		// getAnimate().setJMenuBar(menu2.getMenuBar());
 		
 		menus = new ArrayList<Menu>();
 		addMenuTo(getImage());
 		addMenuTo(getControls());
-		addMenuTo(getAnimate());
 		addMenuTo(getResize());
 		addMenuTo(home.getConsole().getFrame());
 		
-		//Set sizes to the default dimensions
+		// Set sizes to the default dimensions
 		setWidth(DEFAULT_IMAGE_WIDTH);
 		setHeight(DEFAULT_IMAGE_HEIGHT);
 		
-		//OS X fullscreen support:
-		FullScreenUtilities.setWindowCanFullScreen(getImage(),true);
-		//Allow esc key to... well... escape fullscreen
+		// OS X fullscreen support:
+		FullScreenUtilities.setWindowCanFullScreen(getImage(), true);
+		// Allow esc key to... well... escape fullscreen
 		getImage().addKeyListener(new KeyListener()
-		{	
-			@Override public void keyTyped(KeyEvent e) { }
-			@Override public void keyReleased(KeyEvent e) { }
+		{
+			@Override
+			public void keyTyped(KeyEvent e)
+			{
+			}
+			
+			@Override
+			public void keyReleased(KeyEvent e)
+			{
+			}
 			
 			@Override
 			public void keyPressed(KeyEvent e)
 			{
-				if (e.getKeyCode() == KeyEvent.VK_ESCAPE)
+				if(e.getKeyCode() == KeyEvent.VK_ESCAPE)
 					Simulation.this.setFullscreen(false);
 			}
 		});
-	
-		//Set up graphics.
+		
+		// Set up graphics.
 		setUpGraphics();
 	}
 	
-
+	public void postInitialize()
+	{
+		// Relies on what the user initializes.
+		animate = new Animate(getImage());
+		addMenuTo(getAnimate());
+	}
+	
 	private void setFullscreen(boolean fullscreen)
 	{
-		if (this.fullscreen != fullscreen)
+		if(this.fullscreen != fullscreen)
 		{
-			if (Simulation.IS_MAC_OS_X)
+			if(Simulation.IS_MAC_OS_X)
 				Application.getApplication().requestToggleFullScreen(getImage());
 			
 			this.fullscreen = fullscreen;
@@ -266,8 +371,8 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 	}
 	
 	public void toggleFullscreen()
-	{	
-		if (Simulation.IS_MAC_OS_X)
+	{
+		if(Simulation.IS_MAC_OS_X)
 			Application.getApplication().requestToggleFullScreen(getImage());
 		
 		this.fullscreen = !this.fullscreen;
@@ -335,7 +440,10 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 		calculateCount = 0;
 	}
 	
-	private static final int changeInSpeed = 10; // TODO: maybe make this scale in some way to accommodate for the 1/x behavior.
+	private static final int changeInSpeed = 10; // TODO: maybe make this scale
+													// in some way to
+													// accommodate for the 1/x
+													// behavior.
 	
 	public File getDefaultFile()
 	{
@@ -347,13 +455,13 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 		JFileChooser chooser = new JFileChooser();
 		chooser.setFileFilter(new FileNameExtensionFilter("PNG Images", "png"));
 		chooser.setSelectedFile(getDefaultFile());
-        if (chooser.showSaveDialog(getImage()) == JFileChooser.APPROVE_OPTION)
-        {
-        	String file = chooser.getSelectedFile().getAbsolutePath();
-        	if (!chooser.getSelectedFile().getName().contains("."))
-        		file += ".png";
-            save(new File(file));
-        }
+		if(chooser.showSaveDialog(getImage()) == JFileChooser.APPROVE_OPTION)
+		{
+			String file = chooser.getSelectedFile().getAbsolutePath();
+			if(!chooser.getSelectedFile().getName().contains("."))
+				file += ".png";
+			save(new File(file));
+		}
 	}
 	
 	public void save(File file)
@@ -373,6 +481,7 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 		stopForBreakpoint = animate.getStopAtBreakpoint();
 		
 		resetAction();
+		
 		try
 		{
 			animationOut = new FileImageOutputStream(animate.getFile());
@@ -392,6 +501,34 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 		}
 		
 		timerAnimation.start();
+	}
+	
+	public void animateVariable()
+	{
+		resetAction();
+		
+		try
+		{
+			animationOut = new FileImageOutputStream(animate.getFile());
+			animationWriter = new GifSequenceWriter(animationOut, imgType, animate.getFrameDelay(), animate.getLoop());
+		}
+		catch(FileNotFoundException e)
+		{
+			e.printStackTrace();
+		}
+		catch(IIOException e)
+		{
+			e.printStackTrace();
+		}
+		catch(IOException e)
+		{
+			e.printStackTrace();
+		}
+		
+		animationControls = new ArrayList<Control<?>>(getAnimate().getAddedControls());
+		variableAnimationN = 0;
+		
+		timerAnimationVariable.start();
 	}
 	
 	public void animationComplete()
@@ -425,6 +562,11 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 			timerAnimation.stop();
 			animationComplete();
 		}
+		if (timerAnimationVariable.isRunning())
+		{
+			timerAnimationVariable.stop();
+			animationComplete();
+		}	
 	}
 	
 	public void openPreferences()
@@ -522,9 +664,11 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 	}
 	
 	/**
-	 * Sets the width of the simulation so that the
-	 * image becomes the specified size (not the window).
-	 * @param width The desired image width, in pixels.
+	 * Sets the width of the simulation so that the image becomes the specified
+	 * size (not the window).
+	 * 
+	 * @param width
+	 *            The desired image width, in pixels.
 	 */
 	public void setWidth(int width)
 	{
@@ -533,8 +677,8 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 	}
 	
 	/**
-	 * Gets the width of the underlying
-	 * image for the simulation.
+	 * Gets the width of the underlying image for the simulation.
+	 * 
 	 * @return The simulation image width, in pixels.
 	 */
 	public int getWidth()
@@ -543,9 +687,11 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 	}
 	
 	/**
-	 * Sets the height of the simulation so that the
-	 * image becomes the specified size (not the window).
-	 * @param width The desired image height, in pixels.
+	 * Sets the height of the simulation so that the image becomes the specified
+	 * size (not the window).
+	 * 
+	 * @param width
+	 *            The desired image height, in pixels.
 	 */
 	public void setHeight(int height)
 	{
@@ -554,8 +700,8 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 	}
 	
 	/**
-	 * Gets the height of the underlying
-	 * image for the simulation.
+	 * Gets the height of the underlying image for the simulation.
+	 * 
 	 * @return The simulation image height, in pixels.
 	 */
 	public int getHeight()
@@ -569,25 +715,29 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 	{
 		return dateFormat.format(new Date());
 	}
+	
 	public Animate getAnimate()
 	{
 		return animate;
 	}
+	
 	public void setStopForBreakpoint(boolean stopForBreakpoint)
 	{
 		this.stopForBreakpoint = stopForBreakpoint;
 	}
+	
 	public void decreaseAnimationSpeed()
 	{
 		timerManual.setDelay(timerManual.getDelay() + changeInSpeed);
 		hertz = -1;
 		calculateHertz();
 	}
+	
 	public void increaseAnimationSpeed()
 	{
 		timerManual.setDelay(timerManual.getDelay() - changeInSpeed >= 1 ? timerManual.getDelay() - changeInSpeed : 1);
 		hertz = -1;
-		calculateHertz();	
+		calculateHertz();
 	}
 	
 	public Resize getResize()
@@ -595,50 +745,68 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 		return resize;
 	}
 	
-	//Wrapper for the control window.
+	// Wrapper for the control window.
 	
-	
-	//Mouse Adapter Capabilities – Same as java.awt.event.MouseAdapter
+	// Mouse Adapter Capabilities – Same as java.awt.event.MouseAdapter
 	/**
-     * {@inheritDoc}
-     */
-    public void mouseClicked(MouseEvent e) {}
-
-    /**
-     * {@inheritDoc}
-     */
-    public void mousePressed(MouseEvent e) {}
-
-    /**
-     * {@inheritDoc}
-     */
-    public void mouseReleased(MouseEvent e) {}
-
-    /**
-     * {@inheritDoc}
-     */
-    public void mouseEntered(MouseEvent e) {}
-
-    /**
-     * {@inheritDoc}
-     */
-    public void mouseExited(MouseEvent e) {}
-
-    /**
-     * {@inheritDoc}
-     * @since 1.6
-     */
-    public void mouseWheelMoved(MouseWheelEvent e){}
-
-    /**
-     * {@inheritDoc}
-     * @since 1.6
-     */
-    public void mouseDragged(MouseEvent e){}
-
-    /**
-     * {@inheritDoc}
-     * @since 1.6
-     */
-    public void mouseMoved(MouseEvent e){}
+	 * {@inheritDoc}
+	 */
+	public void mouseClicked(MouseEvent e)
+	{
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public void mousePressed(MouseEvent e)
+	{
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public void mouseReleased(MouseEvent e)
+	{
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public void mouseEntered(MouseEvent e)
+	{
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public void mouseExited(MouseEvent e)
+	{
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * @since 1.6
+	 */
+	public void mouseWheelMoved(MouseWheelEvent e)
+	{
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * @since 1.6
+	 */
+	public void mouseDragged(MouseEvent e)
+	{
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * @since 1.6
+	 */
+	public void mouseMoved(MouseEvent e)
+	{
+	}
 }

@@ -14,8 +14,9 @@ public class RadioButtonControl extends Control<String>
 	private ButtonGroup group;
 	private JRadioButton[] buttons;
 	
-	public RadioButtonControl(String[] labels, String selected)
+	public RadioButtonControl(String name, String[] labels, String selected)
 	{
+		super(name);
 		this.defaultLabels = labels;
 		this.defaultSelected = selected;
 	}
@@ -50,8 +51,11 @@ public class RadioButtonControl extends Control<String>
 	}
 	
 	@Override
-	public boolean setValue(String value)
+	public boolean setValue(Object value)
 	{
+		if (!value.getClass().equals(String.class))
+			throw new RuntimeException("Tried to set value of " + getClass().getSimpleName() + " to a " + value.getClass().getSimpleName());
+		
 		for (JRadioButton button : buttons)
 		{
 			if (button.getActionCommand().equals(value))
@@ -62,5 +66,19 @@ public class RadioButtonControl extends Control<String>
 		}
 		
 		return true;
+	}
+
+	@Override
+	public JPanel createAnimatePanel()
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String[] getAnimateValues()
+	{
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

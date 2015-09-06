@@ -21,8 +21,9 @@ public class SliderControl extends Control<Double>
 	
 	private final int SLIDER_MAX = 10000; //10k different possible slider values, definitely enough to accomadate the screen pixels.
 	
-	public SliderControl(double min, double max, double value, String label)
+	public SliderControl(String name, double min, double max, double value, String label)
 	{
+		super(name);
 		this.min = min;
 		this.max = max;
 		this.defaultValue = value;
@@ -65,12 +66,31 @@ public class SliderControl extends Control<Double>
 	}
 	
 	@Override
-	public boolean setValue(Double value)
+	public boolean setValue(Object value)
 	{
-		if (value < min || value > max)
+		if (!value.getClass().equals(Double.class))
+			throw new RuntimeException("Tried to set value of " + getClass().getSimpleName() + " to a " + value.getClass().getSimpleName());
+		
+		Double doubleValue = (Double) value;
+		
+		if (doubleValue < min || doubleValue > max)
 			return false;
 		
-		slider.setValue((int)Math.round((value / (max-min))*SLIDER_MAX));
+		slider.setValue((int)Math.round((doubleValue / (max-min))*SLIDER_MAX));
 		return true;
+	}
+
+	@Override
+	public JPanel createAnimatePanel()
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Double[] getAnimateValues()
+	{
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

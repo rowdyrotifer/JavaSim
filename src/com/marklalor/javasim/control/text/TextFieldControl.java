@@ -22,26 +22,32 @@ public abstract class TextFieldControl<T> extends Control<T>
 	
 	public TextFieldControl()
 	{
-		this("");
+		this(null);
 	}
 	
-	public TextFieldControl(String label)
+	public TextFieldControl(String name)
 	{
-		this(label, "");
+		this(name, "");
 	}
 	
-	public TextFieldControl(String label, String value)
+	public TextFieldControl(String name, String label)
 	{
-		this(label, value, null);
+		this(name, label, null);
 	}
 	
-	public TextFieldControl(String label, String value, Class<? extends DocumentFilter> filter)
+	public TextFieldControl(String name, String label, String value)
 	{
-		this(label, value, filter, 2);
+		this(name, label, value, null);
 	}
 	
-	public TextFieldControl(String label, String value, Class<? extends DocumentFilter> filter, int columns)
+	public TextFieldControl(String name, String label, String value, Class<? extends DocumentFilter> filter)
 	{
+		this(name, label, value, filter, 2);
+	}
+	
+	public TextFieldControl(String name, String label, String value, Class<? extends DocumentFilter> filter, int columns)
+	{
+		super(name);
 		this.defaultLabel = label;
 		this.defaultValue = value;
 		this.filter = filter;
@@ -79,7 +85,7 @@ public abstract class TextFieldControl<T> extends Control<T>
 		panel.setMaximumSize(panel.getPreferredSize());
 		
 		return panel;
-	}
+	} 
 	
 	public JTextField getTextField()
 	{
