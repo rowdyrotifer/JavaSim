@@ -42,8 +42,9 @@ public class SliderControl extends Control<Double>
 		slider.setMajorTickSpacing(SLIDER_MAX);
 	    slider.setPaintTicks(true);
 	    Hashtable<Integer, JLabel> labelTable = new Hashtable<Integer, JLabel>();
-	    labelTable.put(new Integer(0), new JLabel(String.valueOf(min)));
-	    labelTable.put(new Integer(SLIDER_MAX), new JLabel(String.valueOf(max)));
+	    final int maxChar = 6;
+	    labelTable.put(new Integer(0), new JLabel(String.valueOf(min).substring(0, String.valueOf(min).length() > maxChar ? maxChar : String.valueOf(min).length())));
+	    labelTable.put(new Integer(SLIDER_MAX), new JLabel(String.valueOf(max).substring(0, String.valueOf(max).length() > maxChar ? maxChar : String.valueOf(max).length())));
 	    slider.setLabelTable(labelTable);
 	    slider.setPaintLabels(true);
 	    slider.setValue((int)Math.round((defaultValue / (max-min))*SLIDER_MAX));

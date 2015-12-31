@@ -28,7 +28,6 @@ public class StringControl extends TextFieldControl<String>
 	@Override
 	public JPanel createAnimatePanel()
 	{
-		// TODO Auto-generated method stub
 		return null;
 	}
 

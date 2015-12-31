@@ -61,21 +61,25 @@ public class IntegerControl extends TextFieldControl<Integer>
 	@Override
 	public Integer[] getAnimateValues()
 	{
-		int endValue = val(end), startValue = val(start), intervalsValue = val(intervals);
+		int endValue = val(end), startValue = val(start), intervalsValue = (val(intervals) - 1);
+		
+		
 		
 		double interval = (endValue - startValue) / ((double)intervalsValue);
-		if (intervalsValue == 0)
+		if (intervalsValue == -1)
 		{
 			intervalsValue = (endValue - startValue) + 1;
 			interval = 1;
 		}
 		
-		Integer[] values = new Integer[intervalsValue];
+		Integer[] values = new Integer[intervalsValue + 1];
 		
 		for (int n = 0; n < intervalsValue; n++)
 		{
 			values[n] = new Integer((int)Math.round(startValue + (n * interval)));
 		}
+		values[intervalsValue] = new Integer(endValue); //TODO: this for doubles
+		
 		
 		return values;
 	}

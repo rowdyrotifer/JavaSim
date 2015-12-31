@@ -270,23 +270,19 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 				else
 					delay = animate.getFrameDelay();
 				
-				boolean last = (animationControls.isEmpty() && currentAnimationControlValueQueue.size() == 1);
+				boolean last = (animationControls.isEmpty() && currentAnimationControlValueQueue.isEmpty());
 				
 				if (last)
 					delay = animate.getStopDelay();
 				
-				if(variableAnimationN % animate.getSaveEvery() == 0 ||
-						variableAnimationN == 0 ||
-						last ||
-						!timerAnimation.isRunning())
-					try
-					{
-						animationWriter.writeToSequence(combinedImage, delay);
-					}
-					catch(IOException e1)
-					{
-						e1.printStackTrace();
-					}
+				try
+				{
+					animationWriter.writeToSequence(combinedImage, delay);
+				}
+				catch(IOException e1)
+				{
+					e1.printStackTrace();
+				}
 				
 				if(last)
 					stop();
@@ -325,28 +321,31 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 		setWidth(DEFAULT_IMAGE_WIDTH);
 		setHeight(DEFAULT_IMAGE_HEIGHT);
 		
-		// OS X fullscreen support:
-		FullScreenUtilities.setWindowCanFullScreen(getImage(), true);
-		// Allow esc key to... well... escape fullscreen
-		getImage().addKeyListener(new KeyListener()
+		if (System.getProperty("os.name").toLowerCase().startsWith("mac os x"))
 		{
-			@Override
-			public void keyTyped(KeyEvent e)
+			// OS X fullscreen support:
+			FullScreenUtilities.setWindowCanFullScreen(getImage(), true);
+			// Allow esc key to... well... escape fullscreen
+			getImage().addKeyListener(new KeyListener()
 			{
-			}
-			
-			@Override
-			public void keyReleased(KeyEvent e)
-			{
-			}
-			
-			@Override
-			public void keyPressed(KeyEvent e)
-			{
-				if(e.getKeyCode() == KeyEvent.VK_ESCAPE)
-					Simulation.this.setFullscreen(false);
-			}
-		});
+				@Override
+				public void keyTyped(KeyEvent e)
+				{
+				}
+				
+				@Override
+				public void keyReleased(KeyEvent e)
+				{
+				}
+				
+				@Override
+				public void keyPressed(KeyEvent e)
+				{
+					if(e.getKeyCode() == KeyEvent.VK_ESCAPE)
+						Simulation.this.setFullscreen(false);
+				}
+			});
+		}
 		
 		// Set up graphics.
 		setUpGraphics();
@@ -526,6 +525,7 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 		}
 		
 		animationControls = new ArrayList<Control<?>>(getAnimate().getAddedControls());
+		currentAnimationControl = null;
 		variableAnimationN = 0;
 		
 		timerAnimationVariable.start();

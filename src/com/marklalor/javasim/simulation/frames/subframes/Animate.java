@@ -268,9 +268,13 @@ public class Animate extends ImageSubframe
 			public void actionPerformed(ActionEvent e)
 			{
 				Control<?> newControl = Animate.this.getImage().getSimulation().getControls().getControls().get(String.valueOf(Animate.this.controlSelection.getSelectedItem()));
-				controlsPanel.add(newControl.createAnimatePanel());
-				Animate.this.addedControls.add(newControl);
-				Animate.this.pack();
+				JPanel controlPanel = newControl.createAnimatePanel();
+				if (controlPanel != null)
+				{
+					controlsPanel.add(controlPanel);
+					Animate.this.addedControls.add(newControl);
+					Animate.this.pack();
+				}
 			}
 		});
 		p1.add(addControl);

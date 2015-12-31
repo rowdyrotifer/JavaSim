@@ -62,11 +62,19 @@ public class SimulationInfo implements Serializable
 		    className = className.replace('/', '.');
 		    
 		    //Load it and return it if it's a simulation.
-		    Class<?> simClass = cl.loadClass(className);
-		    
-		    if (Simulation.class.isAssignableFrom(simClass))
+		    try
 		    {
-		    	returnClass = (Class<? extends Simulation>) simClass;
+		    	System.out.println("Loading " + className);
+		    	Class<?> simClass = cl.loadClass(className);
+		    	if (Simulation.class.isAssignableFrom(simClass))
+			    {
+			    	returnClass = (Class<? extends Simulation>) simClass;
+			    }
+		    }
+		    //Weird class files...?
+		    catch(Exception ex)
+		    {
+		    	ex.printStackTrace();
 		    }
 	    }
 	    

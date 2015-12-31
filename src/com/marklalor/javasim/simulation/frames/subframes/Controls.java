@@ -15,7 +15,6 @@ public class Controls extends ImageSubframe
 {
 	private static final long serialVersionUID = 7063568782126029536L;
 	private Map<String, Control<?>> controls;
-	private int autoKeyN = 0;
 	
 	public Controls(Image owner)
 	{
