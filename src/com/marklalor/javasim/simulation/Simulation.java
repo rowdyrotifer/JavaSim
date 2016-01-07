@@ -439,10 +439,8 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 		calculateCount = 0;
 	}
 	
-	private static final int changeInSpeed = 10; // TODO: maybe make this scale
-													// in some way to
-													// accommodate for the 1/x
-													// behavior.
+	private static final int changeInSpeed = 10; // TODO: maybe make this scale in some way to
+												 // accommodate for the 1/x behavior.
 	
 	public File getDefaultFile()
 	{

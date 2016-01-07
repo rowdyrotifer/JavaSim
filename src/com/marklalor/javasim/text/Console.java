@@ -9,9 +9,8 @@ package com.marklalor.javasim.text;
 //
 // RJHM van den Bergh , rvdb@comweb.nl
 //
-// Modified by Mark Lalor
+// Modified by Mark Lalor to integrate with JavaSim
 //
-
 import java.io.*;
 import java.awt.*;
 import java.awt.event.*;
