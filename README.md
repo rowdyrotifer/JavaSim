@@ -1,6 +1,6 @@
 # Table of Contents
 1. [Features](#features)
-2. [Install](#install)
+2. [Installation](#installation)
 3. [Example](#example)
 
 # JavaSim
@@ -9,16 +9,17 @@ Java simulation framework.
 
 ## Features
 
- * Easy to extend "Simulation" class
- * Simple program features
-   * copy image
-   * close window
-   * resize window
-   * reload simulation
- * Save created images
- * Create simple animations
+ * Easy to extend Simulation class.
+   * provides a sort of canvas to draw on.
+   * easy animation with repeatedly-called "draw" function.
+ * Program that reads your extended class can:
+   * save generated images.
+   * create animations.
+   * run at variable rates.
+   * run frame-by-frame.
+   * view in full screen.
 
-## Install
+## Installation
 
 See the [latest releases](https://github.com/MarkLalor/JavaSim/releases/latest) for downloads.
 
@@ -31,71 +32,55 @@ main screen. They can then be selected to load the simulation.
 The following program is designed to generate an image of a nephroid. Running `File → Create Animated Gif`
 with the default settings saves this image:
 
-![Nephroid Example](http://marklalor.com/wp-content/uploads/2015/08/NephroidExample.gif)
+![Nephroid Example](examples/Nephriod.gif)
 
 ```java
-public class Nephroid extends Simulation
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Point;
+
+import com.marklalor.javasim.simulation.preset.BlankImageSimulation;
+
+public class TripleAngleNephroid extends BlankImageSimulation
 {
-	public Nephroid(SimulationInfo info)
-	{
-		super(info);
-	}
-
-	public static final float TRANSPARENCY = 0.1f;
-	public static final double RADIUS_PERCENT = 0.8d;
-	
-	private static final int dTheta = 1;
-	private static final Point text = new Point(15, 20);
-	private static final DecimalFormat decimalFormat = new DecimalFormat("0.00");
-	
-	@Override
-	public void initialize()
-	{
-		getImage().setVisible(true);
-	}
-	
-	@Override
-	public void reset(Graphics2D permanent)
-	{
-		permanent.setColor(Color.WHITE);
-		permanent.fillRect(0, 0, getWidth(), getHeight());
-	}
-
 	@Override
 	public void draw(Graphics2D permanent, Graphics2D temporary)
 	{
-		permanent.translate(getWidth()/2, getHeight()/2);
-		permanent.setColor(new Color(0.05f, 0.05f, 0.05f, TRANSPARENCY));	
+		//Move the origin from the corner to the center.
+		permanent.translate(getWidth() / 2, getHeight() / 2);
 		
-		double radius = (Math.min(getWidth(), getHeight())/2) * RADIUS_PERCENT;
+		//Choose a semi-transparent black color.
+		permanent.setColor(new Color(0, 0, 0, 0.2f));
 		
-		Point p1 = getPoint(getN()*dTheta, radius);
-		Point p2 = getPoint(getN()*3*dTheta, radius);
+		//Get a radius that is 90% of the way to the edge of the screen.
+		double radius = (Math.min(getWidth(), getHeight()) / 2) * 0.9;
 		
-		permanent.drawLine(p1.x, p1.y, p2.x, p2.y);
+		//Generate points on a circle using JavaSim's getN() to animate.
+		Point point1 = getPoint(getN(), radius);
+		Point point2 = getPoint(getN()*3, radius);
 		
-		temporary.setColor(Color.BLACK);
-		temporary.setFont(new Font("Monospaced", Font.BOLD, 20)); 
-		temporary.drawString(" n = " + getN(), text.x, text.y);
-		temporary.drawString(" θ = " + decimalFormat.format(getN()*dTheta), text.x, text.y + 25);
-		temporary.drawString("dθ = " + decimalFormat.format(dTheta), text.x, text.y + 50);
+		//Draw a line between the two points.
+		permanent.drawLine(point1.x, point1.y, point2.x, point2.y);
 		
-		if (((getN())*dTheta) % 360 == 0 && getN() != 0)
+		//Stop after 360 lines.
+		if (getN() == 360)
 			breakpoint();
 	}
 	
+	//Get a point on the radius of a circle.
 	private Point getPoint(double theta, double radius)
 	{
-		return new Point((int)(radius*Math.cos(theta * (Math.PI / 180d))), (int) (radius * Math.sin(theta * (Math.PI / 180d))));
+		int x = (int)(radius*Math.cos(Math.toRadians(theta)));
+		int y = (int)(radius*Math.sin(Math.toRadians(theta)));
+		return new Point(x, y);
 	}
 }
 ```
 
-The program is simple:
+This bare bones program works by overriding `draw(Graphics2D permanent, Graphics2D temporary)`.
+The differences between `Graphics2D permanent` and `Graphics2D temporary`
+are simple. Things drawn onto `permanent` persist throughout an animation, whereas objects drawn on to `temporary`
+are cleared each frame.
+This simulation draws one semitransparent black line onto the `permanent` graphics each frame, connecting each angle to the angle three times it.
 
- * `initialize()` is called when the simulation is first loaded. Here we set the image to be visible.
- * `reset(Graphics2D permanent)` is called once initially and any other time the image should be refreshed, such
-as when the user resizes the window, or they select `Simulation → Reset`.
- * `draw(Graphics2D permanent, Graphics2D temporary)` is where most of the logic goes. First, the differences between `Graphics2D permanent` and `Graphics2D temporary`
-are simple. Things drawn onto `permanent` persist throughout an animation, whereas drawings on `temporary` are cleared each time. This simulation
-draws semitransparent black lines onto the permanent layer and strings onto the temporary layer.
+See the [getting started](https://github.com/MarkLalor/JavaSim/wiki/Getting-Started) page for a full introduction on how and what to use.
