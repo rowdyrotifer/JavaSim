@@ -41,7 +41,7 @@ import java.awt.Point;
 
 import com.marklalor.javasim.simulation.preset.BlankImageSimulation;
 
-public class TripleAngleNephroid extends BlankImageSimulation
+public class Nephroid extends BlankImageSimulation
 {
 	@Override
 	public void draw(Graphics2D permanent, Graphics2D temporary)
