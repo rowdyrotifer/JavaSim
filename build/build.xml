@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="build_app" name="Build JavaSim">
+	<target name="clean">
+		<delete file="../dist/JavaSim.jar"></delete>
+		<delete file="../dist/JavaSim.app"></delete>
+	</target>
+	<target name="create_jar" depends="clean">
+		<jar destfile="../dist/JavaSim.jar" manifest="MANIFEST.MF" filesetmanifest="mergewithoutmain">
+			<fileset dir="../bin"/>
+		</jar>
+	</target>
+	<target name="build_app" depends="create_jar">
+		<taskdef name="jarbundler" classname="net.sourceforge.jarbundler.JarBundler"/>
+			<jarbundler
+				dir="../dist"
+			    name="JavaSim"
+			    shortname="JavaSim"
+			    icon="icons.icns"
+			    stubfile="universalJavaApplicationStub"
+				mainclass="com.marklalor.javasim.JavaSim"
+				jvmversion="1.7+"
+				jar="../dist/JavaSim.jar"
+				copyright="© 2015—2016 Mark Lalor"
+				hiResCapable="true">
+			</jarbundler>
+		<exec executable="open">
+			<arg value="../dist"/>
+		</exec>
+	</target>
+</project>
