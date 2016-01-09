@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project default="build_app" name="Build JavaSim">
+<project default="finalize_dist" name="Build JavaSim">
+	<property name="version" value="1.1.0"/>
 	<target name="clean">
-		<delete file="../dist/JavaSim.jar"></delete>
-		<delete file="../dist/JavaSim.app"></delete>
+		<delete dir="../dist" />
+		<delete dir="osx/src"/>
 	</target>
 	<target name="create_jar" depends="clean">
 		<jar destfile="../dist/JavaSim.jar" manifest="MANIFEST.MF" filesetmanifest="mergewithoutmain">
@@ -15,16 +16,26 @@
 				dir="../dist"
 			    name="JavaSim"
 			    shortname="JavaSim"
-			    icon="icons.icns"
-			    stubfile="universalJavaApplicationStub"
+			    icon="osx/icons.icns"
+			    stubfile="osx/universalJavaApplicationStub"
 				mainclass="com.marklalor.javasim.JavaSim"
 				jvmversion="1.7+"
+				version="${version}"
 				jar="../dist/JavaSim.jar"
-				copyright="© 2015—2016 Mark Lalor"
+				copyright="JavaSim ${version}, © 2015–2016 Mark Lalor."
 				hiResCapable="true">
 			</jarbundler>
 		<exec executable="open">
 			<arg value="../dist"/>
 		</exec>
+	</target>
+	<target name = "build_dmg" depends="build_app">
+		<exec executable="/bin/sh">
+			<arg value="osx/build_dmg"/>
+			<arg value="${version}"/>
+		</exec>
+	</target>
+	<target name = "finalize_dist" depends="build_dmg">
+		<move file = "../dist/JavaSim.jar" tofile="../dist/JavaSim-${version}.jar" />
 	</target>
 </project>
