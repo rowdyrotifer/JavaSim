@@ -85,3 +85,31 @@ are cleared each frame.
 This simulation draws one semitransparent black line onto the `permanent` graphics each frame, connecting each angle to the angle three times it.
 
 See the [getting started](https://github.com/MarkLalor/JavaSim/wiki/Getting-Started) page for a full introduction on how and what to use.
+
+## Building From Source
+
+JavaSim uses [Apache Ant](http://ant.apache.org) for building and Ant Task [JarBundler (Tobias Fischer's fork)](https://github.com/tofi86/Jarbundler) for packaging for OS X.
+
+Building requires at least Ant and a Java 7 JDK.
+
+#### Quick build (only runnable jar):
+
+```shell
+git clone https://github.com/MarkLalor/JavaSim.git
+
+cd JavaSim/build
+ant create_jar -Djdk="/Path/To/JDK"
+```
+
+This will create `JavaSim.jar` in the `dist` directory.
+
+#### Full build (runnable jar, OSX .app, and .dmg)
+Requires [JarBundler](https://github.com/tofi86/Jarbundler) and osascript (will certainly not build .dmg on Windows because it relies on applescript. JarBundler for .app should work on Windows, though!) 
+
+```shell
+git clone https://github.com/MarkLalor/JavaSim.git
+cd JavaSim/build
+ant -Djdk="/Path/To/JDK"
+```
+
+This will create `JavaSim.app`, `JavaSim-x.y.z.dmg`, and `JavaSim-x.y.z.jar` in the `dist` directory.
