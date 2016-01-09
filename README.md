@@ -32,7 +32,7 @@ main screen. They can then be selected to load the simulation.
 The following program is designed to generate an image of a nephroid. Running `File → Create Animated Gif`
 with the default settings saves this image:
 
-![Nephroid Example](examples/Nephriod.gif)
+![Nephroid Example](https://raw.githubusercontent.com/MarkLalor/JavaSim/master/examples/Nephroid.gif)
 
 ```java
 import java.awt.Color;
