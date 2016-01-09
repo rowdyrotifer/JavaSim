@@ -5,6 +5,8 @@ import java.awt.Graphics;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.awt.geom.Point2D;
 
 import javax.swing.JFrame;
@@ -45,6 +47,7 @@ public class Image extends JFrame
 			@Override public void mouseEntered(MouseEvent e) { }
 			@Override public void mouseClicked(MouseEvent e) { }
 		});
+		
 		this.addMouseMotionListener(new MouseMotionListener()
 		{
 			@Override
@@ -54,6 +57,16 @@ public class Image extends JFrame
 					Image.this.setLocation((int)(e.getLocationOnScreen().getX() - origin.getX()), (int)(e.getLocationOnScreen().getY() - origin.getY()));
 			}
 			@Override public void mouseMoved(MouseEvent e) { }
+		});
+		
+		this.addWindowListener(new WindowAdapter()
+		{
+			@Override
+			public void windowClosing(WindowEvent e)
+			{
+				Image.this.getSimulation().delete();
+				super.windowClosing(e);
+			}
 		});
 		
 		this.imagePanel = new ImageJPanel(this);

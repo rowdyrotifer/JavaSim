@@ -212,6 +212,8 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 			{
 				draw();
 				hertzCheck();
+				
+				//Determine the delay depending on where we are in the animation (use start, stop, or intermediate delay)
 				int delay = 0;
 				if(getFrameNumber() == animate.getStartFrame())
 					delay = animate.getStartDelay();
@@ -611,8 +613,10 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 		System.out.println("Image No Longer On Clipboard");
 	}
 	
+	//Stop and close the simulation.
 	public void delete()
 	{
+		stop();
 		getImage().dispose();
 		getControls().dispose();
 		getHome().getConsole().getFrame().setVisible(false);
@@ -648,6 +652,12 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 	{
 		return image;
 	}
+	
+//	Not needed for now, won't be added until needed (and therefore tested)
+//	public Menu getMenu()
+//	{
+//		return menus.get(0);
+//	}
 	
 	public Controls getControls()
 	{
