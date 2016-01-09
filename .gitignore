@@ -1,9 +1,11 @@
 #Binaries.
-/bin/
-/release/
-/dist/
+bin/
+release/
+dist/
+build/osx/src
 #Eclipse stuff.
-/.settings
+.settings
+.externalToolBuilders/ANT\ Builder.launch
 #OS X
 .DS_Store
 #I think Eclipse generates these with markdown preview.
