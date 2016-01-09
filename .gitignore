@@ -1,4 +1,11 @@
+#Binaries.
 /bin/
-/dist/JavaSim.app
+/release/
+/dist/
+#Eclipse stuff.
 /.settings
+#OS X
 .DS_Store
+#I think Eclipse generates these with markdown preview.
+.LICENSE.md.html
+.README.md.html
