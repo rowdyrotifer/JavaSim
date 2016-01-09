@@ -296,8 +296,8 @@ public class Menu implements ActionListener
 		}
 		else if(e.getSource() == nextFrame)
 		{
-			sim.incrementN();
 			sim.draw();
+			sim.incrementFrameNumber();
 		}
 		else if(e.getSource() == decreaseSpeed)
 		{

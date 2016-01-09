@@ -68,10 +68,9 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 	private boolean fullscreen = false;
 	
 	// Misc Main stucture;
-	private List<Menu> menus; // give every window a copy of the menu, this gets
-								// around issues with JDialog's incapability to
-								// properly handle its parent menu's
-								// accelerators…
+	private List<Menu> menus; // give every window a copy of the menu, this gets around
+							  // issues with JDialog's incapability to
+							  // properly handle its parent menu's accelerators.
 	
 	// Main Frames
 	private Image image;
@@ -112,9 +111,7 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 	
 	// Simulation features.
 	public abstract void initialize();
-	
 	public abstract void reset(Graphics2D permanent);
-	
 	public abstract void draw(Graphics2D permanent, Graphics2D temporary);
 	
 	// Predefined listeners
@@ -140,20 +137,21 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 		return resetAction;
 	}
 	
-	// Simulation N (frame) variable.
-	private int n = 0;
+	// Simulation Frame Number: n
+	// Protected (not private) so that simulations can just use "n" for convenience.
+	protected int n = 0;
 	
-	public int getN()
+	public int getFrameNumber()
 	{
 		return this.n;
 	}
 	
-	public void setN(int n)
+	public void setFrameNumber(int n)
 	{
 		this.n = n;
 	}
 	
-	public void incrementN()
+	public void incrementFrameNumber()
 	{
 		this.n++;
 	}
@@ -195,13 +193,13 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 		resize = new Resize(getImage());
 		
 		// Make the general, manual animation timer.
-		timerManual = new Timer(10, new ActionListener()
+		timerManual = new Timer(0, new ActionListener()
 		{
 			@Override
 			public void actionPerformed(ActionEvent e)
 			{
-				incrementN();
 				draw();
+				incrementFrameNumber();
 				hertzCheck();
 			}
 		});
@@ -215,16 +213,16 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 				draw();
 				hertzCheck();
 				int delay = 0;
-				if(getN() == animate.getStartFrame())
+				if(getFrameNumber() == animate.getStartFrame())
 					delay = animate.getStartDelay();
-				if(getN() != animate.getStopFrame() && getN() != animate.getStartFrame())
+				if(getFrameNumber() != animate.getStopFrame() && getFrameNumber() != animate.getStartFrame())
 					delay = animate.getFrameDelay();
-				if(getN() == animate.getStopFrame() || !timerAnimation.isRunning())
+				if(getFrameNumber() == animate.getStopFrame() || !timerAnimation.isRunning())
 					delay = animate.getStopDelay();
 				
-				if(getN() % animate.getSaveEvery() == 0 ||
-						getN() == animate.getStartFrame() ||
-						getN() == animate.getStopFrame() ||
+				if(getFrameNumber() % animate.getSaveEvery() == 0 ||
+						getFrameNumber() == animate.getStartFrame() ||
+						getFrameNumber() == animate.getStopFrame() ||
 						!timerAnimation.isRunning())
 					try
 					{
@@ -235,10 +233,10 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 						e1.printStackTrace();
 					}
 				
-				if(getN() == animate.getStopFrame())
+				if(getFrameNumber() == animate.getStopFrame())
 					stop();
 				
-				incrementN();
+				incrementFrameNumber();
 			}
 		});
 		
@@ -427,7 +425,7 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 	
 	public void resetAction()
 	{
-		setN(0);
+		setFrameNumber(0);
 		reset();
 		combinedImage = permanentImage;
 		getImage().paintImage();
@@ -733,7 +731,7 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 	
 	public void increaseAnimationSpeed()
 	{
-		timerManual.setDelay(timerManual.getDelay() - changeInSpeed >= 1 ? timerManual.getDelay() - changeInSpeed : 1);
+		timerManual.setDelay(timerManual.getDelay() - changeInSpeed >= 1 ? timerManual.getDelay() - changeInSpeed : 0);
 		hertz = -1;
 		calculateHertz();
 	}
