@@ -1,20 +1,34 @@
 package com.marklalor.javasim.text;
-//
-// A simple Java Console for your application (Swing version)
-// Requires Java 1.1.5 or higher
-//
-// Disclaimer the use of this source is at your own risk. 
-//
-// Permission to use and distribute into your own applications
-//
-// RJHM van den Bergh , rvdb@comweb.nl
-//
-// Modified by Mark Lalor to integrate with JavaSim
-//
-import java.io.*;
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
+
+/**
+ * 
+ * A simple Java Console for your application (Swing version)
+ * Requires Java 1.1.5 or higher
+ * 
+ * Disclaimer the use of this source is at your own risk. 
+ * 
+ * Permission to use and distribute into your own applications
+ * 
+ * RJHM van den Bergh , rvdb@comweb.nl
+ * 
+ * Modified by Mark Lalor to integrate with JavaSim
+ * 
+ **/
+
+import java.awt.BorderLayout;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+import java.io.IOException;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
+import java.io.PrintStream;
+
+import javax.swing.JFrame;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+
+import com.marklalor.javasim.JavaSim;
 
 public class Console extends WindowAdapter implements WindowListener, Runnable
 {
@@ -46,7 +60,7 @@ public class Console extends WindowAdapter implements WindowListener, Runnable
 		try
 		{
 			PipedOutputStream pipedOut = new PipedOutputStream(this.outInputStream);
-			System.setOut(new PrintStream(pipedOut, true));
+			if (JavaSim.CONSOLE_BIND) System.setOut(new PrintStream(pipedOut, true));
 		}
 		catch(java.io.IOException io)
 		{
@@ -60,7 +74,7 @@ public class Console extends WindowAdapter implements WindowListener, Runnable
 		try
 		{
 			PipedOutputStream pipedOut = new PipedOutputStream(this.errInputStream);
-			System.setErr(new PrintStream(pipedOut, true));
+			if (JavaSim.CONSOLE_BIND) System.setErr(new PrintStream(pipedOut, true));
 		}
 		catch(java.io.IOException io)
 		{

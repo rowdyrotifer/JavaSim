@@ -8,8 +8,17 @@ import javax.swing.UIManager;
 public class JavaSim
 {
 	public static final File location = new File(System.getProperty("user.home") + File.separator + "Documents" + File.separator + "JavaSim");
+	public static boolean CONSOLE_BIND = true;
+	
 	public static void main(String[] args)
 	{
+		//Simple args for now.
+		for (String arg : args)
+		{
+			if (arg.equals("noconsolebind"))
+				CONSOLE_BIND = false;
+		}
+		
 		if (System.getProperty("os.name").toLowerCase().startsWith("mac os x"))
 		{
 			try
