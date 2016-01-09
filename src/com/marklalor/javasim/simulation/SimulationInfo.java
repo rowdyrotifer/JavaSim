@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Serializable;
+import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -13,38 +14,68 @@ import java.net.URLClassLoader;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-
-import org.json.JSONObject;
 
 public class SimulationInfo implements Serializable
 {
 	private static final long serialVersionUID = -4872104954414842342L;
 	
+	private static final String INFO_FILE = "info.properties";
+	
 	private File file;
-	private String name, date, author, version, description;
+	private String name, main, date, author, version, description;
 
-	public SimulationInfo(File file, String name, String date, String author, String version, String description)
+	public SimulationInfo(File file, String name, String main, String date, String author, String version, String description)
 	{
-		setData(file, name, date, author, version, description);
+		setData(file, name, main, date, author, version, description);
 	}
 	
 	public SimulationInfo(File jar)
 	{
-		JSONObject metadata = loadMetadata(jar);
-		setData(jar, metadata.getString("name"), metadata.getString("date"), metadata.getString("author"), metadata.getString("version"), metadata.getString("description"));
+		JarFile jarfile = null;
+		try
+		{
+			jarfile = new JarFile(jar);
+		}
+		catch(IOException e)
+		{
+			e.printStackTrace();
+		}
+		
+		JarEntry properties_entry = jarfile.getJarEntry(INFO_FILE);
+		if (properties_entry != null)
+		{
+			Map<String, String> properties = loadMetadata(jar);
+			if (properties != null)
+				setData(jar, properties.get("name"), properties.get("main"), properties.get("date"), properties.get("author"), properties.get("version"), properties.get("description"));
+			else
+				setDataBasic(jar);
+		}
+		else
+		{
+			setDataBasic(jar);
+		}
 	}
 	
+	private void setDataBasic(File jar)
+	{
+		setData(jar, jar.getName(), "", "", "", "", "");	
+	}
+
 	public SimulationInfo(Class<? extends Simulation> simulationClass)
 	{
-		JSONObject metadata = loadMetadata(simulationClass);
-		setData(new File(SimulationInfo.findPathJar(simulationClass)), metadata.getString("name"), metadata.getString("date"), metadata.getString("author"), metadata.getString("version"), metadata.getString("description"));
+		Map<String, String> properties = loadMetadata(simulationClass);
+		setData(new File(SimulationInfo.findPathJar(simulationClass)), properties.get("name"), properties.get("main"), properties.get("date"), properties.get("author"), properties.get("version"), properties.get("description"));
 	}
 
 	@SuppressWarnings("unchecked")
-	public static Class<? extends Simulation> loadSimulationClass(File file) throws IOException, ClassNotFoundException
+	public static Class<? extends Simulation> loadSimulationClass(File file, String targetClassName) throws IOException, ClassNotFoundException
 	{
+		System.out.println("Trying to load class from \"" + file + (targetClassName==null?"\" automatically.":"\", searching for \"" + targetClassName + "\""));
 		JarFile jarFile = new JarFile(file);
 		Enumeration<JarEntry> e = jarFile.entries();
 
@@ -65,11 +96,24 @@ public class SimulationInfo implements Serializable
 		    try
 		    {
 		    	System.out.println("Loading " + className);
-		    	Class<?> simClass = cl.loadClass(className);
-		    	if (Simulation.class.isAssignableFrom(simClass))
-			    {
-			    	returnClass = (Class<? extends Simulation>) simClass;
-			    }
+		    	if (targetClassName != null)
+		    	{
+			    	if (className.equals(targetClassName))	
+			    	{
+			    		Class<?> simClass = cl.loadClass(className);
+			    		if (!Simulation.class.isAssignableFrom(simClass))
+			    			throw new RuntimeException("The main class from " + INFO_FILE + ", " + targetClassName + ", does not extend Simulation");
+			    		returnClass = (Class<? extends Simulation>) simClass;
+			    	}
+		    	}
+		    	else
+		    	{
+			    	Class<?> simClass = cl.loadClass(className);
+			    	if (Simulation.class.isAssignableFrom(simClass))
+				    {
+				    	returnClass = (Class<? extends Simulation>) simClass;
+				    }
+		    	}
 		    }
 		    //Weird class files...?
 		    catch(Exception ex)
@@ -83,17 +127,55 @@ public class SimulationInfo implements Serializable
 		return returnClass;
 	}
 	
-	private void setData(File file,String name, String date, String author, String version, String description)
+	private void setData(File file, String name, String main, String date, String author, String version, String description)
 	{
 		this.file = file;
 		this.name = name;
+		this.main = main;
 		this.date = date;
 		this.author = author;
 		this.version = version;
 		this.description = description;
 	}
 
-	public static JSONObject loadMetadata(File jar) //TODO: merge logic from other similar method
+	public static Map<String, String> loadMetadata(File jar)
+	{
+		String in = getPropertiesString(jar);
+		return loadPropertiesFromString(in);
+	}
+	
+	public static Map<String, String> loadMetadata(Class<? extends Simulation> clazz)
+	{
+		String in = getPropertiesString(clazz);
+		return loadPropertiesFromString(in);
+	}
+	
+	private static Map<String, String> loadPropertiesFromString(String in)
+	{	
+		if (in == null)
+			return null;
+		
+		Properties properties = new Properties();
+		
+		try
+		{
+			properties.load(new StringReader(in));
+		}
+		catch(IOException e)
+		{
+			System.out.println("Could not load simulation's \"" + INFO_FILE + "\" file from input stream.");
+			e.printStackTrace();
+		}
+		
+		Map<String, String> propertiesMap = new HashMap<String, String>();
+		final String[] keys = {"main", "name", "date", "author", "version", "description"};
+		for (String key : keys)
+			propertiesMap.put(key, properties.getProperty(key));
+		
+		return propertiesMap;
+	}
+
+	private static String getPropertiesString(File jar)
 	{
 		URL url = null;
 		
@@ -106,25 +188,34 @@ public class SimulationInfo implements Serializable
 			e.printStackTrace();
 		}
 		
-		System.out.println(jar);
+		System.out.println("Getting info string from jar \"" + jar + "\" from resource \"" + INFO_FILE + "\"");
 		
 		final URLClassLoader urlClassLoader = new URLClassLoader( new URL[] { url } );
 		
-		InputStream in = urlClassLoader.getResourceAsStream("info.json");
-		BufferedReader input = new BufferedReader(new InputStreamReader(in));
+		InputStream in = urlClassLoader.getResourceAsStream(INFO_FILE);
 		
-		String data = "";
+		BufferedReader input = new BufferedReader(new InputStreamReader(in));
+		String data = "", line = null;
 		try
 		{
-			StringBuilder builder = new StringBuilder();
-			String line = "";
-
-			while ((line = input.readLine()) != null)
-			    builder.append(line);
-
-			data = builder.toString();
-
+			while((line = input.readLine()) != null)
+				data += line + "\n";
+		}
+		catch(IOException e)
+		{
+			e.printStackTrace();
+		}
+		try
+		{
 			input.close();
+			in.close();
+		}
+		catch(IOException e)
+		{
+			e.printStackTrace();
+		}
+		try
+		{
 			urlClassLoader.close();
 		}
 		catch(IOException e)
@@ -132,13 +223,15 @@ public class SimulationInfo implements Serializable
 			e.printStackTrace();
 		}
 		
-		return new JSONObject(data);
+		return data;
 	}
 	
-	private static JSONObject loadMetadata(Class<? extends Simulation> c)
+	private static String getPropertiesString(Class<? extends Simulation> clazz)
 	{
-		//URL url = c.getResource("/info.json");
-		URL url = c.getResource("info.json");
+		URL url = clazz.getResource(INFO_FILE);
+		
+		System.out.println("Getting input stream from class \"" + clazz.getCanonicalName() + "\"");
+		
 		InputStream in = null;
 		try
 		{
@@ -147,6 +240,7 @@ public class SimulationInfo implements Serializable
 		catch(IOException e)
 		{
 			e.printStackTrace();
+			return null;
 		}
 		
 		BufferedReader input = new BufferedReader(new InputStreamReader(in));
@@ -170,7 +264,7 @@ public class SimulationInfo implements Serializable
 			e.printStackTrace();
 		}
 		
-		return new JSONObject(data);
+		return data;
 	}
 	
 	//Getters and setters
@@ -193,6 +287,16 @@ public class SimulationInfo implements Serializable
 	public void setName(String name)
 	{
 		this.name = name;
+	}
+	
+	public String getMain()
+	{
+		return main;
+	}
+	
+	public void setMain(String main)
+	{
+		this.main = main;
 	}
 
 	public String getDate()

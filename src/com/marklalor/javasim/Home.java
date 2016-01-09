@@ -170,7 +170,7 @@ public class Home extends JFrame implements ListSelectionListener
 		
 		try
 		{
-			simClass = SimulationInfo.loadSimulationClass(info.getFile());
+			simClass = SimulationInfo.loadSimulationClass(info.getFile(), info.getMain()==null?null:(info.getMain()==""?null:info.getMain()));
 		}
 		catch(ClassNotFoundException e)
 		{
@@ -179,6 +179,12 @@ public class Home extends JFrame implements ListSelectionListener
 		catch(IOException e)
 		{
 			e.printStackTrace();
+		}
+		
+		if (simClass == null)
+		{
+			System.out.println("Could not load the simulation class!");
+			return;
 		}
 		
 		try
