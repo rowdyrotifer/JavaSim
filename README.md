@@ -96,7 +96,6 @@ Building requires at least Ant and a Java 7 JDK.
 
 ```shell
 git clone https://github.com/MarkLalor/JavaSim.git
-
 cd JavaSim/build
 ant create_jar -Djdk="/Path/To/JDK"
 ```
