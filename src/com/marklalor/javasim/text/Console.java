@@ -29,10 +29,100 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
 import com.marklalor.javasim.JavaSim;
+import com.marklalor.javasim.simulation.frames.Minimizable;
 
-public class Console extends WindowAdapter implements WindowListener, Runnable
+public class Console extends JFrame implements Minimizable
 {
-	private JFrame frame;
+	private static final long serialVersionUID = 6318364263842210392L;
+
+	private class ConsoleAdapter extends WindowAdapter implements WindowListener, Runnable
+	{
+		public synchronized void windowClosed(WindowEvent evt)
+		{
+			quit = true;
+			this.notifyAll(); // stop all threads
+			try
+			{
+				outThread.join(1000);
+				outInputStream.close();
+			}
+			catch(Exception e)
+			{
+			}
+			try
+			{
+				errThread.join(1000);
+				errInputStream.close();
+			}
+			catch(Exception e)
+			{
+			}
+			System.exit(0);
+		}
+		
+		public synchronized void run()
+		{
+			try
+			{
+				while(Thread.currentThread() == outThread)
+				{
+					try
+					{
+						this.wait(100);
+					}
+					catch(InterruptedException ie)
+					{
+					}
+					if(outInputStream.available() != 0)
+					{
+						String input = this.readLine(outInputStream);
+						textArea.append(input);
+					}
+					if(quit)
+						return;
+				}
+				
+				while(Thread.currentThread() == errThread)
+				{
+					try
+					{
+						this.wait(100);
+					}
+					catch(InterruptedException ie)
+					{
+					}
+					if(errInputStream.available() != 0)
+					{
+						String input = this.readLine(errInputStream);
+						textArea.append(input);
+					}
+					if(quit)
+						return;
+				}
+			}
+			catch(Exception e)
+			{
+				textArea.append("Internal console error: " + e);
+			}
+		}
+		
+		public synchronized String readLine(PipedInputStream in) throws IOException
+		{
+			String input = "";
+			do
+			{
+				int available = in.available();
+				if(available == 0)
+					break;
+				byte b[] = new byte[available];
+				in.read(b);
+				input = input + new String(b, 0, b.length);
+			}
+			while(!input.endsWith("\n") && !input.endsWith("\r\n") && !quit);
+			return input;
+		}
+	}
+	
 	private JTextArea textArea;
 	
 	private Thread outThread;
@@ -43,19 +133,23 @@ public class Console extends WindowAdapter implements WindowListener, Runnable
 	private final PipedInputStream outInputStream = new PipedInputStream();
 	private final PipedInputStream errInputStream = new PipedInputStream();
 	
+	private ConsoleAdapter adapter;
+	
 	public Console()
 	{
-		frame = new JFrame("JavaSim Console");
-		frame.setSize(500, 500);
+		setTitle("JavaSim Console");
+		setSize(500, 500);
 		
 		textArea = new JTextArea();
 		textArea.setEditable(false);
 		
-		frame.getContentPane().setLayout(new BorderLayout());
-		frame.getContentPane().add(new JScrollPane(textArea), BorderLayout.CENTER);
-		frame.setAutoRequestFocus(false);
+		getContentPane().setLayout(new BorderLayout());
+		getContentPane().add(new JScrollPane(textArea), BorderLayout.CENTER);
+		setAutoRequestFocus(false);
 		
-		frame.addWindowListener(this);
+		adapter = new ConsoleAdapter();
+		
+		addWindowListener(adapter);//TODO asdfadfasdfadsfasdf
 		
 		try
 		{
@@ -88,109 +182,21 @@ public class Console extends WindowAdapter implements WindowListener, Runnable
 		quit = false; // signals the Threads that they should exit
 		
 		// Starting two seperate threads to read from the PipedInputStreams
-		outThread = new Thread(this);
+		outThread = new Thread(adapter);
 		outThread.setDaemon(true);
 		outThread.start();
 		
-		errThread = new Thread(this);
+		errThread = new Thread(adapter);
 		errThread.setDaemon(true);
 		errThread.start();
 		
 		System.out.println("Console Started…");
 	}
-	
-	public synchronized void windowClosed(WindowEvent evt)
+
+	@Override
+	public void minimize()
 	{
-		quit = true;
-		this.notifyAll(); // stop all threads
-		try
-		{
-			outThread.join(1000);
-			outInputStream.close();
-		}
-		catch(Exception e)
-		{
-		}
-		try
-		{
-			errThread.join(1000);
-			errInputStream.close();
-		}
-		catch(Exception e)
-		{
-		}
-		System.exit(0);
-	}
-	
-	public synchronized void run()
-	{
-		try
-		{
-			while(Thread.currentThread() == outThread)
-			{
-				try
-				{
-					this.wait(100);
-				}
-				catch(InterruptedException ie)
-				{
-				}
-				if(outInputStream.available() != 0)
-				{
-					String input = this.readLine(outInputStream);
-					textArea.append(input);
-				}
-				if(quit)
-					return;
-			}
-			
-			while(Thread.currentThread() == errThread)
-			{
-				try
-				{
-					this.wait(100);
-				}
-				catch(InterruptedException ie)
-				{
-				}
-				if(errInputStream.available() != 0)
-				{
-					String input = this.readLine(errInputStream);
-					textArea.append(input);
-				}
-				if(quit)
-					return;
-			}
-		}
-		catch(Exception e)
-		{
-			textArea.append("Internal console error: " + e);
-		}
-	}
-	
-	public JFrame getFrame()
-	{
-		return frame;
-	}
-	
-	public void setVisible(boolean visible)
-	{
-		frame.setVisible(visible);
-	}
-	
-	public synchronized String readLine(PipedInputStream in) throws IOException
-	{
-		String input = "";
-		do
-		{
-			int available = in.available();
-			if(available == 0)
-				break;
-			byte b[] = new byte[available];
-			in.read(b);
-			input = input + new String(b, 0, b.length);
-		}
-		while(!input.endsWith("\n") && !input.endsWith("\r\n") && !quit);
-		return input;
+		if (isVisible())
+			setState(ICONIFIED);
 	}
 }

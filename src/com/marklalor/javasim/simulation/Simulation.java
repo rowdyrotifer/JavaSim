@@ -184,10 +184,9 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 		controls.setLocation(getControls().getLocation().x - (getImage().getWidth() / 2) - (getControls().getWidth() / 2), getImage().getY());
 		
 		// Reposition the console.
-		getHome().getConsole().getFrame().setSize(DEFAULT_CONSOLE_WIDTH, DEFAULT_CONSOLE_HEIGHT);
-		getHome().getConsole().getFrame().setLocationRelativeTo(getImage());
-		getHome().getConsole().getFrame()
-				.setLocation(getHome().getConsole().getFrame().getLocation().x + (getImage().getWidth() / 2) + (getHome().getConsole().getFrame().getWidth() / 2), getImage().getY());
+		getHome().getConsole().setSize(DEFAULT_CONSOLE_WIDTH, DEFAULT_CONSOLE_HEIGHT);
+		getHome().getConsole().setLocationRelativeTo(getImage());
+		getHome().getConsole().setLocation(getHome().getConsole().getLocation().x + (getImage().getWidth() / 2) + (getHome().getConsole().getWidth() / 2), getImage().getY());
 		
 		// Other dialogs.
 		resize = new Resize(getImage());
@@ -315,7 +314,7 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 		addMenuTo(getImage());
 		addMenuTo(getControls());
 		addMenuTo(getResize());
-		addMenuTo(home.getConsole().getFrame());
+		addMenuTo(home.getConsole());
 		
 		// Set sizes to the default dimensions
 		setWidth(DEFAULT_IMAGE_WIDTH);
@@ -619,7 +618,7 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 		stop();
 		getImage().dispose();
 		getControls().dispose();
-		getHome().getConsole().getFrame().setVisible(false);
+		getHome().getConsole().setVisible(false);
 	}
 	
 	public void breakpoint()

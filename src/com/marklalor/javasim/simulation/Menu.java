@@ -16,12 +16,13 @@ import javax.swing.JPopupMenu;
 import javax.swing.KeyStroke;
 
 import com.marklalor.javasim.Home;
+import com.marklalor.javasim.simulation.frames.Minimizable;
 
 import apple.dts.samplecode.osxadapter.OSXAdapter; //TODO: apple Application class can replace?
 
 public class Menu implements ActionListener
 {
-	private Simulation sim;
+	private Simulation _simulation;
 	private JFrame parent;
 	
 	private JMenuBar menuBar;
@@ -34,15 +35,17 @@ public class Menu implements ActionListener
 	private JMenuItem play, playUntilBreakpoint, stop, nextFrame, decreaseSpeed, increaseSpeed;
 	private JMenu simulation;
 	private JMenuItem reset, resizeMenuItem, fullscreen, showConsole;
+	private JMenu window;
+	private JMenuItem minimize;
 	
 	public JMenuBar getMenuBar()
 	{
 		return menuBar;
 	}
 	
-	public Menu(Simulation sim, JFrame parent)
+	public Menu(Simulation _simulation, JFrame parent)
 	{
-		this.sim = sim;
+		this._simulation = _simulation;
 		this.parent = parent;
 		
 		menuBar = new JMenuBar();
@@ -50,7 +53,7 @@ public class Menu implements ActionListener
 		file = new JMenu("File");
 		
 		// New Simulation – Command + N
-		newSimulation = new JMenuItem("New " + sim.getInfo().getName());
+		newSimulation = new JMenuItem("New " + getSimulation().getInfo().getName());
 		newSimulation.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		newSimulation.addActionListener(this);
 		file.add(newSimulation);
@@ -77,15 +80,15 @@ public class Menu implements ActionListener
 		
 		file.addSeparator();
 		
-		// Open Content Folder – Command + M
+		// Open Content Folder – Command + D
 		openContentFolder = new JMenuItem("Open Content Folder");
-		openContentFolder.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+		openContentFolder.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		openContentFolder.addActionListener(this);
 		file.add(openContentFolder);
 		
-		// Open Home Folder – Command + Shift + M
+		// Open Home Folder – Command + Shift + D
 		openHomeFolder = new JMenuItem("Open Home Folder");
-		openHomeFolder.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, (Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | InputEvent.SHIFT_MASK)));
+		openHomeFolder.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, (Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | InputEvent.SHIFT_MASK)));
 		openHomeFolder.addActionListener(this);
 		file.add(openHomeFolder);
 		
@@ -102,8 +105,8 @@ public class Menu implements ActionListener
 		{
 			try
 			{
-				OSXAdapter.setPreferencesHandler(sim, sim.getClass().getMethod("openPreferences", (Class[]) null));
-				OSXAdapter.setQuitHandler(sim, sim.getClass().getMethod("delete", (Class[]) null));
+				OSXAdapter.setPreferencesHandler(getSimulation(), getSimulation().getClass().getMethod("openPreferences", (Class[]) null));
+				OSXAdapter.setQuitHandler(getSimulation(), getSimulation().getClass().getMethod("delete", (Class[]) null));
 			}
 			catch(SecurityException e)
 			{
@@ -221,9 +224,18 @@ public class Menu implements ActionListener
 		simulation.add(showConsole);
 		
 		menuBar.add(simulation);
+		
+		window = new JMenu("Window");
+		
+		// Minimize – Command + M
+		minimize = new JMenuItem("Minimize");
+		minimize.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+		minimize.addActionListener(this);
+		window.add(minimize);
+		
+		menuBar.add(window);
 	}
 
-	
 	@Override
 	public void actionPerformed(ActionEvent e)
 	{
@@ -231,26 +243,26 @@ public class Menu implements ActionListener
 		
 		if(e.getSource() == newSimulation)
 		{
-			Home.run(sim.getHome(), sim.getInfo());
+			Home.run(getSimulation().getHome(), getSimulation().getInfo());
 		}
 		else if(e.getSource() == saveImage)
 		{
-			sim.save(sim.getDefaultFile());
+			getSimulation().save(getSimulation().getDefaultFile());
 		}
 		else if(e.getSource() == saveImageAs)
 		{
-			sim.saveAs();
+			getSimulation().saveAs();
 		}
 		else if(e.getSource() == animateMenuItem)
 		{
-			sim.getAnimate().setLocationRelativeTo(sim.getImage());
-			sim.getAnimate().setVisible(true);
+			getSimulation().getAnimate().setLocationRelativeTo(getSimulation().getImage());
+			getSimulation().getAnimate().setVisible(true);
 		}
 		else if(e.getSource() == openContentFolder)
 		{
 			try
 			{
-				Desktop.getDesktop().open(sim.getContentDirectory());
+				Desktop.getDesktop().open(getSimulation().getContentDirectory());
 			}
 			catch(IOException e1)
 			{
@@ -261,7 +273,7 @@ public class Menu implements ActionListener
 		{
 			try
 			{
-				Desktop.getDesktop().open(sim.getContentDirectory().getParentFile());
+				Desktop.getDesktop().open(getSimulation().getContentDirectory().getParentFile());
 			}
 			catch(IOException e1)
 			{
@@ -270,69 +282,80 @@ public class Menu implements ActionListener
 		}
 		else if(e.getSource() == closeSimulation)
 		{
-			sim.delete();
+			getSimulation().delete();
 		}
 		else if(e.getSource() == openProperties)
 		{
-			sim.openPreferences();
+			getSimulation().openPreferences();
 		}
 		else if(e.getSource() == copy)
 		{
-			sim.copyImageToClipboard();
+			getSimulation().copyImageToClipboard();
 		}
 		else if(e.getSource() == play)
 		{
-			sim.setStopForBreakpoint(false);
-			sim.play();
+			getSimulation().setStopForBreakpoint(false);
+			getSimulation().play();
 		}
 		else if(e.getSource() == playUntilBreakpoint)
 		{
-			sim.setStopForBreakpoint(true);
-			sim.play();
+			getSimulation().setStopForBreakpoint(true);
+			getSimulation().play();
 		}
 		else if(e.getSource() == stop)
 		{
-			sim.stop();
+			getSimulation().stop();
 		}
 		else if(e.getSource() == nextFrame)
 		{
-			sim.draw();
-			sim.incrementFrameNumber();
+			getSimulation().draw();
+			getSimulation().incrementFrameNumber();
 		}
 		else if(e.getSource() == decreaseSpeed)
 		{
-			sim.decreaseAnimationSpeed();
+			getSimulation().decreaseAnimationSpeed();
 		}
 		else if(e.getSource() == increaseSpeed)
 		{
-			sim.increaseAnimationSpeed();
+			getSimulation().increaseAnimationSpeed();
 		}
 		else if(e.getSource() == reset)
 		{
-			sim.resetAction();
+			getSimulation().resetAction();
 		}
 		else if(e.getSource() == reloadSimulation)
 		{
-			Home.run(sim.getHome(), sim.getInfo());
-			sim.delete();
+			Home.run(getSimulation().getHome(), getSimulation().getInfo());
+			getSimulation().delete();
 		}
 		else if (e.getSource() == resizeMenuItem)
 		{
-			sim.getResize().setLocationRelativeTo(sim.getImage());
-			sim.getResize().setVisible(true);
+			getSimulation().getResize().setLocationRelativeTo(getSimulation().getImage());
+			getSimulation().getResize().setVisible(true);
 		}
 		else if (e.getSource() == fullscreen)
 		{
-			sim.toggleFullscreen();
+			getSimulation().toggleFullscreen();
 		}
 		else if (e.getSource() == showConsole)
 		{
-			sim.getHome().getConsole().setVisible(true);
+			getSimulation().getHome().getConsole().setVisible(true);
+		}
+		else if (e.getSource() == minimize)
+		{
+			JFrame parent = this.getParent();
+			if (Minimizable.class.isAssignableFrom(parent.getClass()))
+				((Minimizable)parent).minimize();
 		}
 	}
 	
 	public JFrame getParent()
 	{
 		return parent;
+	}
+	
+	public Simulation getSimulation()
+	{
+		return this._simulation;
 	}
 }

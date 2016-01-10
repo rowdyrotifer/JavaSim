@@ -10,7 +10,7 @@ import javax.swing.text.PlainDocument;
 
 import com.marklalor.javasim.text.filter.IntegerFilter;
 
-public class ImageSubframe extends JFrame
+public class ImageSubframe extends JFrame implements Minimizable
 {	
 	private static final long serialVersionUID = 6751475825307229601L;
 	
@@ -44,5 +44,12 @@ public class ImageSubframe extends JFrame
 		group.add(new JLabel(label), BorderLayout.WEST);
 		group.add(textField, BorderLayout.CENTER);
 		return group;
+	}
+
+	@Override
+	public void minimize()
+	{
+		if (isVisible())
+			setState(ICONIFIED);
 	}
 }

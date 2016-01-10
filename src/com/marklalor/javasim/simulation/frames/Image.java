@@ -14,7 +14,7 @@ import javax.swing.JPanel;
 
 import com.marklalor.javasim.simulation.Simulation;
 
-public class Image extends JFrame
+public class Image extends JFrame implements Minimizable
 {
 	private static final long serialVersionUID = 7211460258372253616L;
 	
@@ -123,5 +123,12 @@ public class Image extends JFrame
 			g.clearRect(0, 0, getWidth(), getHeight());
 			g.drawImage(parent.getSimulation().getCurrentImage(), 0, getInsets().top, null);
 		}
+	}
+
+	@Override
+	public void minimize()
+	{
+		if (isVisible())
+			setState(ICONIFIED);
 	}
 }
