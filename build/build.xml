@@ -20,6 +20,22 @@
 			<fileset dir="../bin"/>
 		</jar>
 	</target>
+	<target name="create_source_jar" depends="clean">
+		<property name="jdk" location="/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk"/>
+		<path id="master-classpath">
+		  <fileset dir="${jdk}/Contents/Home/jre/lib">
+		    <include name="*.jar"/>
+		  </fileset>
+		</path>
+		<mkdir dir="../bin"/>
+		<javac srcdir="../src" destdir="../bin" includeantruntime="false">
+			<classpath refid="master-classpath"/>
+		</javac>
+		<jar destfile="../dist/JavaSim-${version}-src.jar" manifest="MANIFEST.MF" filesetmanifest="mergewithoutmain">
+			<fileset dir="../bin"/>
+			<fileset dir="../src"/>
+		</jar>
+	</target>
 	<target name="build_app" depends="create_jar">
 		<taskdef name="jarbundler" classname="net.sourceforge.jarbundler.JarBundler"/>
 			<jarbundler
