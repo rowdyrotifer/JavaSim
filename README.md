@@ -97,7 +97,7 @@ Building requires at least Ant and a Java 7 JDK.
 ```shell
 git clone https://github.com/MarkLalor/JavaSim.git
 cd JavaSim/build
-ant create_jar -Djdk="/Path/To/JDK"
+ant create_jar
 ```
 
 This will create `JavaSim.jar` in the `dist` directory.
@@ -108,7 +108,7 @@ Requires [JarBundler](https://github.com/tofi86/Jarbundler) and osascript (will 
 ```shell
 git clone https://github.com/MarkLalor/JavaSim.git
 cd JavaSim/build
-ant -Djdk="/Path/To/JDK"
+ant
 ```
 
 This will create `JavaSim.app`, `JavaSim-x.y.z.dmg`, and `JavaSim-x.y.z.jar` in the `dist` directory.
