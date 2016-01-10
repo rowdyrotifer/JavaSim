@@ -28,11 +28,13 @@ import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import com.marklalor.javasim.simulation.HomeMenu;
 import com.marklalor.javasim.simulation.Simulation;
 import com.marklalor.javasim.simulation.SimulationInfo;
+import com.marklalor.javasim.simulation.frames.Minimizable;
 import com.marklalor.javasim.text.Console;
 
-public class Home extends JFrame implements ListSelectionListener
+public class Home extends JFrame implements ListSelectionListener, Minimizable
 {
 	private static final long serialVersionUID = 6321955323521519657L;
 	
@@ -45,7 +47,9 @@ public class Home extends JFrame implements ListSelectionListener
 	private JLabel name, date, author, version, description;
 	private JButton run;
 	
+	private HomeMenu menu;
 	private Console console;
+	
 	
 	public Home(File location)
 	{
@@ -54,6 +58,9 @@ public class Home extends JFrame implements ListSelectionListener
 		loadSimulations();
 		setupLayout();
 		simulationList.setSelectedIndex(0);
+		
+		menu = new HomeMenu(this);
+		this.setJMenuBar(menu.getMenuBar());
 	}
 
 	private static final FilenameFilter jarFilter = new FilenameFilter()
@@ -235,5 +242,12 @@ public class Home extends JFrame implements ListSelectionListener
 		this.author.setText(info.getAuthor());
 		this.version.setText("Version " + info.getVersion());
 		this.description.setText("<html><p>" + info.getDescription() + "</p></html>");
+	}
+	
+	@Override
+	public void minimize()
+	{
+		if (isVisible())
+			setState(ICONIFIED);
 	}
 }

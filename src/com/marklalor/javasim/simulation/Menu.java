@@ -51,7 +51,7 @@ public class Menu implements ActionListener
 		menuBar = new JMenuBar();
 		
 		file = new JMenu("File");
-		
+		 
 		// New Simulation – Command + N
 		newSimulation = new JMenuItem("New " + getSimulation().getInfo().getName());
 		newSimulation.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
@@ -80,17 +80,17 @@ public class Menu implements ActionListener
 		
 		file.addSeparator();
 		
-		// Open Content Folder – Command + D
-		openContentFolder = new JMenuItem("Open Content Folder");
-		openContentFolder.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-		openContentFolder.addActionListener(this);
-		file.add(openContentFolder);
-		
-		// Open Home Folder – Command + Shift + D
+		// Open Home Folder – Command + D
 		openHomeFolder = new JMenuItem("Open Home Folder");
-		openHomeFolder.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, (Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | InputEvent.SHIFT_MASK)));
+		openHomeFolder.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		openHomeFolder.addActionListener(this);
 		file.add(openHomeFolder);
+		
+		// Open Content Folder – Command + Shift + D
+		openContentFolder = new JMenuItem("Open Content Folder");
+		openContentFolder.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, (Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | InputEvent.SHIFT_MASK)));
+		openContentFolder.addActionListener(this);
+		file.add(openContentFolder);
 		
 		file.addSeparator();
 		

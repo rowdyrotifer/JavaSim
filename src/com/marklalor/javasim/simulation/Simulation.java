@@ -314,7 +314,7 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 		addMenuTo(getImage());
 		addMenuTo(getControls());
 		addMenuTo(getResize());
-		addMenuTo(home.getConsole());
+		addMenuTo(home.getConsole()); //TODO: this is not appropriate, it should just recognize the most recently active simulation.
 		
 		// Set sizes to the default dimensions
 		setWidth(DEFAULT_IMAGE_WIDTH);
@@ -618,7 +618,6 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 		stop();
 		getImage().dispose();
 		getControls().dispose();
-		getHome().getConsole().setVisible(false);
 	}
 	
 	public void breakpoint()
