@@ -2,6 +2,7 @@
 1. [Features](#features)
 2. [Installation](#installation)
 3. [Example](#example)
+4. [Building From Source](#building-from-source)
 
 # JavaSim
 
