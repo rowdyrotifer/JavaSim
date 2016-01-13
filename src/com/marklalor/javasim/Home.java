@@ -89,7 +89,6 @@ public class Home extends JFrame implements ListSelectionListener, Minimizable
 		GridBagConstraints constraints = new GridBagConstraints();
 		constraints.fill = GridBagConstraints.BOTH;
 		constraints.weighty = 1;
-		constraints.gridwidth = 2;
 		
 		DefaultListModel<SimulationInfo> model = new DefaultListModel<SimulationInfo>();
 		if (simulations != null)
@@ -103,7 +102,8 @@ public class Home extends JFrame implements ListSelectionListener, Minimizable
 		simulationList.setLayoutOrientation(JList.VERTICAL);
 		simulationList.setVisibleRowCount(-1);
 		simulationList.addListSelectionListener(this);
-		constraints.weightx = 0.25;
+		simulationList.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 4, new Color(0.25f, 0.10f, 0.10f)));
+		
 		getContentPane().add(simulationList, constraints);
 		
 		simulationList.addMouseListener(new MouseAdapter()
@@ -134,8 +134,8 @@ public class Home extends JFrame implements ListSelectionListener, Minimizable
 		
 		simulationInfoPanel = new JPanel();
 		simulationInfoPanel.setLayout(new BoxLayout(simulationInfoPanel, BoxLayout.Y_AXIS));
-		simulationInfoPanel.setBackground(new Color(0.8f, 0.8f, 0.8f));
-		simulationInfoPanel.setBorder(BorderFactory.createMatteBorder(0, 8, 0, 0, new Color(0.15f, 0.15f, 0.15f)));
+		simulationInfoPanel.setBackground(new Color(0.90f, 0.85f, 0.85f));
+		simulationInfoPanel.setBorder(BorderFactory.createMatteBorder(2, 6, 0, 0, new Color(0.90f, 0.85f, 0.85f)));
 		constraints.weightx = 0.75;
 		getContentPane().add(simulationInfoPanel, constraints);
 		
