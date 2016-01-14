@@ -1,6 +1,7 @@
 package com.marklalor.javasim;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -24,6 +25,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -104,7 +106,11 @@ public class Home extends JFrame implements ListSelectionListener, Minimizable
 		simulationList.addListSelectionListener(this);
 		simulationList.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 4, new Color(0.25f, 0.10f, 0.10f)));
 		
-		getContentPane().add(simulationList, constraints);
+		JScrollPane simulationListScrollPane = new JScrollPane(simulationList);
+		simulationListScrollPane.setPreferredSize(new Dimension(200, 100));
+		simulationListScrollPane.setMinimumSize(new Dimension(200, 100));
+		simulationListScrollPane.setBorder(BorderFactory.createEmptyBorder());
+		getContentPane().add(simulationListScrollPane, constraints);
 		
 		simulationList.addMouseListener(new MouseAdapter()
 		{
@@ -137,7 +143,10 @@ public class Home extends JFrame implements ListSelectionListener, Minimizable
 		simulationInfoPanel.setBackground(new Color(0.90f, 0.85f, 0.85f));
 		simulationInfoPanel.setBorder(BorderFactory.createMatteBorder(2, 6, 0, 0, new Color(0.90f, 0.85f, 0.85f)));
 		constraints.weightx = 0.75;
-		getContentPane().add(simulationInfoPanel, constraints);
+		
+		JScrollPane simulationInfoPanelScrollPane = new JScrollPane(simulationInfoPanel);
+		simulationInfoPanelScrollPane.setBorder(BorderFactory.createEmptyBorder());
+		getContentPane().add(simulationInfoPanelScrollPane, constraints);
 		
 		this.name = new JLabel();
 		this.name.setFont(this.name.getFont().deriveFont(26f).deriveFont(Font.BOLD));
