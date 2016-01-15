@@ -42,6 +42,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import com.apple.eawt.Application;
 import com.apple.eawt.FullScreenUtilities;
 import com.marklalor.javasim.Home;
+import com.marklalor.javasim.JavaSim;
 import com.marklalor.javasim.control.Control;
 import com.marklalor.javasim.imaging.GifSequenceWriter;
 import com.marklalor.javasim.imaging.TransferableImage;
@@ -158,7 +159,6 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 	
 	public void preInitialize(SimulationInfo info)
 	{
-		getHome().getConsole().setVisible(true);
 		// Don't allow anyone to use this method a second time… just… no.
 		if(this.info != null)
 			throw new RuntimeException("Do not call method com.marklalor.javasim.simulation.Simulation#javaSimInitialize more than once (it is called once automatically by JavaSim Home)");
@@ -183,10 +183,14 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 		controls.setLocationRelativeTo(getImage());
 		controls.setLocation(getControls().getLocation().x - (getImage().getWidth() / 2) - (getControls().getWidth() / 2), getImage().getY());
 		
-		// Reposition the console.
-		getHome().getConsole().setSize(DEFAULT_CONSOLE_WIDTH, DEFAULT_CONSOLE_HEIGHT);
-		getHome().getConsole().setLocationRelativeTo(getImage());
-		getHome().getConsole().setLocation(getHome().getConsole().getLocation().x + (getImage().getWidth() / 2) + (getHome().getConsole().getWidth() / 2), getImage().getY());
+		// Reposition the console (but skip if the console is not bound)
+		if (JavaSim.CONSOLE_BIND)
+		{
+			getHome().getConsole().setSize(DEFAULT_CONSOLE_WIDTH, DEFAULT_CONSOLE_HEIGHT);
+			getHome().getConsole().setLocationRelativeTo(getImage());
+			getHome().getConsole().setLocation(getHome().getConsole().getLocation().x + (getImage().getWidth() / 2) + (getHome().getConsole().getWidth() / 2), getImage().getY());
+			getHome().getConsole().setVisible(true);
+		}
 		
 		// Other dialogs.
 		resize = new Resize(getImage());

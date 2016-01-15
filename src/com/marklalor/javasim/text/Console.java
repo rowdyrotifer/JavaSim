@@ -24,6 +24,7 @@ import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.io.PrintStream;
 
+import javax.swing.BorderFactory;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -144,12 +145,15 @@ public class Console extends JFrame implements Minimizable
 		textArea.setEditable(false);
 		
 		getContentPane().setLayout(new BorderLayout());
-		getContentPane().add(new JScrollPane(textArea), BorderLayout.CENTER);
+		
+		JScrollPane textAreaScrollPane = new JScrollPane(textArea);
+		textAreaScrollPane.setBorder(BorderFactory.createEmptyBorder());
+		getContentPane().add(textAreaScrollPane, BorderLayout.CENTER);
 		setAutoRequestFocus(false);
 		
 		adapter = new ConsoleAdapter();
 		
-		addWindowListener(adapter);//TODO asdfadfasdfadsfasdf
+		addWindowListener(adapter);
 		
 		try
 		{
@@ -191,6 +195,10 @@ public class Console extends JFrame implements Minimizable
 		errThread.start();
 		
 		System.out.println("Console Started…");
+		if (!JavaSim.CONSOLE_BIND)
+		{
+			textArea.append("STDOUT/STDERR not bound to this console.\nTo bind, run without the \"noconsolebind\" argument.");
+		}
 	}
 
 	@Override
