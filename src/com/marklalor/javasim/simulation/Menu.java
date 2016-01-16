@@ -15,7 +15,6 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.KeyStroke;
 
-import com.marklalor.javasim.Home;
 import com.marklalor.javasim.simulation.frames.Minimizable;
 
 import apple.dts.samplecode.osxadapter.OSXAdapter; //TODO: apple Application class can replace?
@@ -243,7 +242,7 @@ public class Menu implements ActionListener
 		
 		if(e.getSource() == newSimulation)
 		{
-			Home.run(getSimulation().getHome(), getSimulation().getInfo());
+			getSimulation().getHome().run(getSimulation().getInfo());
 		}
 		else if(e.getSource() == saveImage)
 		{
@@ -325,7 +324,7 @@ public class Menu implements ActionListener
 		}
 		else if(e.getSource() == reloadSimulation)
 		{
-			Home.run(getSimulation().getHome(), getSimulation().getInfo());
+			getSimulation().getHome().run(getSimulation().getInfo());
 			getSimulation().delete();
 		}
 		else if (e.getSource() == resizeMenuItem)

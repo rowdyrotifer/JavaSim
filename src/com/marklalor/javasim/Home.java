@@ -175,10 +175,10 @@ public class Home extends JFrame implements ListSelectionListener, Minimizable
 	
 	private void runSelected()
 	{
-		run(this, (SimulationInfo) simulationList.getSelectedValue());
+		this.run((SimulationInfo) simulationList.getSelectedValue());
 	}
 	
-	public static void run(Home home, SimulationInfo info)
+	public void run(SimulationInfo info)
 	{
 		System.out.println("Running " + info.getName());
 		
@@ -208,9 +208,8 @@ public class Home extends JFrame implements ListSelectionListener, Minimizable
 			System.out.println("Initializing " + simClass.toString());
 			try
 			{
-				//final Simulation simulation = simClass.getDeclaredConstructor(SimulationInfo.class).newInstance(info);
 				final Simulation simulation = simClass.newInstance();
-				simulation.setHome(home);
+				simulation.setHome(this);
 				simulation.preInitialize(info);
 				simulation.initialize();
 				simulation.postInitialize();
