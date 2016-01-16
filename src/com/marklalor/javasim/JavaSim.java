@@ -46,6 +46,11 @@ public class JavaSim
 		});
 	}
 	
+	public static String getVersion()
+	{
+		return JavaSim.class.getPackage().getSpecificationVersion();
+	}
+	
 	private static void makeSureFolderExists()
 	{
 		location.mkdirs();
