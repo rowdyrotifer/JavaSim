@@ -51,9 +51,9 @@
 		<antcall target="jar">
 			<param name="jarname" value="${filename}-src.jar"/>
 		</antcall>
-	</target>	
+	</target>
 	
-	<target name="build_osx_app" depends="create_jar">
+	<target name="build_osx" depends="create_jar">
 		<taskdef name="jarbundler" classname="net.sourceforge.jarbundler.JarBundler"/>
 			<jarbundler
 				dir="../dist"
@@ -68,15 +68,22 @@
 				copyright="JavaSim ${version}, © 2015–2016 Mark Lalor."
 				hiResCapable="true">
 			</jarbundler>
-		<exec executable="open">
-			<arg value="../dist"/>
-		</exec>
 	</target>
-	<target name = "build_dmg" depends="build_osx_app">
-		<delete dir="osx/src" />
+	<target name = "build_dmg" depends="build_osx">
+		<delete dir="osx/src"/>
 		<exec executable="/bin/sh">
 			<arg value="osx/build_dmg"/>
 			<arg value="${version}"/>
 		</exec>
+	</target>
+	<target name="run_jar">
+		<exec executable="open">
+			<arg value="../dist/${filename}.jar"/>
+		</exec>
+	</target>
+	<target name="run_osx">
+		<exec executable="open">
+			<arg value="../dist/JavaSim.app"/>
+		</exec>	
 	</target>
 </project>
