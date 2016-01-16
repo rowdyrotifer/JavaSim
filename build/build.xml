@@ -7,7 +7,7 @@
 	<target name="build">
 		<delete dir="../bin"/>
 		<mkdir dir="../bin"/>
-		<javac source="1.7" target="1.7" srcdir="../src" destdir="../bin" includeantruntime="false" fork="true">
+		<javac encoding="UTF-8" source="1.7" target="1.7" srcdir="../src" destdir="../bin" includeantruntime="false" fork="true">
 			<compilerarg line="-XDignore.symbol.file"/>
 			<!-- Compiling with rt.jar... may not work compiling on windows. -->
 			<!-- http://stackoverflow.com/questions/4065401/using-internal-sun-classes-with-javac -->

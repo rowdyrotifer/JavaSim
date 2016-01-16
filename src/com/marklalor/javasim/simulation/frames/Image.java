@@ -31,7 +31,6 @@ public class Image extends JFrame implements Minimizable
 		this.simulation = simulation;
 		this.addMouseListener(new MouseListener()
 		{
-			
 			@Override
 			public void mouseReleased(MouseEvent e)
 			{

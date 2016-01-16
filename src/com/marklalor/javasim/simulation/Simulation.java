@@ -50,7 +50,22 @@ import com.marklalor.javasim.simulation.frames.Image;
 import com.marklalor.javasim.simulation.frames.subframes.Animate;
 import com.marklalor.javasim.simulation.frames.subframes.Controls;
 import com.marklalor.javasim.simulation.frames.subframes.Resize;
+import com.marklalor.javasim.simulation.preset.BlankImageSimulation;
 
+/**
+ * <p>
+ * Master simulation class, containing components such as the {@link SimulationInfo}, the {@link Image}, and the {@link Controls}.
+ * A simulation subclass is responsible for implementing the {@link #initialize()}, {@link #reset()}, and {@link #draw(Graphics2D, Graphics2D)} methods.
+ * </p>
+ * <p>
+ * For even more bare-bones implementations of a simulation, see presets such as {@link BlankImageSimulation}, which are Simulations designed for simple target behavior, such
+ * as creating an image with a white background.
+ * </p>
+ * @see <a href = "https://github.com/MarkLalor/JavaSim#example">https://github.com/MarkLalor/JavaSim#example</a>
+ * @see #initialize()
+ * @see #reset()
+ * @see #draw(Graphics2D, Graphics2D)
+ */
 public abstract class Simulation implements ClipboardOwner, MouseListener, MouseWheelListener, MouseMotionListener
 {
 	public static final int DEFAULT_IMAGE_WIDTH = 500, DEFAULT_IMAGE_HEIGHT = 500;
@@ -69,9 +84,7 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 	private boolean fullscreen = false;
 	
 	// Misc Main stucture;
-	private List<Menu> menus; // give every window a copy of the menu, this gets around
-							  // issues with JDialog's incapability to
-							  // properly handle its parent menu's accelerators.
+	private List<Menu> menus;
 	
 	// Main Frames
 	private Image image;
@@ -110,9 +123,75 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 	private ImageOutputStream animationOut;
 	private GifSequenceWriter animationWriter;
 	
-	// Simulation features.
+	// Simulation abstract methods:
+	
+	/**
+	 * <p>
+	 * Called by {@link Home#run(Home, SimulationInfo)} when a simulation is ran
+	 * via the home screen. This is called after most of the core initialization
+	 * is done by {@link #preInitialize(SimulationInfo)}. And before any
+	 * initialization-reliant tasks done in {@link #postInitialize()}. This is
+	 * an appropriate time to do things such as:
+	 * </p>
+	 * <p>
+	 * <ul>
+	 * <li>initialize your own fields (like a regular constructor).</li>
+	 * <li>initialize JavaSim controls (see {@link Control}).</li>
+	 * <li>show, set size of, and set location of panels (e.g. {@link #getImage()}, {@link #getControls()}).</li>
+	 * </ul>
+	 * </p>
+	 * <p>
+	 * For clarification, this method is called in {@link Home#run(SimulationInfo)} like so:
+	 * <pre>
+	 * {@code
+	 * simulation.preInitialize(home, info);
+	 * simulation.initialize();
+	 * simulation.postInitialize();
+	 * simulation.resetAction();
+	 * }
+	 * </pre>
+	 * </p>
+	 */
 	public abstract void initialize();
+	/**
+	 * <p>
+	 * Called when the simulation should be logically reset. From the GUI, this
+	 * is done by Simulation→Reset, but it can also be called programmatically
+	 * by {@link #resetAction()}. Currently, the simulation is reset:
+	 * </p>
+	 * <ul>
+	 * <li>After all initialization is completed.</li>
+	 * <li>From the menu item Simulation→Reset</li>
+	 * <li>At the beginning of creation of an animation.</li>
+	 * <li>On resize of a window.</li>
+	 * </ul>
+	 * </p>
+	 * @param permanent <code>Graphics2D</code> object which may be drawn on
+	 * to logically reset the simulation. For example, using {@link Graphics2D#fillRect(int, int, int, int)}
+	 * to paint white on top of the whole image effectively resets it.
+	 */
 	public abstract void reset(Graphics2D permanent);
+	/**
+	 * <p>
+	 * Called by an animation timer, typically the one started by Animation→Play,
+	 * but also by File→Created Animated Gif. <code>permanent</code> and <code>temporary</code>
+	 * are graphics objects intended to be drawn on by the implementer. Items
+	 * drawn onto <code>permanent</code> persist throughout multiple frames,
+	 * whereas items drawn onto <code>temporary</code> are removed after each frame.
+	 * </p>
+	 * 
+	 * <p>
+	 * Both can be used in conjunction depending on the needs of your app. For
+	 * example, one might draw one shape onto <code>permanent</code> every frame
+	 * in order to build up an image, while drawing a string onto the corner of
+	 * <code>temporary</code> in order to keep track of variables that change
+	 * each frame.
+	 * </p>
+	 * 
+	 * @param permanent <code>Graphics2D</code> object whose drawings persist each frame.
+	 * @param temporary <code>Graphics2D</code> object whose drawings are cleared each frame.
+	 * @see Simulation 
+	 */
 	public abstract void draw(Graphics2D permanent, Graphics2D temporary);
 	
 	// Predefined listeners
@@ -138,35 +217,61 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 		return resetAction;
 	}
 	
-	// Simulation Frame Number: n
-	// Protected (not private) so that simulations can just use "n" for convenience.
+	/**
+	 * <p>Simulation frame number.</p>
+	 * <p>
+	 * This field is protected instead of privated for the convenience of the child class.
+	 * It is shorthand for {@link #getFrameNumber()}.
+	 * </p>
+	 * @see #getFrameNumber()
+	 */
 	protected int n = 0;
 	
+	/**
+	 * <p>
+	 * Gets the current frame of the simulation. This starts at 0 and is automatically incremented
+	 * by 1 as the simulation is played. It is reset back to 0 when the simulation is reset.
+	 * </p>
+	 * <p>Use {@link #n} as a shorthand, if you wish. {@link #getFrameNumber()} simply returns {@link #n}.</p>
+	 * @see {@link Simulation#n} 
+	 * @return The simulation frame number.
+	 */
 	public int getFrameNumber()
 	{
 		return this.n;
 	}
 	
+	/**
+	 * @param n the new frame for the simulation.
+	 * @see  #getFrameNumber()
+	 */
 	public void setFrameNumber(int n)
 	{
 		this.n = n;
 	}
 	
+	/**
+	 * Increments the current frame number by 1.
+	 * @see  #getFrameNumber()
+	 */
 	public void incrementFrameNumber()
 	{
 		this.n++;
 	}
 	
-	public void preInitialize(SimulationInfo info)
+	public void preInitialize(Home home, SimulationInfo info)
 	{
 		// Don't allow anyone to use this method a second time… just… no.
-		if(this.info != null)
-			throw new RuntimeException("Do not call method com.marklalor.javasim.simulation.Simulation#javaSimInitialize more than once (it is called once automatically by JavaSim Home)");
+		if(getInfo() != null)
+			throw new RuntimeException("Do not call method com.marklalor.javasim.simulation.Simulation#preInitialize more than once (it is called once automatically by JavaSim Home)");
+		
+		//Set the Home this simulation was launched from.
+		setHome(home);
 		
 		// Inherit the info read from its file earlier.
-		this.info = info;
+		setInfo(info);
 		
-		// Set the simulation's content directory and (make sure it exists)
+		// Set the simulation's content directory and (make sure it exists).
 		contentDirectory = new File(getHome().getHomeDirectory(), info.getName());
 		contentDirectory.mkdirs();
 		
@@ -254,10 +359,6 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 				if (currentAnimationControl == null || currentAnimationControlValueQueue.size() == 0)
 				{
 					currentAnimationControl = animationControls.remove(0);
-					
-//					System.out.println(currentAnimationControl.getName());
-//					System.out.println(Arrays.asList(currentAnimationControl.getAnimateValues()));
-					
 					currentAnimationControlValueQueue = new ArrayList<Object>(Arrays.asList(currentAnimationControl.getAnimateValues())); //??? gross cast
 				}
 				
@@ -354,9 +455,16 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 		setUpGraphics();
 	}
 	
+	/**
+	 * Contains initialization code that relies on being run after {@link #initialize()}.
+	 * For example, the created of the animate window for a simulation is done
+	 * here because the user should have initialized them by the time of
+	 * <code>initialize</code>, but not necessarily before then.
+	 * @see Home#run(SimulationInfo)
+	 */
 	public void postInitialize()
 	{
-		// Relies on what the user initializes.
+		//Relies on what the user initializes for animating over a variable.
 		animate = new Animate(getImage());
 		addMenuTo(getAnimate());
 	}

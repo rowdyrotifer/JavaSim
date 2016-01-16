@@ -209,8 +209,7 @@ public class Home extends JFrame implements ListSelectionListener, Minimizable
 			try
 			{
 				final Simulation simulation = simClass.newInstance();
-				simulation.setHome(this);
-				simulation.preInitialize(info);
+				simulation.preInitialize(this, info);
 				simulation.initialize();
 				simulation.postInitialize();
 				simulation.resetAction();
