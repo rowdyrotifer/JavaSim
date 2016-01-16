@@ -1,30 +1,59 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project default="finalize_dist" name="Build JavaSim">
+<project default="create_jar" name="Build JavaSim">
 	<property name="version" value="1.1.2"/>
-	<target name="clean">
-		<delete dir="../dist" />
-		<delete dir="osx/src"/>
-	</target>
-	<target name="create_jar" depends="clean">
+	<property name="mainclass" value="com.marklalor.javasim.JavaSim"/>
+	<property name="filename" value="JavaSim-${version}"/>
+
+	<target name="build">
+		<delete dir="../bin"/>
 		<mkdir dir="../bin"/>
 		<javac source="1.7" target="1.7" srcdir="../src" destdir="../bin" includeantruntime="false" fork="true">
-			<compilerarg line="-XDignore.symbol.file"/><!-- Compiling with rt.jar, http://stackoverflow.com/questions/4065401/using-internal-sun-classes-with-javac -->
+			<compilerarg line="-XDignore.symbol.file"/>
+			<!-- Compiling with rt.jar... may not work compiling on windows. -->
+			<!-- http://stackoverflow.com/questions/4065401/using-internal-sun-classes-with-javac -->
 		</javac>
-		<jar destfile="../dist/JavaSim.jar" manifest="MANIFEST.MF" filesetmanifest="mergewithoutmain">
-			<fileset dir="../bin"/>
+	</target>
+	<target name="clean">
+		<delete dir="osx/src" />
+		<delete dir="../dist" />
+	</target>
+	
+	<target name="jar">
+		<jar destfile="../dist/${jarname}">
+			<fileset dir="../bin" />
+			<fileset dir="../src">
+				<exclude name="**" if="${excludesource}"/>
+			</fileset>
+			<manifest>
+				<attribute name="Manifest-Version" value="1.0"/>
+				<attribute name="Main-Class" value="${mainclass}"/>
+				<section name="com/marklalor/javasim/">
+					<attribute name="Specification-Title" value="JavaSim Classes"/>
+					<attribute name="Specification-Version" value="${version}"/>
+					<attribute name="Specification-Vendor" value="Mark Lalor"/>
+				</section>
+		    </manifest>
 		</jar>
 	</target>
-	<target name="create_source_jar" depends="clean">
-		<mkdir dir="../bin"/>
-			<javac source="1.7" target="1.7" srcdir="../src" destdir="../bin" includeantruntime="false" fork="true">
-				<compilerarg line="-XDignore.symbol.file"/><!-- Compiling with rt.jar, http://stackoverflow.com/questions/4065401/using-internal-sun-classes-with-javac -->
-			</javac>
-			<jar destfile="../dist/JavaSim.jar" manifest="MANIFEST.MF" filesetmanifest="mergewithoutmain">
-				<fileset dir="../bin"/>
-				<fileset dir="../src"/>
-			</jar>
+	
+	
+	<target name="create_jar">
+		<delete file="../dist/${filename}.jar" />
+		<antcall target="build"/>
+		<antcall target="jar">
+			<param name="excludesource" value="true"/>
+			<param name="jarname" value="${filename}.jar"/>
+		</antcall>
 	</target>
-	<target name="build_app" depends="create_jar">
+	<target name="create_source_jar">
+		<delete file="../dist/${filename}-src.jar" />
+		<antcall target="build"/>
+		<antcall target="jar">
+			<param name="jarname" value="${filename}-src.jar"/>
+		</antcall>
+	</target>	
+	
+	<target name="build_osx_app" depends="create_jar">
 		<taskdef name="jarbundler" classname="net.sourceforge.jarbundler.JarBundler"/>
 			<jarbundler
 				dir="../dist"
@@ -35,7 +64,7 @@
 				mainclass="com.marklalor.javasim.JavaSim"
 				jvmversion="1.7+"
 				version="${version}"
-				jar="../dist/JavaSim.jar"
+				jar="../dist/${filename}.jar"
 				copyright="JavaSim ${version}, © 2015–2016 Mark Lalor."
 				hiResCapable="true">
 			</jarbundler>
@@ -43,13 +72,11 @@
 			<arg value="../dist"/>
 		</exec>
 	</target>
-	<target name = "build_dmg" depends="build_app">
+	<target name = "build_dmg" depends="build_osx_app">
+		<delete dir="osx/src" />
 		<exec executable="/bin/sh">
 			<arg value="osx/build_dmg"/>
 			<arg value="${version}"/>
 		</exec>
-	</target>
-	<target name = "finalize_dist" depends="build_dmg">
-		<move file = "../dist/JavaSim.jar" tofile="../dist/JavaSim-${version}.jar" />
 	</target>
 </project>
