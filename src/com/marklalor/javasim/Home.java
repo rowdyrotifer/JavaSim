@@ -35,12 +35,15 @@ import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.apache.log4j.Level;
+import org.apache.log4j.LogManager;
 
 import com.marklalor.javasim.simulation.HomeMenu;
 import com.marklalor.javasim.simulation.Simulation;
 import com.marklalor.javasim.simulation.SimulationInfo;
 import com.marklalor.javasim.simulation.frames.Minimizable;
 import com.marklalor.javasim.text.Console;
+import com.marklalor.javasim.text.JavaSimConsoleAppender;
 
 public class Home extends JFrame implements ListSelectionListener, Minimizable
 {
@@ -64,32 +67,45 @@ public class Home extends JFrame implements ListSelectionListener, Minimizable
 		if (args != null)
 			parseCommandLineArgs(args);
 		
-		console = new Console();
+		setUpConsole();
 		loadSimulations();
-		setupLayout();
-		simulationList.setSelectedIndex(0);
+		setUpLayout();
+		
+		
 		menu = new HomeMenu(this);
 		this.setJMenuBar(menu.getMenuBar());
 	}
 	
+	private void setUpConsole()
+	{
+		console = new Console();
+		
+		if (JavaSim.CONSOLE_BIND)
+		{
+			JavaSimConsoleAppender consoleAppender = new JavaSimConsoleAppender(console);
+			consoleAppender.setThreshold(Level.INFO);
+			LogManager.getRootLogger().addAppender(consoleAppender);
+		}
+		
+		JavaSim.getLogger().info("Console started.");
+		JavaSim.getLogger().info("JavaSim version: {}", JavaSim.getVersion());	
+	}
+
 	private void parseCommandLineArgs(String args[])
 	{
 		CommandLineParser parser = new DefaultParser();
 		
 		Options options = new Options();
-		options.addOption("n", "noconsolebind", false, "Do not bind the system output to the in-app console.");
+		options.addOption("n", "noconsolebind", false, "Do not bind the logger to the console.");
 		
 		try
 		{
 			CommandLine cmd = parser.parse(options, args);
-			System.out.println(cmd.getArgList());
-			System.out.println(cmd.hasOption("noconsolebind"));
 			JavaSim.CONSOLE_BIND = !cmd.hasOption("noconsolebind");
 		}
 		catch(ParseException e)
 		{
-			System.out.println("Could not parse the command line args properly.");
-			e.printStackTrace();
+			JavaSim.getLogger().error("Could not parse the command line args properly.", e);
 			return;
 		}
 	}
@@ -110,7 +126,7 @@ public class Home extends JFrame implements ListSelectionListener, Minimizable
 		}
 	}
 
-	private void setupLayout()
+	private void setUpLayout()
 	{
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setTitle("Java Simulation Home");
@@ -199,6 +215,8 @@ public class Home extends JFrame implements ListSelectionListener, Minimizable
 		});
 		this.run.setVisible(false);
 		simulationInfoPanel.add(this.run);
+		
+		simulationList.setSelectedIndex(0);
 	}
 	
 	private void runSelected()
@@ -208,7 +226,7 @@ public class Home extends JFrame implements ListSelectionListener, Minimizable
 	
 	public void run(SimulationInfo info)
 	{
-		System.out.println("Running " + info.getName());
+		JavaSim.getLogger().info("Running {}", info.getName());
 		
 		Class<? extends Simulation> simClass = null;
 		
@@ -227,13 +245,13 @@ public class Home extends JFrame implements ListSelectionListener, Minimizable
 		
 		if (simClass == null)
 		{
-			System.out.println("Could not load the simulation class!");
+			JavaSim.getLogger().error("Could not load the simulation class! {}", info);
 			return;
 		}
 		
 		try
 		{
-			System.out.println("Initializing " + simClass.toString());
+			JavaSim.getLogger().info("Initializing {}", simClass.getName());
 			try
 			{
 				final Simulation simulation = simClass.newInstance();

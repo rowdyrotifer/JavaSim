@@ -7,7 +7,7 @@
 			<attribute name="javadoc_location" value="http://commons.apache.org/proper/commons-cli/javadocs/api-release/index.html"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="build/lib/log4j-1.2.17.jar"/>
+	<classpathentry kind="lib" path="build/lib/log4j-1.2.17.jar" sourcepath="build/lib/log4j-1.2.17-sources.jar"/>
 	<classpathentry kind="lib" path="build/lib/slf4j-api-1.7.13.jar" sourcepath="build/lib/slf4j-api-1.7.13-sources.jar"/>
 	<classpathentry kind="lib" path="build/lib/slf4j-log4j12-1.7.13.jar" sourcepath="build/lib/slf4j-log4j12-1.7.13-sources.jar"/>
 	<classpathentry kind="output" path="bin"/>

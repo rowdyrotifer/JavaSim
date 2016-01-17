@@ -5,19 +5,24 @@ import java.io.File;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class JavaSim
 {
 	public static final File location = new File(System.getProperty("user.home") + File.separator + "Documents" + File.separator + "JavaSim");
 	public static boolean CONSOLE_BIND = true;
 	
+	private static Logger logger;
+	
+	public static Logger getLogger()
+	{
+		return logger;
+	}
+	
 	public static void main(final String[] args)
 	{
-		//Simple args for now.
-		for (String arg : args)
-		{
-			if (arg.equals("noconsolebind"))
-				CONSOLE_BIND = false;
-		}
+		JavaSim.logger = LoggerFactory.getLogger(JavaSim.class);	
 		
 		if (System.getProperty("os.name").toLowerCase().startsWith("mac os x"))
 		{

@@ -20,6 +20,8 @@ import java.util.Properties;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+import com.marklalor.javasim.JavaSim;
+
 public class SimulationInfo implements Serializable
 {
 	private static final long serialVersionUID = -4872104954414842342L;
@@ -75,7 +77,11 @@ public class SimulationInfo implements Serializable
 	@SuppressWarnings("unchecked")
 	public static Class<? extends Simulation> loadSimulationClass(File file, String targetClassName) throws IOException, ClassNotFoundException
 	{
-		System.out.println("Trying to load class from \"" + file + (targetClassName==null?"\" automatically.":"\", searching for \"" + targetClassName + "\""));
+		if (targetClassName == null)
+			JavaSim.getLogger().trace("Automatically searching for Simulation subclass in {}", file);
+		else
+			JavaSim.getLogger().trace("Searching for {} in {}", targetClassName, file);
+		
 		JarFile jarFile = new JarFile(file);
 		Enumeration<JarEntry> e = jarFile.entries();
 
@@ -95,7 +101,7 @@ public class SimulationInfo implements Serializable
 		    //Load it and return it if it's a simulation.
 		    try
 		    {
-		    	System.out.println("Loading " + className);
+		    	JavaSim.getLogger().trace("Loading {}", className);
 		    	if (targetClassName != null)
 		    	{
 			    	if (className.equals(targetClassName))	
@@ -163,8 +169,7 @@ public class SimulationInfo implements Serializable
 		}
 		catch(IOException e)
 		{
-			System.out.println("Could not load simulation's \"" + INFO_FILE + "\" file from input stream.");
-			e.printStackTrace();
+			JavaSim.getLogger().error("Could not load simulation's {} file from input stream.", INFO_FILE, e);
 		}
 		
 		Map<String, String> propertiesMap = new HashMap<String, String>();
@@ -188,7 +193,7 @@ public class SimulationInfo implements Serializable
 			e.printStackTrace();
 		}
 		
-		System.out.println("Getting info string from jar \"" + jar + "\" from resource \"" + INFO_FILE + "\"");
+		JavaSim.getLogger().info("Loading properties from {}/{}", jar, INFO_FILE);
 		
 		final URLClassLoader urlClassLoader = new URLClassLoader( new URL[] { url } );
 		
@@ -230,7 +235,7 @@ public class SimulationInfo implements Serializable
 	{
 		URL url = clazz.getResource(INFO_FILE);
 		
-		System.out.println("Getting input stream from class \"" + clazz.getCanonicalName() + "\"");
+		JavaSim.getLogger().info("Getting input stream from {}", clazz.getCanonicalName());
 		
 		InputStream in = null;
 		try

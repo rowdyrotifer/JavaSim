@@ -15,6 +15,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.KeyStroke;
 
+import com.marklalor.javasim.JavaSim;
 import com.marklalor.javasim.simulation.frames.Minimizable;
 
 import apple.dts.samplecode.osxadapter.OSXAdapter; //TODO: apple Application class can replace?
@@ -238,7 +239,7 @@ public class Menu implements ActionListener
 	@Override
 	public void actionPerformed(ActionEvent e)
 	{
-		System.out.println("[MENU] " + ((JMenu) ((JPopupMenu) ((JMenuItem) e.getSource()).getParent()).getInvoker()).getText() + " \u2192 " + ((JMenuItem) e.getSource()).getText());
+		JavaSim.getLogger().info("{}\u2192{}", ((JMenu) ((JPopupMenu) ((JMenuItem) e.getSource()).getParent()).getInvoker()).getText(), ((JMenuItem) e.getSource()).getText());
 		
 		if(e.getSource() == newSimulation)
 		{

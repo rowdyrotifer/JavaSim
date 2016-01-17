@@ -642,7 +642,7 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 	
 	public void animationComplete()
 	{
-		System.out.println("Animation Completed!");
+		JavaSim.getLogger().info("Animation Completed!");
 	}
 	
 	public void reset()
@@ -680,7 +680,7 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 	
 	public void openPreferences()
 	{
-		System.out.println("open preferences");
+		JavaSim.getLogger().info("Open Preferences");
 	}
 	
 	public void draw()
@@ -721,7 +721,7 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 	
 	public void lostOwnership(Clipboard clipboard, Transferable contents)
 	{
-		System.out.println("Image No Longer On Clipboard");
+		JavaSim.getLogger().info("Image no longer on clipboard.");
 	}
 	
 	//Stop and close the simulation.
