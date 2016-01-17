@@ -10,7 +10,7 @@ public class JavaSim
 	public static final File location = new File(System.getProperty("user.home") + File.separator + "Documents" + File.separator + "JavaSim");
 	public static boolean CONSOLE_BIND = true;
 	
-	public static void main(String[] args)
+	public static void main(final String[] args)
 	{
 		//Simple args for now.
 		for (String arg : args)
@@ -39,7 +39,7 @@ public class JavaSim
 			@Override
 			public void run()
 			{
-				Home home = new Home(location);
+				Home home = new Home(location, args);
 				home.setSize(800, 500);
 				home.setVisible(true);
 			}

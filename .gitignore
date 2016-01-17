@@ -3,6 +3,7 @@ bin/
 release/
 dist/
 build/osx/src
+build/lib
 #Eclipse stuff.
 .settings
 .externalToolBuilders/ANT\ Builder.launch

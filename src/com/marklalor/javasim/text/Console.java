@@ -195,6 +195,7 @@ public class Console extends JFrame implements Minimizable
 		errThread.start();
 		
 		System.out.println("Console Started… JavaSim version: " + JavaSim.getVersion());
+		
 		if (!JavaSim.CONSOLE_BIND)
 		{
 			textArea.append("STDOUT/STDERR not bound to this console.\nTo bind, run without the \"noconsolebind\" argument.");

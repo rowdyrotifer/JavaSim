@@ -30,6 +30,12 @@ import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+
 import com.marklalor.javasim.simulation.HomeMenu;
 import com.marklalor.javasim.simulation.Simulation;
 import com.marklalor.javasim.simulation.SimulationInfo;
@@ -40,7 +46,7 @@ public class Home extends JFrame implements ListSelectionListener, Minimizable
 {
 	private static final long serialVersionUID = 6321955323521519657L;
 	
-	public File homeDirectory; //TODO: just make this un-static, shouldn't be needed
+	private File homeDirectory;
 	
 	private List<SimulationInfo> simulations;
 	private JList<SimulationInfo> simulationList;
@@ -52,17 +58,40 @@ public class Home extends JFrame implements ListSelectionListener, Minimizable
 	private HomeMenu menu;
 	private Console console;
 	
-	
-	public Home(File location)
+	public Home(File location, String[] args)
 	{
 		homeDirectory = location;
+		if (args != null)
+			parseCommandLineArgs(args);
+		
 		console = new Console();
 		loadSimulations();
 		setupLayout();
 		simulationList.setSelectedIndex(0);
-		
 		menu = new HomeMenu(this);
 		this.setJMenuBar(menu.getMenuBar());
+	}
+	
+	private void parseCommandLineArgs(String args[])
+	{
+		CommandLineParser parser = new DefaultParser();
+		
+		Options options = new Options();
+		options.addOption("n", "noconsolebind", false, "Do not bind the system output to the in-app console.");
+		
+		try
+		{
+			CommandLine cmd = parser.parse(options, args);
+			System.out.println(cmd.getArgList());
+			System.out.println(cmd.hasOption("noconsolebind"));
+			JavaSim.CONSOLE_BIND = !cmd.hasOption("noconsolebind");
+		}
+		catch(ParseException e)
+		{
+			System.out.println("Could not parse the command line args properly.");
+			e.printStackTrace();
+			return;
+		}
 	}
 
 	private static final FilenameFilter jarFilter = new FilenameFilter()
@@ -80,7 +109,6 @@ public class Home extends JFrame implements ListSelectionListener, Minimizable
 			simulations.add(info);
 		}
 	}
-
 
 	private void setupLayout()
 	{

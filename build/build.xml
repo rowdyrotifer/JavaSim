@@ -1,14 +1,25 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project default="create_jar" name="Build JavaSim">
+<project xmlns:ivy="antlib:org.apache.ivy.ant" default="create_jar" name="Build JavaSim">
 	<property name="version" value="1.1.2"/>
 	<property name="mainclass" value="com.marklalor.javasim.JavaSim"/>
 	<property name="filename" value="JavaSim-${version}"/>
 
+	<target name="resolve" description="Retrieve dependencies (Apache Ivy)">
+        <ivy:retrieve />
+    </target>
 	<target name="build">
 		<delete dir="../bin"/>
 		<mkdir dir="../bin"/>
+		<path id="master-classpath">
+			<fileset dir="lib">
+				<include name="*.jar"/>
+				<exclude name="*-sources.jar" />
+				<exclude name="*-javadoc.jar" />
+			</fileset>
+		</path>
 		<javac encoding="UTF-8" source="1.7" target="1.7" srcdir="../src" destdir="../bin" includeantruntime="false" fork="true">
 			<compilerarg line="-XDignore.symbol.file"/>
+			<classpath refid="master-classpath"/>
 			<!-- Compiling with rt.jar... may not work compiling on windows. -->
 			<!-- http://stackoverflow.com/questions/4065401/using-internal-sun-classes-with-javac -->
 		</javac>
@@ -24,6 +35,7 @@
 			<fileset dir="../src">
 				<exclude name="**" if="${excludesource}"/>
 			</fileset>
+			<zipgroupfileset dir="lib" includes="*.jar" excludes="*-sources.jar,*-javadoc.jar"/>
 			<manifest>
 				<attribute name="Manifest-Version" value="1.0"/>
 				<attribute name="Main-Class" value="${mainclass}"/>
