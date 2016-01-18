@@ -30,14 +30,10 @@ import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
 import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
 
+import com.marklalor.javasim.preferences.ApplicationPreferences;
 import com.marklalor.javasim.simulation.HomeMenu;
 import com.marklalor.javasim.simulation.Simulation;
 import com.marklalor.javasim.simulation.SimulationInfo;
@@ -49,7 +45,7 @@ public class Home extends JFrame implements ListSelectionListener, Minimizable
 {
 	private static final long serialVersionUID = 6321955323521519657L;
 	
-	private File homeDirectory;
+	private ApplicationPreferences preferences;
 	
 	private List<SimulationInfo> simulations;
 	private JList<SimulationInfo> simulationList;
@@ -61,11 +57,9 @@ public class Home extends JFrame implements ListSelectionListener, Minimizable
 	private HomeMenu menu;
 	private Console console;
 	
-	public Home(File location, String[] args)
+	public Home(ApplicationPreferences preferences)
 	{
-		homeDirectory = location;
-		if (args != null)
-			parseCommandLineArgs(args);
+		this.preferences = preferences;
 		
 		setUpConsole();
 		loadSimulations();
@@ -78,9 +72,9 @@ public class Home extends JFrame implements ListSelectionListener, Minimizable
 	
 	private void setUpConsole()
 	{
-		console = new Console();
+		console = new Console(this);
 		
-		if (JavaSim.CONSOLE_BIND)
+		if (getPreferences().getConsoleBind())
 		{
 			JavaSimConsoleAppender consoleAppender = new JavaSimConsoleAppender(console);
 			consoleAppender.setThreshold(Level.INFO);
@@ -90,26 +84,7 @@ public class Home extends JFrame implements ListSelectionListener, Minimizable
 		JavaSim.getLogger().info("Console started.");
 		JavaSim.getLogger().info("JavaSim version: {}", JavaSim.getVersion());	
 	}
-
-	private void parseCommandLineArgs(String args[])
-	{
-		CommandLineParser parser = new DefaultParser();
-		
-		Options options = new Options();
-		options.addOption("n", "noconsolebind", false, "Do not bind the logger to the console.");
-		
-		try
-		{
-			CommandLine cmd = parser.parse(options, args);
-			JavaSim.CONSOLE_BIND = !cmd.hasOption("noconsolebind");
-		}
-		catch(ParseException e)
-		{
-			JavaSim.getLogger().error("Could not parse the command line args properly.", e);
-			return;
-		}
-	}
-
+	
 	private static final FilenameFilter jarFilter = new FilenameFilter()
 	{
 		@Override
@@ -119,7 +94,7 @@ public class Home extends JFrame implements ListSelectionListener, Minimizable
 	private void loadSimulations()
 	{
 		simulations = new ArrayList<SimulationInfo>();
-		for (File jar : homeDirectory.listFiles(jarFilter))
+		for (File jar : getPreferences().getSimulationDirectory().listFiles(jarFilter))
 		{
 			SimulationInfo info = new SimulationInfo(jar);
 			simulations.add(info);
@@ -280,9 +255,9 @@ public class Home extends JFrame implements ListSelectionListener, Minimizable
 		return console;
 	}
 	
-	public File getHomeDirectory()
+	public ApplicationPreferences getPreferences()
 	{
-		return homeDirectory;
+		return preferences;
 	}
 	
 	@Override

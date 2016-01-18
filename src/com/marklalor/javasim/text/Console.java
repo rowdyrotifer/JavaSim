@@ -7,17 +7,21 @@ import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
-import com.marklalor.javasim.JavaSim;
+import com.marklalor.javasim.Home;
 import com.marklalor.javasim.simulation.frames.Minimizable;
 
 public class Console extends JFrame implements Minimizable
 {
 	private static final long serialVersionUID = 6318364263842210392L;
+
+	private Home home;
 	
 	private JTextArea textArea;
 	
-	public Console()
+	public Console(Home home)
 	{
+		this.home = home;
+		
 		setTitle("JavaSim Console");
 		setSize(500, 500);
 		
@@ -31,10 +35,15 @@ public class Console extends JFrame implements Minimizable
 		getContentPane().add(textAreaScrollPane, BorderLayout.CENTER);
 		setAutoRequestFocus(false);
 		
-		if (!JavaSim.CONSOLE_BIND)
-			textArea.append("STDOUT/STDERR not bound to this console.\nTo bind, run without the \"noconsolebind\" argument.");
+		if (!getHome().getPreferences().getConsoleBind())
+			textArea.append("Logger not bound to this console.\nTo bind, run without the \"noconsolebind\" argument.");
 	}
 
+	public Home getHome()
+	{
+		return home;
+	}
+	
 	@Override
 	public void minimize()
 	{

@@ -272,7 +272,7 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 		setInfo(info);
 		
 		// Set the simulation's content directory and (make sure it exists).
-		contentDirectory = new File(getHome().getHomeDirectory(), info.getName());
+		contentDirectory = new File(getHome().getPreferences().getSimulationDirectory(), info.getName());
 		contentDirectory.mkdirs();
 		
 		// Create and set up the main image that goes with this simulation.
@@ -289,7 +289,7 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 		controls.setLocation(getControls().getLocation().x - (getImage().getWidth() / 2) - (getControls().getWidth() / 2), getImage().getY());
 		
 		// Reposition the console (but skip if the console is not bound)
-		if (JavaSim.CONSOLE_BIND)
+		if (getHome().getPreferences().getConsoleBind())
 		{
 			getHome().getConsole().setSize(DEFAULT_CONSOLE_WIDTH, DEFAULT_CONSOLE_HEIGHT);
 			getHome().getConsole().setLocationRelativeTo(getImage());
