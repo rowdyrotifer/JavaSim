@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <project xmlns:ivy="antlib:org.apache.ivy.ant" default="create_jar" name="Build JavaSim">
+	<property name="debug" value="true"/>
 	<property name="version" value="1.2.0"/>
 	<property name="mainclass" value="com.marklalor.javasim.JavaSim"/>
 	<property name="filename" value="JavaSim-${version}"/>
@@ -17,13 +18,20 @@
 				<exclude name="*-javadoc.jar" />
 			</fileset>
 		</path>
-		<javac encoding="UTF-8" source="1.7" target="1.7" srcdir="../src" destdir="../bin" includeantruntime="false" fork="true">
+		<!-- Copy non-java files (looking at you, log4j) -->
+		<copy todir="../bin">
+		  <fileset dir="../src">
+		    <exclude name="**/*.java"/>
+		  </fileset>
+		</copy>
+		<javac encoding="UTF-8" source="1.7" target="1.7" srcdir="../src" destdir="../bin" includeantruntime="false" fork="true" debug="${debug}">
 			<compilerarg line="-XDignore.symbol.file"/>
 			<classpath refid="master-classpath"/>
 			<!-- Compiling with rt.jar... may not work compiling on windows. -->
 			<!-- http://stackoverflow.com/questions/4065401/using-internal-sun-classes-with-javac -->
 		</javac>
 	</target>
+	
 	<target name="clean">
 		<delete dir="osx/src" />
 		<delete dir="../dist" />

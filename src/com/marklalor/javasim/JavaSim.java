@@ -5,6 +5,7 @@ import java.io.File;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
+import org.apache.log4j.PropertyConfigurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,13 +25,15 @@ public class JavaSim
 		//Initialize the SLF4J logger.
 		JavaSim.logger = LoggerFactory.getLogger(JavaSim.class);
 		
+        PropertyConfigurator.configure(JavaSim.class.getResourceAsStream("log4j.properties"));
+        
 		SwingUtilities.invokeLater(new Runnable()
 		{
 			@Override
 			public void run()
 			{
 				try { UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()); }
-				catch(Exception e) { JavaSim.getLogger().info("{}", e.getMessage()); }
+				catch(Exception e) { JavaSim.getLogger().info("Failed to set system look and feel.", e); }
 				
 				//Create the preferences object (it will let us detect the
 				//OS cleanly to find the OS-dependent preferences file).
