@@ -30,7 +30,6 @@ import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
 
@@ -58,14 +57,10 @@ public class Home extends JFrame implements ListSelectionListener, Minimizable
 	private HomeMenu menu;
 	private Console console;
 
-	private File tempDirectory;
 	
 	public Home(ApplicationPreferences preferences)
 	{
 		this.preferences = preferences;
-		
-		this.tempDirectory = new File(getPreferences().getSaveDirectory(), ".temp");
-		this.deleteTempFiles();
 		
 		this.setUpConsole();
 		this.loadSimulations();
@@ -293,23 +288,4 @@ public class Home extends JFrame implements ListSelectionListener, Minimizable
 		if (isVisible())
 			setState(ICONIFIED);
 	}
-    
-	public File getTempDirectory()
-    {
-        return tempDirectory;
-    }
-	
-    public void deleteTempFiles()
-    {
-        try
-        {
-            FileUtils.deleteDirectory(tempDirectory);
-        }
-        catch(IOException e)
-        {
-            JavaSim.getLogger().error("Could not delete temp folder {}", tempDirectory, e);
-        }
-        
-        JavaSim.getLogger().debug("Deleted all temp files.");
-    }
 }

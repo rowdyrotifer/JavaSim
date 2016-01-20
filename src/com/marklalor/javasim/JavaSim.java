@@ -1,14 +1,17 @@
 package com.marklalor.javasim;
 
 import java.io.File;
+import java.io.IOException;
 
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.PropertyConfigurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.marklalor.javasim.misc.TempFileShutdownHook;
 import com.marklalor.javasim.preferences.ApplicationPreferences;
 
 public class JavaSim
@@ -57,9 +60,21 @@ public class JavaSim
 				preferences.parseCommandLineArguments(arguments);
 				preferences.parsePreferencesFile(preferencesFile);
 				
+				//Use OS X native menu bar (should pretty much always be yes, only disable to debug).
 				if (preferences.getUseScreenMenuBar())
 					System.setProperty("apple.laf.useScreenMenuBar", "true");
 				
+				//Manage the temp folder.
+				
+				//Set the shutdown hook to delete the temporary directory on program exit.
+				Runtime.getRuntime().addShutdownHook(new Thread(new TempFileShutdownHook(preferences.getTempDirectory())));
+				//Delete a temp folder that may have remained due to an error.
+				try { FileUtils.deleteDirectory(preferences.getTempDirectory()); }
+		        catch(IOException e) { JavaSim.getLogger().error("Could not delete temp folder {}", preferences.getTempDirectory(), e); }
+				//Recreate it, of course!
+				preferences.getTempDirectory().mkdirs();
+				
+				//Finally, start the home panel.
 				Home home = new Home(preferences);
 				home.setSize(800, 500);
 				home.setVisible(true);

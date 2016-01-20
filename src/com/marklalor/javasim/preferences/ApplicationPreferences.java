@@ -106,4 +106,9 @@ public class ApplicationPreferences
 	{
 		return os.contains("nux");
 	}
+
+    public File getTempDirectory()
+    {
+        return new File(getSaveDirectory(), ".temp");
+    }
 }

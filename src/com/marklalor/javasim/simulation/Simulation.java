@@ -930,9 +930,7 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 	
     public void print()
     {
-        getHome().getTempDirectory().mkdirs();
-        
-        File tempFile =  new File(getHome().getTempDirectory(), getInfo().getName() + "_" + getTimestamp() + ".png");
+        File tempFile =  new File(getHome().getPreferences().getTempDirectory(), getInfo().getName() + "_" + getTimestamp() + ".png");
         
         try
         {
