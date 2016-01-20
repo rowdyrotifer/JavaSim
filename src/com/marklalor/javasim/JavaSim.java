@@ -32,6 +32,7 @@ public class JavaSim
 			@Override
 			public void run()
 			{
+			    //Set native system look and feel.
 				try { UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()); }
 				catch(Exception e) { JavaSim.getLogger().info("Failed to set system look and feel.", e); }
 				
@@ -43,21 +44,13 @@ public class JavaSim
 				
 				//Find the preferences file depending on OS.
 				if (preferences.isMacOSX())
-				{
 					preferencesFile = new File(System.getProperty("user.home")  + File.separator + "Library" + File.separator + "Application Support" + File.separator + "JavaSim" + File.separator + "preferences.json");
-				}
 				else if (preferences.isWindows())
-				{
 					preferencesFile = new File(System.getenv("APPDATA") + File.separator + "JavaSim" + File.separator + "preferences.json");
-				}
 				else if (preferences.isLinux())
-				{
-					preferencesFile = new File("/var/lib/javasim/preferences.json");
-				}
+					preferencesFile = new File(File.separator + "var" + File.separator + "lib" + File.separator + "javasim" + File.separator + "preferences.json");
 				else
-				{
 					new File(System.getProperty("user.home") + File.separator + "JavaSim" + File.separator + "preferences.json");
-				}
 				
 				JavaSim.getLogger().info("Resolved preferences file: {}", preferencesFile.getAbsolutePath());
 				

@@ -40,15 +40,25 @@ public class ApplicationPreferences
 	
 	//PreferencesFile
 	
-	public File getSimulationDirectory()
+	public File getMainDirectory()
 	{
-		return preferences.getSimulationDirectory();
+		return preferences.getMainDirectory();
 	}
 	
-	public void setSimulationDirectory(File simulationDirectory)
+	public void setMainDirectory(File simulationDirectory)
 	{
-		preferences.setSimulationDirectory(simulationDirectory);
+		preferences.setMainDirectory(simulationDirectory);
 	}
+	
+	public File getSaveDirectory()
+    {
+        return preferences.getSaveDirectory();
+    }
+	
+	public void setSaveDirectory(File saveDirectory)
+    {
+        preferences.setSaveDirectory(saveDirectory);
+    }
 	
 	//CommandLineArgs
 	

@@ -397,10 +397,10 @@ public class SimulationInfo implements Serializable
 			throw new InternalError("default charset doesn't exist. Your VM is borked.");
 		}
 	}
-	
-	@Override
-	public String toString()
-	{
-		return getName();
-	}
+
+    @Override
+    public String toString()
+    {
+        return getName();
+    }
 }

@@ -100,12 +100,16 @@ public class HomeMenu implements ActionListener
 		{
 			try
 			{
-				Desktop.getDesktop().open(getHome().getPreferences().getSimulationDirectory());
+				Desktop.getDesktop().open(getHome().getPreferences().getMainDirectory());
 			}
 			catch(IOException e1)
 			{
 				e1.printStackTrace();
 			}
+		}
+		else if(e.getSource() == refreshSimulations)
+		{
+		    getHome().loadSimulations();
 		}
 		else if(e.getSource() == close)
 		{

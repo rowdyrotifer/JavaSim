@@ -28,7 +28,7 @@ public class Menu implements ActionListener
 	private JMenuBar menuBar;
 	
 	private JMenu file;
-	private JMenuItem newSimulation, reloadSimulation, saveImage, saveImageAs, animateMenuItem, openHomeFolder, openContentFolder, closeSimulation, openProperties;
+	private JMenuItem newSimulation, reloadSimulation, saveImage, saveImageAs, animateMenuItem, openHomeFolder, openContentFolder, closeSimulation, print, openProperties;
 	private JMenu edit;
 	private JMenuItem copy;
 	private JMenu animation;
@@ -100,8 +100,14 @@ public class Menu implements ActionListener
 		closeSimulation.addActionListener(this);
 		file.add(closeSimulation);
 		
+		// Print – Command + P
+        print = new JMenuItem("Print");
+        print.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        print.addActionListener(this);
+        file.add(print);
+		
 		//Preferences
-		if(Simulation.IS_MAC_OS_X)
+		if(getSimulation().getHome().getPreferences().isMacOSX())
 		{
 			try
 			{
@@ -110,11 +116,11 @@ public class Menu implements ActionListener
 			}
 			catch(SecurityException e)
 			{
-				e.printStackTrace();
+				JavaSim.getLogger().error("SecurityException while trying to set OSXAdapter handlers.", e);
 			}
 			catch(NoSuchMethodException e)
 			{
-				e.printStackTrace();
+			    JavaSim.getLogger().error("NoSuchMethodException while trying to set OSXAdapter handlers.", e);
 			}
 		}
 		else
@@ -143,15 +149,15 @@ public class Menu implements ActionListener
 		
 		animation = new JMenu("Animation");
 		
-		// Play – Command + P
+		// Play – Command + L
 		play = new JMenuItem("Play");
-		play.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+		play.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		play.addActionListener(this);
 		animation.add(play);
 		
-		// Play Until Breakpoint – Command + Shift + P
+		// Play Until Breakpoint – Command + Shift + L
 		playUntilBreakpoint = new JMenuItem("Play Until Breakpoint");
-		playUntilBreakpoint.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, (Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() + InputEvent.SHIFT_MASK)));
+		playUntilBreakpoint.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, (Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() + InputEvent.SHIFT_MASK)));
 		playUntilBreakpoint.addActionListener(this);
 		animation.add(playUntilBreakpoint);
 		
@@ -208,9 +214,9 @@ public class Menu implements ActionListener
 		resizeMenuItem.addActionListener(this);
 		simulation.add(resizeMenuItem);
 		
-		// Fullscreen – Command + Shift + F (OSX) F11 (Windows)
+		// Fullscreen – Command + Shift + F (OS X) F11 (Windows)
 		fullscreen = new JMenuItem("Enter Full Screen");
-		if (Simulation.IS_MAC_OS_X)
+		if (getSimulation().getHome().getPreferences().isMacOSX())
 			fullscreen.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, (Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | InputEvent.CTRL_MASK)));
 		else
 			fullscreen.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F11, 0));
@@ -273,7 +279,7 @@ public class Menu implements ActionListener
 		{
 			try
 			{
-				Desktop.getDesktop().open(getSimulation().getContentDirectory().getParentFile());
+				Desktop.getDesktop().open(getSimulation().getHome().getPreferences().getMainDirectory());
 			}
 			catch(IOException e1)
 			{
@@ -284,6 +290,10 @@ public class Menu implements ActionListener
 		{
 			getSimulation().delete();
 		}
+		else if(e.getSource() == print)
+        {
+            getSimulation().print();
+        }
 		else if(e.getSource() == openProperties)
 		{
 			getSimulation().openPreferences();

@@ -1,5 +1,6 @@
 package com.marklalor.javasim.simulation;
 
+import java.awt.Desktop;
 import java.awt.Graphics2D;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
@@ -73,8 +74,6 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 	public static final int DEFAULT_CONSOLE_WIDTH = 400, DEFAULT_CONSOLE_HEIGHT = 500;
 	
 	public int imgType = BufferedImage.TYPE_INT_ARGB;
-	
-	public static boolean IS_MAC_OS_X = System.getProperty("os.name").toLowerCase().startsWith("mac os x");
 	
 	private Home home;
 	private SimulationInfo info;
@@ -272,7 +271,7 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 		setInfo(info);
 		
 		// Set the simulation's content directory and (make sure it exists).
-		contentDirectory = new File(getHome().getPreferences().getSimulationDirectory(), info.getName());
+		contentDirectory = new File(getHome().getPreferences().getSaveDirectory(), info.getName());
 		contentDirectory.mkdirs();
 		
 		// Create and set up the main image that goes with this simulation.
@@ -473,8 +472,9 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 	{
 		if(this.fullscreen != fullscreen)
 		{
-			if(Simulation.IS_MAC_OS_X)
+			if(getHome().getPreferences().isMacOSX())
 				Application.getApplication().requestToggleFullScreen(getImage());
+			//TODO: Windows, Linux fullscreen.
 			
 			this.fullscreen = fullscreen;
 		}
@@ -482,7 +482,7 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 	
 	public void toggleFullscreen()
 	{
-		if(Simulation.IS_MAC_OS_X)
+		if(getHome().getPreferences().isMacOSX())
 			Application.getApplication().requestToggleFullScreen(getImage());
 		
 		this.fullscreen = !this.fullscreen;
@@ -577,10 +577,11 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 		try
 		{
 			ImageIO.write(combinedImage, "png", file);
+			JavaSim.getLogger().info("Saved {}", file);
 		}
 		catch(IOException e)
 		{
-			e.printStackTrace();
+		    JavaSim.getLogger().error("Could not save file {}", file, e);
 		}
 	}
 	
@@ -924,5 +925,31 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 	 */
 	public void mouseMoved(MouseEvent e)
 	{
+	    
 	}
+	
+    public void print()
+    {
+        getHome().getTempDirectory().mkdirs();
+        
+        File tempFile =  new File(getHome().getTempDirectory(), getInfo().getName() + "_" + getTimestamp() + ".png");
+        
+        try
+        {
+            ImageIO.write(combinedImage, "png", tempFile);
+        }
+        catch(IOException e)
+        {
+            JavaSim.getLogger().error("Could not save temporary image for printing.", e);
+        }
+        
+        try
+        {
+            Desktop.getDesktop().open(tempFile);
+        }
+        catch(IOException e)
+        {
+            JavaSim.getLogger().error("Could not print temporary image.", e);
+        }
+    }
 }

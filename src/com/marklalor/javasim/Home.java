@@ -30,6 +30,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
 
@@ -56,21 +57,25 @@ public class Home extends JFrame implements ListSelectionListener, Minimizable
 	
 	private HomeMenu menu;
 	private Console console;
+
+	private File tempDirectory;
 	
 	public Home(ApplicationPreferences preferences)
 	{
 		this.preferences = preferences;
 		
-		setUpConsole();
-		loadSimulations();
-		setUpLayout();
+		this.tempDirectory = new File(getPreferences().getSaveDirectory(), ".temp");
+		this.deleteTempFiles();
 		
-		
-		menu = new HomeMenu(this);
-		this.setJMenuBar(menu.getMenuBar());
+		this.setUpConsole();
+		this.loadSimulations();
+		this.setUpLayout();
+		this.setUpMenu();
 	}
+
+	//Set up operations.
 	
-	private void setUpConsole()
+    private void setUpConsole()
 	{
 		console = new Console(this);
 		
@@ -91,10 +96,12 @@ public class Home extends JFrame implements ListSelectionListener, Minimizable
 		public boolean accept(File dir, String name) { return name.toLowerCase().endsWith("jar"); }
 	};
 	
-	private void loadSimulations()
+	public void loadSimulations()
 	{
+	    JavaSim.getLogger().debug("Loading simulations.");
+	    
 		simulations = new ArrayList<SimulationInfo>();
-		for (File jar : getPreferences().getSimulationDirectory().listFiles(jarFilter))
+		for (File jar : getPreferences().getMainDirectory().listFiles(jarFilter))
 		{
 			SimulationInfo info = new SimulationInfo(jar);
 			simulations.add(info);
@@ -103,6 +110,8 @@ public class Home extends JFrame implements ListSelectionListener, Minimizable
 
 	private void setUpLayout()
 	{
+	    JavaSim.getLogger().debug("Setting up Home layout.");
+	    
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setTitle("Java Simulation Home");
 		
@@ -194,6 +203,15 @@ public class Home extends JFrame implements ListSelectionListener, Minimizable
 		simulationList.setSelectedIndex(0);
 	}
 	
+	private void setUpMenu()
+    {
+        JavaSim.getLogger().debug("Setting up Home menu bar.");
+        menu = new HomeMenu(this);
+        setJMenuBar(menu.getMenuBar());
+    }
+	
+	//End setup.
+	
 	private void runSelected()
 	{
 		this.run((SimulationInfo) simulationList.getSelectedValue());
@@ -211,43 +229,40 @@ public class Home extends JFrame implements ListSelectionListener, Minimizable
 		}
 		catch(ClassNotFoundException e)
 		{
-			e.printStackTrace();
+		    if (info.getMain() == null)
+		        JavaSim.getLogger().error("Could not automatically find a simulation class.", e);
+		    else
+		        JavaSim.getLogger().error("Could not find class {}", info.getMain(), e);
 		}
 		catch(IOException e)
 		{
-			e.printStackTrace();
+		    JavaSim.getLogger().error("Could not load the simulation class", e);
 		}
 		
 		if (simClass == null)
 		{
-			JavaSim.getLogger().error("Could not load the simulation class! {}", info);
+			JavaSim.getLogger().error("Simulation class was not loaded. {}", info);
 			return;
 		}
 		
-		try
-		{
-			JavaSim.getLogger().info("Initializing {}", simClass.getName());
-			try
-			{
-				final Simulation simulation = simClass.newInstance();
-				simulation.preInitialize(this, info);
-				simulation.initialize();
-				simulation.postInitialize();
-				simulation.resetAction();
-			}
-			catch(IllegalArgumentException |  SecurityException e)//InvocationTargetException | NoSuchMethodException |
-			{
-				e.printStackTrace();
-			}
-		}
-		catch(InstantiationException e)
-		{
-			e.printStackTrace();
-		}
-		catch(IllegalAccessException e)
-		{
-			e.printStackTrace();
-		}
+        try
+        {
+            //Create a new instance of a simulation.
+            JavaSim.getLogger().info("Initializing {}", simClass.getName());
+            Simulation simulation = simClass.newInstance();
+            
+            //Run all the initialization steps.
+            simulation.preInitialize(this, info);
+            simulation.initialize();
+            simulation.postInitialize();
+            
+            //Reset it the begin.
+            simulation.resetAction();
+        }
+        catch(InstantiationException | IllegalAccessException e)
+        {
+            JavaSim.getLogger().error("Could not instantiate an instance of " + simClass.getSimpleName());
+        }
 	}
 	
 	public Console getConsole()
@@ -278,4 +293,23 @@ public class Home extends JFrame implements ListSelectionListener, Minimizable
 		if (isVisible())
 			setState(ICONIFIED);
 	}
+    
+	public File getTempDirectory()
+    {
+        return tempDirectory;
+    }
+	
+    public void deleteTempFiles()
+    {
+        try
+        {
+            FileUtils.deleteDirectory(tempDirectory);
+        }
+        catch(IOException e)
+        {
+            JavaSim.getLogger().error("Could not delete temp folder {}", tempDirectory, e);
+        }
+        
+        JavaSim.getLogger().debug("Deleted all temp files.");
+    }
 }
