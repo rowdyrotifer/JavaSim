@@ -15,7 +15,7 @@ import com.marklalor.javasim.misc.TempFileShutdownHook;
 import com.marklalor.javasim.preferences.ApplicationPreferences;
 
 public class JavaSim
-{	
+{
 	private static Logger logger;
 	
 	public static Logger getLogger()

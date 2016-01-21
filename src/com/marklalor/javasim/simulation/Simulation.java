@@ -1,6 +1,7 @@
 package com.marklalor.javasim.simulation;
 
 import java.awt.Desktop;
+import java.awt.FileDialog;
 import java.awt.Graphics2D;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
@@ -560,16 +561,42 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 	
 	public void saveAs()
 	{
-		JFileChooser chooser = new JFileChooser();
-		chooser.setFileFilter(new FileNameExtensionFilter("PNG Images", "png"));
-		chooser.setSelectedFile(getDefaultFile());
-		if(chooser.showSaveDialog(getImage()) == JFileChooser.APPROVE_OPTION)
-		{
-			String file = chooser.getSelectedFile().getAbsolutePath();
-			if(!chooser.getSelectedFile().getName().contains("."))
-				file += ".png";
-			save(new File(file));
-		}
+	    if (getHome().getPreferences().isMacOSX())
+	    {
+	        //Native file dialog, but with less options / cross platform support.
+	        FileDialog dialog = new FileDialog(getImage(), "Choose a file", FileDialog.LOAD);
+	        
+            dialog.setMode(FileDialog.SAVE);
+            dialog.setDirectory(getContentDirectory().getAbsolutePath());
+	        dialog.setFile(getDefaultFile().getName());
+	        
+	        dialog.setVisible(true);
+	    
+	        String directory = dialog.getDirectory();
+	        String fileName = dialog.getFile();
+	        
+	        if (directory != null && fileName != null)
+	        {
+	            if (!fileName.endsWith(".png"))
+	                fileName += ".png";
+	            save(new File(new File(directory), fileName));
+	        }
+	        else
+	            JavaSim.getLogger().debug("FileDialog canceled.");
+	    }
+	    else
+	    {
+    		JFileChooser chooser = new JFileChooser();
+    		chooser.setFileFilter(new FileNameExtensionFilter("PNG Images", "png"));
+    		chooser.setSelectedFile(getDefaultFile());
+    		if(chooser.showSaveDialog(getImage()) == JFileChooser.APPROVE_OPTION)
+    		{
+    			String file = chooser.getSelectedFile().getAbsolutePath();
+    			if(!chooser.getSelectedFile().getName().contains("."))
+    				file += ".png";
+    			save(new File(file));
+    		}
+	    }
 	}
 	
 	public void save(File file)
