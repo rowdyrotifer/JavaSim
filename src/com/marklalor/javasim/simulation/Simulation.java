@@ -564,9 +564,8 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 	    if (getHome().getPreferences().isMacOSX())
 	    {
 	        //Native file dialog, but with less options / cross platform support.
-	        FileDialog dialog = new FileDialog(getImage(), "Choose a file", FileDialog.LOAD);
+	        FileDialog dialog = new FileDialog(getImage(), "Choose a file", FileDialog.SAVE);
 	        
-            dialog.setMode(FileDialog.SAVE);
             dialog.setDirectory(getContentDirectory().getAbsolutePath());
 	        dialog.setFile(getDefaultFile().getName());
 	        
