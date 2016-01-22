@@ -272,7 +272,7 @@ public class Menu implements ActionListener
 			}
 			catch(IOException e1)
 			{
-				e1.printStackTrace();
+			    JavaSim.getLogger().error("Could not open content folder on native system.", e1);
 			}
 		}
 		else if(e.getSource() == openHomeFolder)
@@ -283,7 +283,7 @@ public class Menu implements ActionListener
 			}
 			catch(IOException e1)
 			{
-				e1.printStackTrace();
+			    JavaSim.getLogger().error("Could not open home folder on native system.", e1);
 			}
 		}
 		else if(e.getSource() == closeSimulation)

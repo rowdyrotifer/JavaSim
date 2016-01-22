@@ -45,7 +45,7 @@ public class SimulationInfo implements Serializable
 		}
 		catch(IOException e)
 		{
-			e.printStackTrace();
+		    JavaSim.getLogger().error("Could not open jar file.", e);
 		}
 		
 		JarEntry properties_entry = jarfile.getJarEntry(INFO_FILE);
@@ -124,7 +124,7 @@ public class SimulationInfo implements Serializable
 		    //Weird class files...?
 		    catch(Exception ex)
 		    {
-		    	ex.printStackTrace();
+		        JavaSim.getLogger().error("Could not load classes from jar.", e);
 		    }
 	    }
 	    
@@ -190,7 +190,7 @@ public class SimulationInfo implements Serializable
 		}
 		catch(MalformedURLException e)
 		{
-			e.printStackTrace();
+			JavaSim.getLogger().error("Invalid jar url {}", url, e);
 		}
 		
 		JavaSim.getLogger().info("Loading properties from {}/{}", jar, INFO_FILE);
@@ -208,7 +208,7 @@ public class SimulationInfo implements Serializable
 		}
 		catch(IOException e)
 		{
-			e.printStackTrace();
+		    JavaSim.getLogger().error("IOException while reading jar info file.", e);
 		}
 		try
 		{
@@ -217,7 +217,7 @@ public class SimulationInfo implements Serializable
 		}
 		catch(IOException e)
 		{
-			e.printStackTrace();
+		    JavaSim.getLogger().error("Error closing jar info file.", e);
 		}
 		try
 		{
@@ -225,7 +225,7 @@ public class SimulationInfo implements Serializable
 		}
 		catch(IOException e)
 		{
-			e.printStackTrace();
+		    JavaSim.getLogger().error("Error closing jar url classloader.", e);
 		}
 		
 		return data;
@@ -244,7 +244,7 @@ public class SimulationInfo implements Serializable
 		}
 		catch(IOException e)
 		{
-			e.printStackTrace();
+		    JavaSim.getLogger().error("Error opening jar input stream.", e);
 			return null;
 		}
 		
@@ -257,7 +257,7 @@ public class SimulationInfo implements Serializable
 		}
 		catch(IOException e)
 		{
-			e.printStackTrace();
+		    JavaSim.getLogger().error("IOException while reading jar info file.", e);
 		}
 		try
 		{
@@ -266,7 +266,7 @@ public class SimulationInfo implements Serializable
 		}
 		catch(IOException e)
 		{
-			e.printStackTrace();
+		    JavaSim.getLogger().error("Error closing jar info file.", e);
 		}
 		
 		return data;

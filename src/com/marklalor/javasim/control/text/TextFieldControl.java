@@ -8,6 +8,7 @@ import javax.swing.JTextField;
 import javax.swing.text.DocumentFilter;
 import javax.swing.text.PlainDocument;
 
+import com.marklalor.javasim.JavaSim;
 import com.marklalor.javasim.control.Control;
 
 public abstract class TextFieldControl<T> extends Control<T>
@@ -71,14 +72,10 @@ public abstract class TextFieldControl<T> extends Control<T>
 			{
 				document.setDocumentFilter(filter.newInstance());
 			}
-			catch(InstantiationException e)
-			{
-				e.printStackTrace();
-			}
-			catch(IllegalAccessException e)
-			{
-				e.printStackTrace();
-			}
+			catch(Exception e)
+		    {
+			    JavaSim.getLogger().error("Error while setting filter on a TextFieldControl.", e);
+		    }
 		}
 		
 		panel.add(textField, BorderLayout.CENTER);

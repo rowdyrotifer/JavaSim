@@ -22,7 +22,6 @@ import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.WritableRaster;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -30,7 +29,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import javax.imageio.IIOException;
 import javax.imageio.ImageIO;
 import javax.imageio.stream.FileImageOutputStream;
 import javax.imageio.stream.ImageOutputStream;
@@ -340,7 +338,7 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 					}
 					catch(IOException e1)
 					{
-						e1.printStackTrace();
+					    JavaSim.getLogger().error("Could not write animation frame to file.", e1);
 					}
 				
 				if(getFrameNumber() == animate.getStopFrame())
@@ -385,7 +383,7 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 				}
 				catch(IOException e1)
 				{
-					e1.printStackTrace();
+				    JavaSim.getLogger().error("Could not write (variable) animation frame to file.", e1);
 				}
 				
 				if(last)
@@ -622,17 +620,9 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 			animationOut = new FileImageOutputStream(animate.getFile());
 			animationWriter = new GifSequenceWriter(animationOut, imgType, animate.getFrameDelay(), animate.getLoop());
 		}
-		catch(FileNotFoundException e)
+		catch(Exception e)
 		{
-			e.printStackTrace();
-		}
-		catch(IIOException e)
-		{
-			e.printStackTrace();
-		}
-		catch(IOException e)
-		{
-			e.printStackTrace();
+		    JavaSim.getLogger().error("Could not start animation.", e);
 		}
 		
 		timerAnimation.start();
@@ -647,17 +637,9 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 			animationOut = new FileImageOutputStream(animate.getFile());
 			animationWriter = new GifSequenceWriter(animationOut, imgType, animate.getFrameDelay(), animate.getLoop());
 		}
-		catch(FileNotFoundException e)
+		catch(Exception e)
 		{
-			e.printStackTrace();
-		}
-		catch(IIOException e)
-		{
-			e.printStackTrace();
-		}
-		catch(IOException e)
-		{
-			e.printStackTrace();
+		    JavaSim.getLogger().error("Could not start (variable) animation.", e);
 		}
 		
 		animationControls = new ArrayList<Control<?>>(getAnimate().getAddedControls());
