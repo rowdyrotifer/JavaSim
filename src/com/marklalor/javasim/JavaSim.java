@@ -67,7 +67,9 @@ public class JavaSim
 				//Manage the temp folder.
 				
 				//Set the shutdown hook to delete the temporary directory on program exit.
-				Runtime.getRuntime().addShutdownHook(new Thread(new TempFileShutdownHook(preferences.getTempDirectory())));
+				Thread deleteTempFolderThread = new Thread(new TempFileShutdownHook(preferences.getTempDirectory()));
+				deleteTempFolderThread.setName("TempFolderDelete");
+				Runtime.getRuntime().addShutdownHook(deleteTempFolderThread);
 				//Delete a temp folder that may have remained due to an error.
 				try { FileUtils.deleteDirectory(preferences.getTempDirectory()); }
 		        catch(IOException e) { JavaSim.getLogger().error("Could not delete temp folder {}", preferences.getTempDirectory(), e); }
