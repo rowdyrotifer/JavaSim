@@ -41,6 +41,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.apple.eawt.Application;
 import com.apple.eawt.FullScreenUtilities;
+
 import com.marklalor.javasim.Home;
 import com.marklalor.javasim.JavaSim;
 import com.marklalor.javasim.control.Control;
@@ -694,14 +695,24 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 	
 	public void draw()
 	{
+	    //Create a temporary image to pass along with the permanent image.
 		temporaryImage = new BufferedImage(permanentImage.getWidth(), permanentImage.getHeight(), imgType);
-		draw(permanentImage.createGraphics(), temporaryImage.createGraphics());
-		combinedImage = new BufferedImage(permanentImage.getWidth(), permanentImage.getHeight(), imgType);
+		Graphics2D tempGraphics = temporaryImage.createGraphics();
+		Graphics2D permanentGraphics = permanentImage.createGraphics();
+		draw(permanentGraphics, tempGraphics);
 		
+		//Create a "combined" image of the same size.
+		combinedImage = new BufferedImage(permanentImage.getWidth(), permanentImage.getHeight(), imgType);
 		Graphics2D combinedGraphics = combinedImage.createGraphics();
+		//Then draw the permanent and temporary images onto it.
 		combinedGraphics.drawImage(permanentImage, 0, 0, null, null);
 		combinedGraphics.drawImage(temporaryImage, 0, 0, null, null);
 		
+		//Dispose of graphics objects created.
+		tempGraphics.dispose();
+		permanentGraphics.dispose();
+		
+		//Repaint the image JFrame. 
 		image.paintImage();
 	}
 	
