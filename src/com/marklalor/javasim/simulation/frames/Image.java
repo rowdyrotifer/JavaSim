@@ -14,11 +14,10 @@ import javax.swing.JPanel;
 
 import com.marklalor.javasim.simulation.Simulation;
 
-public class Image extends JFrame implements Minimizable
+public class Image implements Minimizable
 {
-	private static final long serialVersionUID = 7211460258372253616L;
-	
 	private Simulation simulation;
+	private JFrame frame;	
 	
 	//Draggable behavior
 	private boolean draggable = false;
@@ -29,36 +28,41 @@ public class Image extends JFrame implements Minimizable
 	public Image(Simulation simulation)
 	{
 		this.simulation = simulation;
-		this.addMouseListener(new MouseListener()
+		
+		frame = new JFrame();
+		
+		frame.addMouseListener(new MouseListener()
 		{
 			@Override
 			public void mouseReleased(MouseEvent e)
 			{
 				Image.this.origin = null;
 			}
+			
 			@Override
 			public void mousePressed(MouseEvent e)
 			{
 				if (draggable)
 					Image.this.origin = e.getPoint();
 			}
+			
 			@Override public void mouseExited(MouseEvent e)  { }
 			@Override public void mouseEntered(MouseEvent e) { }
 			@Override public void mouseClicked(MouseEvent e) { }
 		});
 		
-		this.addMouseMotionListener(new MouseMotionListener()
+		frame.addMouseMotionListener(new MouseMotionListener()
 		{
 			@Override
 			public void mouseDragged(MouseEvent e)
 			{
 				if (draggable && origin != null)
-					Image.this.setLocation((int)(e.getLocationOnScreen().getX() - origin.getX()), (int)(e.getLocationOnScreen().getY() - origin.getY()));
+					Image.this.frame.setLocation((int)(e.getLocationOnScreen().getX() - origin.getX()), (int)(e.getLocationOnScreen().getY() - origin.getY()));
 			}
 			@Override public void mouseMoved(MouseEvent e) { }
 		});
 		
-		this.addWindowListener(new WindowAdapter()
+		frame.addWindowListener(new WindowAdapter()
 		{
 			@Override
 			public void windowClosing(WindowEvent e)
@@ -68,9 +72,11 @@ public class Image extends JFrame implements Minimizable
 			}
 		});
 		
-		this.imagePanel = new ImageJPanel(this);
-		setLayout(new BorderLayout());
-		this.getContentPane().add(imagePanel, BorderLayout.CENTER);
+
+        frame.setLayout(new BorderLayout());
+        
+		imagePanel = new ImageJPanel(this);
+		frame.getContentPane().add(imagePanel, BorderLayout.CENTER);
 	}
 	
 	public Simulation getSimulation()
@@ -88,32 +94,36 @@ public class Image extends JFrame implements Minimizable
 		return draggable;
 	}
 	
+	public JFrame getFrame()
+    {
+        return frame;
+    }
+	
 	//Set size making sure the top inset is considered.
-	@Override
 	public void setSize(int width, int height)
 	{
-		super.setSize(width, height + getInsets().top);
+		frame.setSize(width, height + frame.getInsets().top);
 	}
 	
 	public void paintImage()
 	{
-		repaint();
+		frame.repaint();
 	}
 	
 	//Drawing panel:
-	private class ImageJPanel extends JPanel
-	{
-		private static final long serialVersionUID = -6540125631576837932L;
-		
+	@SuppressWarnings("serial")
+    private class ImageJPanel extends JPanel
+	{	
 		private Image parent;
 		
 		public ImageJPanel(Image parent)
 		{
 			super(true);
 			this.parent = parent;
-			this.addMouseMotionListener(this.parent.getSimulation());
-			this.addMouseListener(this.parent.getSimulation());
-			this.addMouseWheelListener(this.parent.getSimulation());
+			//TODO: readd functionality in a more per-case method.
+//			this.addMouseMotionListener(this.parent.getSimulation());
+//			this.addMouseListener(this.parent.getSimulation());
+//			this.addMouseWheelListener(this.parent.getSimulation());
 		}
 
 		@Override
@@ -127,7 +137,7 @@ public class Image extends JFrame implements Minimizable
 	@Override
 	public void minimize()
 	{
-		if (isVisible())
-			setState(ICONIFIED);
+		if (frame.isVisible())
+			frame.setState(JFrame.ICONIFIED);
 	}
 }

@@ -276,23 +276,23 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 		
 		// Create and set up the main image that goes with this simulation.
 		image = new Image(this);
-		image.pack();
+		image.getFrame().pack();
 		image.setSize(DEFAULT_IMAGE_WIDTH, DEFAULT_IMAGE_HEIGHT);
-		image.setLocationRelativeTo(null);
+		image.getFrame().setLocationRelativeTo(null);
 		refreshTitle();
 		
 		// Create and set up the main control panel for this simulation.
 		controls = new Controls(getImage());
 		controls.setSize(DEFAULT_CONTROL_WIDTH, DEFAULT_CONTROL_HEIGHT);
-		controls.setLocationRelativeTo(getImage());
-		controls.setLocation(getControls().getLocation().x - (getImage().getWidth() / 2) - (getControls().getWidth() / 2), getImage().getY());
+		controls.setLocationRelativeTo(getImage().getFrame());
+		controls.setLocation(getControls().getLocation().x - (getImage().getFrame().getWidth() / 2) - (getControls().getWidth() / 2), getImage().getFrame().getY());
 		
 		// Reposition the console (but skip if the console is not bound)
 		if (getHome().getPreferences().getConsoleBind())
 		{
 			getHome().getConsole().setSize(DEFAULT_CONSOLE_WIDTH, DEFAULT_CONSOLE_HEIGHT);
-			getHome().getConsole().setLocationRelativeTo(getImage());
-			getHome().getConsole().setLocation(getHome().getConsole().getLocation().x + (getImage().getWidth() / 2) + (getHome().getConsole().getWidth() / 2), getImage().getY());
+			getHome().getConsole().setLocationRelativeTo(getImage().getFrame());
+			getHome().getConsole().setLocation(getHome().getConsole().getLocation().x + (getImage().getFrame().getWidth() / 2) + (getHome().getConsole().getWidth() / 2), getImage().getFrame().getY());
 			getHome().getConsole().setVisible(true);
 		}
 		
@@ -394,14 +394,14 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 			}
 		});
 		
-		this.getImage().addComponentListener(new ComponentAdapter()
+		this.getImage().getFrame().addComponentListener(new ComponentAdapter()
 		{
 			@Override
 			public void componentResized(ComponentEvent e)
 			{
 				super.componentResized(e);
-				height = getImage().getHeight() - getImage().getInsets().top;
-				width = getImage().getWidth();
+				height = getImage().getFrame().getHeight() - getImage().getFrame().getInsets().top;
+				width = getImage().getFrame().getWidth();
 				setUpGraphics();
 				resetAction();
 			}
@@ -415,7 +415,7 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 		// getAnimate().setJMenuBar(menu2.getMenuBar());
 		
 		menus = new ArrayList<Menu>();
-		addMenuTo(getImage());
+		addMenuTo(getImage().getFrame());
 		addMenuTo(getControls());
 		addMenuTo(getResize());
 		addMenuTo(home.getConsole()); //TODO: this is not appropriate, it should just recognize the most recently active simulation.
@@ -427,9 +427,9 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 		if (System.getProperty("os.name").toLowerCase().startsWith("mac os x"))
 		{
 			// OS X fullscreen support:
-			FullScreenUtilities.setWindowCanFullScreen(getImage(), true);
+			FullScreenUtilities.setWindowCanFullScreen(getImage().getFrame(), true);
 			// Allow esc key to... well... escape fullscreen
-			getImage().addKeyListener(new KeyListener()
+			getImage().getFrame().addKeyListener(new KeyListener()
 			{
 				@Override
 				public void keyTyped(KeyEvent e)
@@ -473,7 +473,7 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 		if(this.fullscreen != fullscreen)
 		{
 			if(getHome().getPreferences().isMacOSX())
-				Application.getApplication().requestToggleFullScreen(getImage());
+				Application.getApplication().requestToggleFullScreen(getImage().getFrame());
 			//TODO: Windows, Linux fullscreen.
 			
 			this.fullscreen = fullscreen;
@@ -483,7 +483,7 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 	public void toggleFullscreen()
 	{
 		if(getHome().getPreferences().isMacOSX())
-			Application.getApplication().requestToggleFullScreen(getImage());
+			Application.getApplication().requestToggleFullScreen(getImage().getFrame());
 		
 		this.fullscreen = !this.fullscreen;
 	}
@@ -519,7 +519,7 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 	
 	private void refreshTitle()
 	{
-		image.setTitle(info.getName() + " – " + info.getAuthor() + " at " + (hertz == -1 ? "?" : hertz) + " Hz");
+		getImage().getFrame().setTitle(info.getName() + " – " + info.getAuthor() + " at " + (hertz == -1 ? "?" : hertz) + " Hz");
 	}
 	
 	private void setUpGraphics()
@@ -563,7 +563,7 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 	    if (getHome().getPreferences().isMacOSX())
 	    {
 	        //Native file dialog, but with less options / cross platform support.
-	        FileDialog dialog = new FileDialog(getImage(), "Choose a file", FileDialog.SAVE);
+	        FileDialog dialog = new FileDialog(getImage().getFrame(), "Choose a file", FileDialog.SAVE);
 	        
             dialog.setDirectory(getContentDirectory().getAbsolutePath());
 	        dialog.setFile(getDefaultFile().getName());
@@ -587,7 +587,7 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
     		JFileChooser chooser = new JFileChooser();
     		chooser.setFileFilter(new FileNameExtensionFilter("PNG Images", "png"));
     		chooser.setSelectedFile(getDefaultFile());
-    		if(chooser.showSaveDialog(getImage()) == JFileChooser.APPROVE_OPTION)
+    		if(chooser.showSaveDialog(getImage().getFrame()) == JFileChooser.APPROVE_OPTION)
     		{
     			String file = chooser.getSelectedFile().getAbsolutePath();
     			if(!chooser.getSelectedFile().getName().contains("."))
@@ -748,7 +748,7 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 	public void delete()
 	{
 		stop();
-		getImage().dispose();
+		getImage().getFrame().dispose();
 		getControls().dispose();
 	}
 	
@@ -808,7 +808,7 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 	 */
 	public void setWidth(int width)
 	{
-		getImage().setSize(width, getImage().getHeight());
+		getImage().setSize(width, getImage().getFrame().getHeight());
 		this.width = width;
 	}
 	
@@ -831,7 +831,7 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 	 */
 	public void setHeight(int height)
 	{
-		getImage().setSize(getImage().getWidth(), height);
+		getImage().setSize(getImage().getFrame().getWidth(), height);
 		this.height = height;
 	}
 	

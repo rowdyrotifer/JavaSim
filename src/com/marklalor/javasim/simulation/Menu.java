@@ -261,7 +261,7 @@ public class Menu implements ActionListener
 		}
 		else if(e.getSource() == animateMenuItem)
 		{
-			getSimulation().getAnimate().setLocationRelativeTo(getSimulation().getImage());
+			getSimulation().getAnimate().setLocationRelativeTo(getSimulation().getImage().getFrame());
 			getSimulation().getAnimate().setVisible(true);
 		}
 		else if(e.getSource() == openContentFolder)
@@ -340,7 +340,7 @@ public class Menu implements ActionListener
 		}
 		else if (e.getSource() == resizeMenuItem)
 		{
-			getSimulation().getResize().setLocationRelativeTo(getSimulation().getImage());
+			getSimulation().getResize().setLocationRelativeTo(getSimulation().getImage().getFrame());
 			getSimulation().getResize().setVisible(true);
 		}
 		else if (e.getSource() == fullscreen)

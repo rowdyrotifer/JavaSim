@@ -47,7 +47,7 @@ public abstract class BlankImageSimulation extends Simulation
 	public void initialize()
 	{
 		//Simulation is intended for images, show the image pane. 
-		getImage().setVisible(true);
+		getImage().getFrame().setVisible(true);
 	}
 	
 	/**
