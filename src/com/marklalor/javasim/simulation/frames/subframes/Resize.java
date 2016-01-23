@@ -1,5 +1,6 @@
 package com.marklalor.javasim.simulation.frames.subframes;
 
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
@@ -15,25 +16,26 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import com.marklalor.javasim.simulation.frames.Image;
-import com.marklalor.javasim.simulation.frames.ImageSubframe;
+import com.marklalor.javasim.simulation.frames.SubFrame;
 
-public class Resize extends ImageSubframe
-{
-	private static final long serialVersionUID = -8535874700179225843L;
-	
-	private JTextField resizeWidth, resizeHeight;
-	private int initialWidth, initialHeight;
-	private JCheckBox preserveAspectRatio;
-	private JButton cancel, resize;
-	
+public class Resize extends SubFrame
+{	
+	//For preserving aspect ratio... if we didn't keep track of the initials,
+	//and someone changed the numbers so that it went to (1, 1), then suddenly
+	//it'd seem like the image was a square all along when perhaps it was (400, 450). 
+	private int initialWidth, initialHeight;	
 	private boolean ignoreNextWidth = false;
 	private boolean ignoreNextHeight = false;
+	
+	//Swing components.
+	private JTextField resizeWidth, resizeHeight;
+    private JCheckBox preserveAspectRatio;
+    private JButton cancel, resize;
 	
 	public Resize(Image image)
 	{
 		super(image);
-		
-		this.addComponentListener(new ComponentAdapter()
+		getFrame().addComponentListener(new ComponentAdapter()
 		{
 			public void componentShown(ComponentEvent e)
 			{
@@ -44,8 +46,8 @@ public class Resize extends ImageSubframe
 			}
 		});
 		
-		setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
-		setTitle("Resize Image");
+		getFrame().setLayout(new BoxLayout(getFrame().getContentPane(), BoxLayout.Y_AXIS));
+		getFrame().setTitle("Resize Image");
 		
 		//Row 1
 		JPanel p1 = new JPanel();
@@ -58,10 +60,10 @@ public class Resize extends ImageSubframe
 		preserveAspectRatio = new JCheckBox("Preserve Aspect Ratio");
 		preserveAspectRatio.setSelected(false);
 		
-		p1.add(ImageSubframe.labeledField("Width", resizeWidth, FILTER_INTEGER));
-		p1.add(ImageSubframe.labeledField("Height", resizeHeight, FILTER_INTEGER));
+		p1.add(SubFrame.labeledField("Width", resizeWidth, FILTER_INTEGER));
+		p1.add(SubFrame.labeledField("Height", resizeHeight, FILTER_INTEGER));
 		p1.add(preserveAspectRatio);
-		this.add(p1);
+		getFrame().add(p1);
 		
 		//Row 2
 		JPanel p2 = new JPanel();
@@ -72,7 +74,7 @@ public class Resize extends ImageSubframe
 			public void actionPerformed(ActionEvent e)
 			{
 				Resize.this.getImage().setSize(getResizeWidth(), getResizeHeight());
-				Resize.this.setVisible(false);
+				Resize.this.getFrame().setVisible(false);
 			}
 		});
 		cancel = new JButton("Cancel");
@@ -81,15 +83,17 @@ public class Resize extends ImageSubframe
 			@Override
 			public void actionPerformed(ActionEvent e)
 			{
-				Resize.this.setVisible(false);
+				Resize.this.getFrame().setVisible(false);
 			}
 		});
 
 		p2.add(resize);
 		p2.add(cancel);
-		p2.setAlignmentX(RIGHT_ALIGNMENT);
-		this.add(p2);
+		p2.setAlignmentX(Component.RIGHT_ALIGNMENT);
+		getFrame().add(p2);
 		
+		//Listen to the text for perserving aspect ratio.
+		//Code is not beautiful, but I couldn't find any other way to do it.
 		DocumentListener resizeInputListener = new DocumentListener()
 		{
 			public void changedUpdate(DocumentEvent e) { check(e); }
@@ -160,11 +164,9 @@ public class Resize extends ImageSubframe
 		resizeWidth.getDocument().addDocumentListener(resizeInputListener);
 		resizeHeight.getDocument().addDocumentListener(resizeInputListener);
 		
-		getRootPane().setDefaultButton(resize);
-		
-		this.setResizable(false);
-		
-		pack();
+		getFrame().getRootPane().setDefaultButton(resize);
+		getFrame().setResizable(false);
+		getFrame().pack();
 	}
 	
 	public int getResizeWidth()

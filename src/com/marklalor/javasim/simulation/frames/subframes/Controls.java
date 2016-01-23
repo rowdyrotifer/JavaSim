@@ -9,32 +9,25 @@ import javax.swing.JSeparator;
 
 import com.marklalor.javasim.control.Control;
 import com.marklalor.javasim.simulation.frames.Image;
-import com.marklalor.javasim.simulation.frames.ImageSubframe;
+import com.marklalor.javasim.simulation.frames.SubFrame;
 
-public class Controls extends ImageSubframe
+public class Controls extends SubFrame
 {
-	private static final long serialVersionUID = 7063568782126029536L;
 	private Map<String, Control<?>> controls;
 	
-	public Controls(Image owner)
+	public Controls(Image image)
 	{
-		super(owner);
-		controls = new HashMap<String, Control<?>>();
-		getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
-		setTitle("Controls");
-	}
-	
-	@Override
-	public void setSize(int width, int height)
-	{
-		super.setSize(width, height + getInsets().top);
+	    super(image);
+        this.controls = new HashMap<String, Control<?>>();
+        getFrame().setTitle("Controls");
+		getFrame().getContentPane().setLayout(new BoxLayout(getFrame().getContentPane(), BoxLayout.Y_AXIS));
 	}
 
 	public <T> void add(Control<T> control)
 	{
 		controls.put(control.getName(), control);
 		JPanel controlPanel = control.getPanel();
-		getContentPane().add(controlPanel);
+		getFrame().getContentPane().add(controlPanel);
 	}
 	
 	public Map<String, Control<?>> getControls()
@@ -44,6 +37,6 @@ public class Controls extends ImageSubframe
 	
 	public void addSeparator()
 	{
-		getContentPane().add(new JSeparator(JSeparator.HORIZONTAL));
+	    getFrame().getContentPane().add(new JSeparator(JSeparator.HORIZONTAL));
 	}
 }

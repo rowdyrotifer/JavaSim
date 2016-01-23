@@ -74,6 +74,7 @@ public class Home extends JFrame implements ListSelectionListener, Minimizable
 	{
 		console = new Console(this);
 		
+		//Bind Log4j info messages to the console.
 		if (getPreferences().getConsoleBind())
 		{
 			JavaSimConsoleAppender consoleAppender = new JavaSimConsoleAppender(console);

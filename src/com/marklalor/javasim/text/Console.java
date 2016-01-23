@@ -10,10 +10,9 @@ import javax.swing.JTextArea;
 import com.marklalor.javasim.Home;
 import com.marklalor.javasim.simulation.frames.Minimizable;
 
+@SuppressWarnings("serial")
 public class Console extends JFrame implements Minimizable
 {
-	private static final long serialVersionUID = 6318364263842210392L;
-
 	private Home home;
 	
 	private JTextArea textArea;

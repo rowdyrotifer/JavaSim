@@ -23,7 +23,8 @@ import apple.dts.samplecode.osxadapter.OSXAdapter; //TODO: apple Application cla
 public class Menu implements ActionListener
 {
 	private Simulation _simulation;
-	private JFrame parent;
+	private JFrame frame;
+	private Object owner;
 	
 	private JMenuBar menuBar;
 	
@@ -43,10 +44,11 @@ public class Menu implements ActionListener
 		return menuBar;
 	}
 	
-	public Menu(Simulation _simulation, JFrame parent)
+	public Menu(Simulation _simulation, JFrame parent, Object owner)
 	{
 		this._simulation = _simulation;
-		this.parent = parent;
+		this.frame = parent;
+		this.owner = owner;
 		
 		menuBar = new JMenuBar();
 		
@@ -261,8 +263,8 @@ public class Menu implements ActionListener
 		}
 		else if(e.getSource() == animateMenuItem)
 		{
-			getSimulation().getAnimate().setLocationRelativeTo(getSimulation().getImage().getFrame());
-			getSimulation().getAnimate().setVisible(true);
+			getSimulation().getAnimate().getFrame().setLocationRelativeTo(getSimulation().getImage().getFrame());
+			getSimulation().getAnimate().getFrame().setVisible(true);
 		}
 		else if(e.getSource() == openContentFolder)
 		{
@@ -340,8 +342,8 @@ public class Menu implements ActionListener
 		}
 		else if (e.getSource() == resizeMenuItem)
 		{
-			getSimulation().getResize().setLocationRelativeTo(getSimulation().getImage().getFrame());
-			getSimulation().getResize().setVisible(true);
+			getSimulation().getResize().getFrame().setLocationRelativeTo(getSimulation().getImage().getFrame());
+			getSimulation().getResize().getFrame().setVisible(true);
 		}
 		else if (e.getSource() == fullscreen)
 		{
@@ -353,19 +355,23 @@ public class Menu implements ActionListener
 		}
 		else if (e.getSource() == minimize)
 		{
-			JFrame parent = this.getParent();
-			if (Minimizable.class.isAssignableFrom(parent.getClass()))
-				((Minimizable)parent).minimize();
+			if (Minimizable.class.isAssignableFrom(owner.getClass()))
+				((Minimizable)owner).minimize();
 		}
 	}
 	
-	public JFrame getParent()
-	{
-		return parent;
-	}
+	public JFrame getFrame()
+    {
+        return frame;
+    }
 	
 	public Simulation getSimulation()
 	{
 		return this._simulation;
 	}
+	
+	public Object getOwner()
+    {
+        return owner;
+    }
 }

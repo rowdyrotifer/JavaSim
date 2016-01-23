@@ -1,16 +1,12 @@
 package com.marklalor.javasim.simulation.frames.subframes;
 
 import com.marklalor.javasim.simulation.frames.Image;
-import com.marklalor.javasim.simulation.frames.ImageSubframe;
+import com.marklalor.javasim.simulation.frames.SubFrame;
 
-public class Preferences extends ImageSubframe
+public class Preferences extends SubFrame
 {
-	private static final long serialVersionUID = 1782515199772726105L;
-	
 	public Preferences(Image image)
 	{
 		super(image);
-		
-		
 	}
 }

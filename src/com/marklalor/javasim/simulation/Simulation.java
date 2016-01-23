@@ -283,9 +283,9 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 		
 		// Create and set up the main control panel for this simulation.
 		controls = new Controls(getImage());
-		controls.setSize(DEFAULT_CONTROL_WIDTH, DEFAULT_CONTROL_HEIGHT);
-		controls.setLocationRelativeTo(getImage().getFrame());
-		controls.setLocation(getControls().getLocation().x - (getImage().getFrame().getWidth() / 2) - (getControls().getWidth() / 2), getImage().getFrame().getY());
+		controls.setSize(DEFAULT_CONTROL_WIDTH, DEFAULT_CONTROL_HEIGHT); //TODO: add more wrapper methods (only for appropriate methods, though...)
+		controls.getFrame().setLocationRelativeTo(getImage().getFrame());
+		controls.getFrame().setLocation(getControls().getFrame().getLocation().x - (getImage().getFrame().getWidth() / 2) - (getControls().getFrame().getWidth() / 2), getImage().getFrame().getY());
 		
 		// Reposition the console (but skip if the console is not bound)
 		if (getHome().getPreferences().getConsoleBind())
@@ -415,10 +415,10 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 		// getAnimate().setJMenuBar(menu2.getMenuBar());
 		
 		menus = new ArrayList<Menu>();
-		addMenuTo(getImage().getFrame());
-		addMenuTo(getControls());
-		addMenuTo(getResize());
-		addMenuTo(home.getConsole()); //TODO: this is not appropriate, it should just recognize the most recently active simulation.
+		addMenuTo(getImage().getFrame(), getImage());
+		addMenuTo(getControls().getFrame(), getControls());
+		addMenuTo(getResize().getFrame(), getResize());
+		addMenuTo(home.getConsole(), home.getConsole()); //TODO: this is not appropriate, it should just recognize the most recently active simulation.
 		
 		// Set sizes to the default dimensions
 		setWidth(DEFAULT_IMAGE_WIDTH);
@@ -465,7 +465,7 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 	{
 		//Relies on what the user initializes for animating over a variable.
 		animate = new Animate(getImage());
-		addMenuTo(getAnimate());
+		addMenuTo(getAnimate().getFrame(), getAnimate());
 	}
 	
 	private void setFullscreen(boolean fullscreen)
@@ -488,9 +488,9 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 		this.fullscreen = !this.fullscreen;
 	}
 	
-	private void addMenuTo(JFrame frame)
+	private void addMenuTo(JFrame frame, Object owner)
 	{
-		Menu menu = new Menu(this, frame);
+		Menu menu = new Menu(this, frame, owner);
 		menus.add(menu);
 		frame.setJMenuBar(menu.getMenuBar());
 	}
@@ -749,7 +749,7 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 	{
 		stop();
 		getImage().getFrame().dispose();
-		getControls().dispose();
+		getControls().getFrame().dispose();
 	}
 	
 	public void breakpoint()

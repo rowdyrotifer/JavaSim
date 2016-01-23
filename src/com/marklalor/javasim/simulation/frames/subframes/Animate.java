@@ -1,6 +1,7 @@
 package com.marklalor.javasim.simulation.frames.subframes;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -24,12 +25,10 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import com.marklalor.javasim.control.Control;
 import com.marklalor.javasim.simulation.Simulation;
 import com.marklalor.javasim.simulation.frames.Image;
-import com.marklalor.javasim.simulation.frames.ImageSubframe;
+import com.marklalor.javasim.simulation.frames.SubFrame;
 
-public class Animate extends ImageSubframe
-{
-	private static final long serialVersionUID = 2937807098313260272L;
-	
+public class Animate extends SubFrame
+{	
 	private JTextField startN, stopN;
 	private JCheckBox startFromBeginning, stopAtBreakpoint;
 	
@@ -51,15 +50,15 @@ public class Animate extends ImageSubframe
 	public Animate(Image image)
 	{
 		super(image);
-		setTitle("Animation Options");
-		getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
+		getFrame().setTitle("Animation Options");
+		getFrame().getContentPane().setLayout(new BoxLayout(getFrame().getContentPane(), BoxLayout.Y_AXIS));
 		
 		tabbledPane = new JTabbedPane();
 		normalTab = createNormalTab();
 		tabbledPane.addTab("Normal", normalTab);
 		variableTab = createVariableTab();
 		tabbledPane.addTab("Variable", variableTab);
-		this.add(tabbledPane);
+		getFrame().add(tabbledPane);
 		
 		// Row 2
 		JPanel p3 = new JPanel();
@@ -69,32 +68,32 @@ public class Animate extends ImageSubframe
 		stopDelay = new JTextField(4);
 		stopDelay.setHorizontalAlignment(JTextField.CENTER);
 		stopDelay.setText("10");
-		p3.add(ImageSubframe.labeledField("Initial Frame Delay (ms)", startDelay, FILTER_INTEGER));
-		p3.add(ImageSubframe.labeledField("End Frame Delay (ms)", stopDelay, FILTER_INTEGER));
-		this.add(p3);
+		p3.add(SubFrame.labeledField("Initial Frame Delay (ms)", startDelay, FILTER_INTEGER));
+		p3.add(SubFrame.labeledField("End Frame Delay (ms)", stopDelay, FILTER_INTEGER));
+		getFrame().add(p3);
 		
 		// Row 3
 		JPanel p4 = new JPanel();
 		frameDelay = new JTextField(4);
 		frameDelay.setHorizontalAlignment(JTextField.CENTER);
 		frameDelay.setText("10");
-		p4.add(ImageSubframe.labeledField("Intermediate Frame Delay (ms)", frameDelay, FILTER_INTEGER));
+		p4.add(SubFrame.labeledField("Intermediate Frame Delay (ms)", frameDelay, FILTER_INTEGER));
 		saveEvery = new JTextField(2);
 		saveEvery.setHorizontalAlignment(JTextField.CENTER);
 		saveEvery.setText("5");
-		p4.add(ImageSubframe.labeledField("Save Every…", saveEvery, FILTER_INTEGER));
+		p4.add(SubFrame.labeledField("Save Every…", saveEvery, FILTER_INTEGER));
 		loop = new JCheckBox("Loop");
 		loop.setSelected(true);
 		p4.add(loop);
-		this.add(p4);
+		getFrame().add(p4);
 		
-		this.add(new JSeparator());
+		getFrame().add(new JSeparator());
 		
 		// Row 4
 		JPanel p5 = new JPanel();
 		fileLocation = new JTextField(20);
 		fileLocation.setText(getDefaultText());
-		p5.add(ImageSubframe.labeledField("File: ", fileLocation, FILTER_NONE));
+		p5.add(SubFrame.labeledField("File: ", fileLocation, FILTER_NONE));
 		browseFile = new JButton("Browse…");
 		browseFile.addActionListener(new ActionListener()
 		{
@@ -104,7 +103,7 @@ public class Animate extends ImageSubframe
 				JFileChooser chooser = new JFileChooser();
 				chooser.setFileFilter(new FileNameExtensionFilter("Gif Images", "gif"));
 				chooser.setSelectedFile(getFile());
-				if(chooser.showSaveDialog(Animate.this) == JFileChooser.APPROVE_OPTION)
+				if(chooser.showSaveDialog(Animate.this.getFrame()) == JFileChooser.APPROVE_OPTION)
 				{
 					String file = chooser.getSelectedFile().getAbsolutePath();
 					if(!chooser.getSelectedFile().getName().contains("."))
@@ -125,9 +124,9 @@ public class Animate extends ImageSubframe
 			}
 		});
 		p5.add(defaultFile);
-		this.add(p5);
+		getFrame().add(p5);
 		
-		this.add(new JSeparator());
+		getFrame().add(new JSeparator());
 		
 		// Row 5
 		JPanel p6 = new JPanel();
@@ -140,12 +139,12 @@ public class Animate extends ImageSubframe
 				if (tabbledPane.getSelectedComponent().equals(normalTab))
 				{
 					Animate.this.getImage().getSimulation().animate();
-					Animate.this.setVisible(false);
+					Animate.this.getFrame().setVisible(false);
 				}
 				else if (tabbledPane.getSelectedComponent().equals(variableTab))
 				{
 					Animate.this.getImage().getSimulation().animateVariable();
-					Animate.this.setVisible(false);
+					Animate.this.getFrame().setVisible(false);
 				}
 			}
 		});
@@ -156,18 +155,17 @@ public class Animate extends ImageSubframe
 			@Override
 			public void actionPerformed(ActionEvent e)
 			{
-				Animate.this.setVisible(false);
+				Animate.this.getFrame().setVisible(false);
 			}
 		});
 		p6.add(cancel);
-		p6.setAlignmentX(RIGHT_ALIGNMENT);
-		this.add(p6);
+		p6.setAlignmentX(Component.RIGHT_ALIGNMENT);
+		getFrame().add(p6);
 		
-		pack();
+		getFrame().pack();
+		getFrame().setResizable(false);
+		getFrame().getRootPane().setDefaultButton(animate);
 		
-		this.setResizable(false);
-		
-		getRootPane().setDefaultButton(animate);
 		animate.requestFocus();
 	}
 	
@@ -187,8 +185,8 @@ public class Animate extends ImageSubframe
 		stopN.setHorizontalAlignment(JTextField.CENTER);
 		stopN.setText("auto");
 		stopN.setEnabled(false);
-		p1.add(ImageSubframe.labeledField("First Frame", startN, FILTER_INTEGER));
-		p1.add(ImageSubframe.labeledField("Last Frame", stopN, FILTER_INTEGER));
+		p1.add(SubFrame.labeledField("First Frame", startN, FILTER_INTEGER));
+		p1.add(SubFrame.labeledField("Last Frame", stopN, FILTER_INTEGER));
 		normal.add(p1);
 		
 		// Row 2
@@ -273,7 +271,7 @@ public class Animate extends ImageSubframe
 				{
 					controlsPanel.add(controlPanel);
 					Animate.this.addedControls.add(newControl);
-					Animate.this.pack();
+					Animate.this.getFrame().pack();
 				}
 			}
 		});
