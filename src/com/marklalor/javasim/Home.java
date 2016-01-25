@@ -33,7 +33,6 @@ import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
 
 import com.marklalor.javasim.misc.FileDropManager;
@@ -86,10 +85,10 @@ public class Home extends JFrame implements ListSelectionListener, Minimizable
 		console = new Console(this);
 		
 		//Bind Log4j info messages to the console.
-		if (getPreferences().getConsoleBind())
+		if (getApplicationPreferences().getConsoleBind())
 		{
 			JavaSimConsoleAppender consoleAppender = new JavaSimConsoleAppender(console);
-			consoleAppender.setThreshold(Level.INFO);
+			consoleAppender.setThreshold(getApplicationPreferences().getPreferences().getLogLevel());
 			LogManager.getRootLogger().addAppender(consoleAppender);
 		}
 		
@@ -108,7 +107,7 @@ public class Home extends JFrame implements ListSelectionListener, Minimizable
 	    JavaSim.getLogger().debug("Loading simulations.");
 	    
 		simulations = new ArrayList<SimulationInfo>();
-		for (File jar : getPreferences().getMainDirectory().listFiles(jarFilter))
+		for (File jar : getApplicationPreferences().getMainDirectory().listFiles(jarFilter))
 		{
 			SimulationInfo info = new SimulationInfo(jar);
 			simulations.add(info);
@@ -167,20 +166,16 @@ public class Home extends JFrame implements ListSelectionListener, Minimizable
 		});
 		
 		simulationList.addKeyListener(new KeyListener()
-		{
-			
-			@Override
-			public void keyTyped(KeyEvent e) { }
-			
-			@Override
-			public void keyReleased(KeyEvent e) { }
-			
+		{	
 			@Override
 			public void keyPressed(KeyEvent e)
 			{
 				if (e.getKeyCode() == KeyEvent.VK_ENTER)
 					runSelected();
 			}
+
+            @Override public void keyTyped(KeyEvent e) { }  
+            @Override public void keyReleased(KeyEvent e) { }
 		});
 		
 		simulationInfoPanel = new JPanel();
@@ -235,6 +230,7 @@ public class Home extends JFrame implements ListSelectionListener, Minimizable
 		
         layeredPane.addComponentListener(new ComponentListener()
         {
+            @Override
             public void componentResized(ComponentEvent e)
             {
                 Home.this.fileDropOverlay.setSize(Home.this.getWidth(), Home.this.getHeight());
@@ -242,9 +238,7 @@ public class Home extends JFrame implements ListSelectionListener, Minimizable
             }
 
             @Override public void componentMoved(ComponentEvent e) { }
-
             @Override public void componentShown(ComponentEvent e) { }
-
             @Override public void componentHidden(ComponentEvent e) { }
         });
 	}
@@ -316,7 +310,7 @@ public class Home extends JFrame implements ListSelectionListener, Minimizable
 		return console;
 	}
 	
-	public ApplicationPreferences getPreferences()
+	public ApplicationPreferences getApplicationPreferences()
 	{
 		return preferences;
 	}
@@ -325,6 +319,7 @@ public class Home extends JFrame implements ListSelectionListener, Minimizable
 	public void valueChanged(ListSelectionEvent e)
 	{
 		this.run.setVisible(true);
+		
 		SimulationInfo info = (SimulationInfo) simulationList.getSelectedValue();
 		this.name.setText(info.getName());
 		this.date.setText(info.getDate());

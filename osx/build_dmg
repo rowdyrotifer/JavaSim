@@ -1,10 +1,10 @@
 #!/bin/sh
 mkdir osx/src
-cp -R ../dist/JavaSim.app osx/src/
+cp -R dist/JavaSim.app osx/src/
 mkdir osx/src/.background
 cp osx/background.png osx/src/.background/background.png
-hdiutil create -srcfolder "osx/src" -volname "JavaSim" -fs HFS+ -fsargs "-c c=64,a=16,e=16" -format UDRW -size 10m "../dist/pack.temp.dmg"
-device=$(hdiutil attach -readwrite -noverify -noautoopen "../dist/pack.temp.dmg" | egrep '^/dev/' | sed 1q | awk '{print $1}')
+hdiutil create -srcfolder "osx/src" -volname "JavaSim" -fs HFS+ -fsargs "-c c=64,a=16,e=16" -format UDRW -size 10m "dist/pack.temp.dmg"
+device=$(hdiutil attach -readwrite -noverify -noautoopen "dist/pack.temp.dmg" | egrep '^/dev/' | sed 1q | awk '{print $1}')
 echo "Waiting 3 seconds after mount attempt."
 sleep 3
 echo '
@@ -34,6 +34,6 @@ sync
 hdiutil detach ${device}
 echo "Waiting 2 seconds after unmounting."
 sleep 2
-hdiutil convert "../dist/pack.temp.dmg" -format UDZO -imagekey zlib-level=9 -o ../dist/JavaSim-$1.dmg
+hdiutil convert "dist/pack.temp.dmg" -format UDZO -imagekey zlib-level=9 -o dist/JavaSim-$1.dmg
 echo "Removing old pack.temp.dmg"
-rm -f ../dist/pack.temp.dmg
+rm -f dist/pack.temp.dmg

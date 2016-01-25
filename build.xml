@@ -9,8 +9,8 @@
         <ivy:retrieve />
     </target>
 	<target name="build">
-		<delete dir="../bin"/>
-		<mkdir dir="../bin"/>
+		<delete dir="bin"/>
+		<mkdir dir="bin"/>
 		<path id="master-classpath">
 			<fileset dir="lib">
 				<include name="*.jar"/>
@@ -19,12 +19,12 @@
 			</fileset>
 		</path>
 		<!-- Copy non-java files (looking at you, log4j) -->
-		<copy todir="../bin">
-		  <fileset dir="../src">
+		<copy todir="bin">
+		  <fileset dir="src">
 		    <exclude name="**/*.java"/>
 		  </fileset>
 		</copy>
-		<javac encoding="UTF-8" source="1.7" target="1.7" srcdir="../src" destdir="../bin" includeantruntime="false" fork="true" debug="${debug}">
+		<javac encoding="UTF-8" source="1.7" target="1.7" srcdir="src" destdir="bin" includeantruntime="false" fork="true" debug="${debug}">
 			<compilerarg line="-XDignore.symbol.file"/>
 			<classpath refid="master-classpath"/>
 			<!-- Compiling with rt.jar... may not work compiling on windows. -->
@@ -34,13 +34,13 @@
 	
 	<target name="clean">
 		<delete dir="osx/src" />
-		<delete dir="../dist" />
+		<delete dir="dist" />
 	</target>
 	
 	<target name="jar">
-		<jar destfile="../dist/${jarname}">
-			<fileset dir="../bin" />
-			<fileset dir="../src">
+		<jar destfile="dist/${jarname}">
+			<fileset dir="bin" />
+			<fileset dir="src">
 				<exclude name="**" if="${excludesource}"/>
 			</fileset>
 			<zipgroupfileset dir="lib" includes="*.jar" excludes="*-sources.jar,*-javadoc.jar"/>
@@ -58,7 +58,7 @@
 	
 	
 	<target name="create_jar">
-		<delete file="../dist/${filename}.jar" />
+		<delete file="dist/${filename}.jar" />
 		<antcall target="build"/>
 		<antcall target="jar">
 			<param name="excludesource" value="true"/>
@@ -66,7 +66,7 @@
 		</antcall>
 	</target>
 	<target name="create_source_jar">
-		<delete file="../dist/${filename}-src.jar" />
+		<delete file="dist/${filename}-src.jar" />
 		<antcall target="build"/>
 		<antcall target="jar">
 			<param name="jarname" value="${filename}-src.jar"/>
@@ -76,7 +76,7 @@
 	<target name="build_osx" depends="create_jar">
 		<taskdef name="jarbundler" classname="net.sourceforge.jarbundler.JarBundler"/>
 			<jarbundler
-				dir="../dist"
+				dir="dist"
 			    name="JavaSim"
 			    shortname="JavaSim"
 			    icon="osx/icons.icns"
@@ -84,7 +84,7 @@
 				mainclass="com.marklalor.javasim.JavaSim"
 				jvmversion="1.7+"
 				version="${version}"
-				jar="../dist/${filename}.jar"
+				jar="dist/${filename}.jar"
 				copyright="JavaSim ${version}, © 2015–2016 Mark Lalor."
 				hiResCapable="true">
 			</jarbundler>
@@ -98,12 +98,12 @@
 	</target>
 	<target name="run_jar">
 		<exec executable="open">
-			<arg value="../dist/${filename}.jar"/>
+			<arg value="dist/${filename}.jar"/>
 		</exec>
 	</target>
 	<target name="run_osx">
 		<exec executable="open">
-			<arg value="../dist/JavaSim.app"/>
+			<arg value="dist/JavaSim.app"/>
 		</exec>	
 	</target>
 </project>
