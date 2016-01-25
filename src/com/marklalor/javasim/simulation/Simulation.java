@@ -432,14 +432,10 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 			getImage().getFrame().addKeyListener(new KeyListener()
 			{
 				@Override
-				public void keyTyped(KeyEvent e)
-				{
-				}
+				public void keyTyped(KeyEvent e){}
 				
 				@Override
-				public void keyReleased(KeyEvent e)
-				{
-				}
+				public void keyReleased(KeyEvent e){}
 				
 				@Override
 				public void keyPressed(KeyEvent e)
@@ -783,12 +779,6 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 		return image;
 	}
 	
-//	Not needed for now, won't be added until needed (and therefore tested)
-//	public Menu getMenu()
-//	{
-//		return menus.get(0);
-//	}
-	
 	public Controls getControls()
 	{
 		return controls;
@@ -947,10 +937,12 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 	    
 	}
 	
+	//Pseudo-print: opens the png in the system editor.
     public void print()
     {
         File tempFile =  new File(getHome().getPreferences().getTempDirectory(), getInfo().getName() + "_" + getTimestamp() + ".png");
         
+        //Save the file to the temporary file directory.
         try
         {
             ImageIO.write(combinedImage, "png", tempFile);
@@ -960,6 +952,7 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
             JavaSim.getLogger().error("Could not save temporary image for printing.", e);
         }
         
+        //Open it with the default system editor.
         try
         {
             Desktop.getDesktop().open(tempFile);

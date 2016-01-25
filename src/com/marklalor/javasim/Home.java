@@ -7,6 +7,8 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
@@ -23,6 +25,7 @@ import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JLayeredPane;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -33,6 +36,9 @@ import javax.swing.event.ListSelectionListener;
 import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
 
+import com.marklalor.javasim.misc.FileDropManager;
+import com.marklalor.javasim.misc.FileDropOverlay;
+import com.marklalor.javasim.misc.FileDropManager.Listener;
 import com.marklalor.javasim.preferences.ApplicationPreferences;
 import com.marklalor.javasim.simulation.HomeMenu;
 import com.marklalor.javasim.simulation.Simulation;
@@ -56,7 +62,12 @@ public class Home extends JFrame implements ListSelectionListener, Minimizable
 	
 	private HomeMenu menu;
 	private Console console;
+	
+	private JLayeredPane layeredPane; 
+	private JPanel main;
+    private FileDropOverlay fileDropOverlay;
 
+	private boolean fileDropVisible;
 	
 	public Home(ApplicationPreferences preferences)
 	{
@@ -110,8 +121,18 @@ public class Home extends JFrame implements ListSelectionListener, Minimizable
 	    
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setTitle("Java Simulation Home");
+
+        layeredPane = getLayeredPane();
+		//Seperate into two layers: a main pane and a glass pane for the FileDropOverlay
+		main = new JPanel();
+		fileDropOverlay = new FileDropOverlay(this);
 		
-		getContentPane().setLayout(new GridBagLayout());
+		fileDropOverlay.setSize(800, 500);
+		fileDropOverlay.setLocation(0, 0);
+		
+		
+		main.setLayout(new GridBagLayout());
+		main.setSize(800, 500);
 		GridBagConstraints constraints = new GridBagConstraints();
 		constraints.fill = GridBagConstraints.BOTH;
 		constraints.weighty = 1;
@@ -134,7 +155,7 @@ public class Home extends JFrame implements ListSelectionListener, Minimizable
 		simulationListScrollPane.setPreferredSize(new Dimension(200, 100));
 		simulationListScrollPane.setMinimumSize(new Dimension(200, 100));
 		simulationListScrollPane.setBorder(BorderFactory.createEmptyBorder());
-		getContentPane().add(simulationListScrollPane, constraints);
+		main.add(simulationListScrollPane, constraints);
 		
 		simulationList.addMouseListener(new MouseAdapter()
 		{
@@ -170,7 +191,7 @@ public class Home extends JFrame implements ListSelectionListener, Minimizable
 		
 		JScrollPane simulationInfoPanelScrollPane = new JScrollPane(simulationInfoPanel);
 		simulationInfoPanelScrollPane.setBorder(BorderFactory.createEmptyBorder());
-		getContentPane().add(simulationInfoPanelScrollPane, constraints);
+		main.add(simulationInfoPanelScrollPane, constraints);
 		
 		this.name = new JLabel();
 		this.name.setFont(this.name.getFont().deriveFont(26f).deriveFont(Font.BOLD));
@@ -197,6 +218,35 @@ public class Home extends JFrame implements ListSelectionListener, Minimizable
 		simulationInfoPanel.add(this.run);
 		
 		simulationList.setSelectedIndex(0);
+		
+		new FileDropManager(this, new Listener()
+        {   
+            @Override
+            public void filesDropped(File[] files)
+            {
+                for (File file : files)
+                    JavaSim.getLogger().info(file.getAbsolutePath());
+            }
+            
+        });
+		
+		layeredPane.add(main, Integer.valueOf(1));
+		layeredPane.add(fileDropOverlay, Integer.valueOf(2));
+		
+        layeredPane.addComponentListener(new ComponentListener()
+        {
+            public void componentResized(ComponentEvent e)
+            {
+                Home.this.fileDropOverlay.setSize(Home.this.getWidth(), Home.this.getHeight());
+                Home.this.main.setSize(Home.this.getWidth(), Home.this.getHeight());
+            }
+
+            @Override public void componentMoved(ComponentEvent e) { }
+
+            @Override public void componentShown(ComponentEvent e) { }
+
+            @Override public void componentHidden(ComponentEvent e) { }
+        });
 	}
 	
 	private void setUpMenu()
@@ -289,4 +339,15 @@ public class Home extends JFrame implements ListSelectionListener, Minimizable
 		if (isVisible())
 			setState(ICONIFIED);
 	}
+    
+	public boolean getFileDropVisible()
+	{
+	    return this.fileDropVisible;
+	}
+	
+    public void setFileDropVisible(boolean fileDropVisible)
+    {
+        this.fileDropVisible = fileDropVisible;
+        this.fileDropOverlay.repaint();
+    }
 }
