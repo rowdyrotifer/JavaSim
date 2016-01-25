@@ -271,7 +271,7 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 		setInfo(info);
 		
 		// Set the simulation's content directory and (make sure it exists).
-		contentDirectory = new File(getHome().getPreferences().getSaveDirectory(), info.getName());
+		contentDirectory = new File(getHome().getApplicationPreferences().getSaveDirectory(), info.getName());
 		contentDirectory.mkdirs();
 		
 		// Create and set up the main image that goes with this simulation.
@@ -288,7 +288,7 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 		controls.getFrame().setLocation(getControls().getFrame().getLocation().x - (getImage().getFrame().getWidth() / 2) - (getControls().getFrame().getWidth() / 2), getImage().getFrame().getY());
 		
 		// Reposition the console (but skip if the console is not bound)
-		if (getHome().getPreferences().getConsoleBind())
+		if (getHome().getApplicationPreferences().getConsoleBind())
 		{
 			getHome().getConsole().setSize(DEFAULT_CONSOLE_WIDTH, DEFAULT_CONSOLE_HEIGHT);
 			getHome().getConsole().setLocationRelativeTo(getImage().getFrame());
@@ -468,7 +468,7 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 	{
 		if(this.fullscreen != fullscreen)
 		{
-			if(getHome().getPreferences().isMacOSX())
+			if(getHome().getApplicationPreferences().isMacOSX())
 				Application.getApplication().requestToggleFullScreen(getImage().getFrame());
 			//TODO: Windows, Linux fullscreen.
 			
@@ -478,7 +478,7 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 	
 	public void toggleFullscreen()
 	{
-		if(getHome().getPreferences().isMacOSX())
+		if(getHome().getApplicationPreferences().isMacOSX())
 			Application.getApplication().requestToggleFullScreen(getImage().getFrame());
 		
 		this.fullscreen = !this.fullscreen;
@@ -556,7 +556,7 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 	
 	public void saveAs()
 	{
-	    if (getHome().getPreferences().isMacOSX())
+	    if (getHome().getApplicationPreferences().isMacOSX())
 	    {
 	        //Native file dialog, but with less options / cross platform support.
 	        FileDialog dialog = new FileDialog(getImage().getFrame(), "Choose a file", FileDialog.SAVE);
@@ -940,7 +940,7 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 	//Pseudo-print: opens the png in the system editor.
     public void print()
     {
-        File tempFile =  new File(getHome().getPreferences().getTempDirectory(), getInfo().getName() + "_" + getTimestamp() + ".png");
+        File tempFile =  new File(getHome().getApplicationPreferences().getTempDirectory(), getInfo().getName() + "_" + getTimestamp() + ".png");
         
         //Save the file to the temporary file directory.
         try

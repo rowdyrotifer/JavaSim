@@ -109,7 +109,7 @@ public class Menu implements ActionListener
         file.add(print);
 		
 		//Preferences
-		if(getSimulation().getHome().getPreferences().isMacOSX())
+		if(getSimulation().getHome().getApplicationPreferences().isMacOSX())
 		{
 			try
 			{
@@ -218,7 +218,7 @@ public class Menu implements ActionListener
 		
 		// Fullscreen – Command + Shift + F (OS X) F11 (Windows)
 		fullscreen = new JMenuItem("Enter Full Screen");
-		if (getSimulation().getHome().getPreferences().isMacOSX())
+		if (getSimulation().getHome().getApplicationPreferences().isMacOSX())
 			fullscreen.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, (Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | InputEvent.CTRL_MASK)));
 		else
 			fullscreen.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F11, 0));
@@ -281,7 +281,7 @@ public class Menu implements ActionListener
 		{
 			try
 			{
-				Desktop.getDesktop().open(getSimulation().getHome().getPreferences().getMainDirectory());
+				Desktop.getDesktop().open(getSimulation().getHome().getApplicationPreferences().getMainDirectory());
 			}
 			catch(IOException e1)
 			{

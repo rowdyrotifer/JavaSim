@@ -19,7 +19,20 @@ public class JavaSimConsoleAppender extends AppenderSkeleton
     protected void append(LoggingEvent event)
     {
     	eventsList.add(event);
-    	console.append("[" + event.getLevel().toString() + "] " + event.getMessage().toString());
+    	
+    	StringBuilder builder = new StringBuilder();
+    	builder.append("[");
+    	builder.append(event.getLevel().toString());
+    	builder.append("] ");
+    	if (!event.getLocationInformation().getClassName().contains("marklalor"))
+    	{
+    	    builder.append("(");
+    	    builder.append(event.getLocationInformation().fullInfo);
+    	    builder.append(") ");
+    	}
+    	builder.append(event.getMessage().toString());
+    	
+    	console.append(builder.toString());
     }
 
 	@Override

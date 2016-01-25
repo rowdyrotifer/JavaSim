@@ -1,57 +1,39 @@
 package com.marklalor.javasim.preferences;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Level;
 
 public class PreferencesFile
-{	
-    /**
-     * <p>preferences.json file</p>
-     * <p>For example, on OS X: <code>/Users/username/Library/Application Support/JavaSim/preferences.json</code></p>
-     */
-    private final File file;
-    
+{
     //ApplicationPreferences parent wrapper class.
-	private ApplicationPreferences applicationPreferences;
+	private transient ApplicationPreferences applicationPreferences;
 	
 	private File mainDirectory;
     private File saveDirectory;
-	
-	private List<File> simulationFiles;
+
+    private List<File> simulationDirectories;
+    private List<File> simulationFiles;
+    
 	private Level logLevel;
 	
-	public PreferencesFile(File preferences, ApplicationPreferences applicationPreferences)
-	{
+	//Initialization option for the deserializer which doesn't know the transient variables.
+    public PreferencesFile() { }
+	
+	public PreferencesFile(ApplicationPreferences applicationPreferences)
+	{   
 		this.applicationPreferences = applicationPreferences;
-		this.file = preferences;
-		
-		if (file.exists())
-        {
-            parse();
-        }
-        else
-        {
-            fillDefaults();
-            save();
-        }   
-		
-		mainDirectory.mkdirs();
-		saveDirectory.mkdirs();
 	}
 
-	private void parse()
-	{
-		
-	}
-
-	private void fillDefaults()
+	public void fillDefaults()
 	{
 	    saveDirectory = new File(
 	            System.getProperty("user.home") + 
 	            File.separator + "Documents" + 
 	            File.separator + "JavaSim");
+        saveDirectory.mkdirs();
 	    
 		if (getApplicationPreferences().isMacOSX())
 		    mainDirectory = new File(
@@ -77,19 +59,24 @@ public class PreferencesFile
 		            File.separator + "Documents" + 
 		            File.separator + "JavaSim" + 
                     File.separator + "Simulations");
+		mainDirectory.mkdirs();
+		
+		simulationDirectories = new ArrayList<File>();
+		
+		simulationFiles = new ArrayList<File>();
 		
 		logLevel = Level.INFO;
-	}
-
-	private void save()
-	{
-		// TODO Auto-generated method stub
 	}
 
 	public ApplicationPreferences getApplicationPreferences()
 	{
 		return applicationPreferences;
 	}
+
+    public void setApplicationPreferences(ApplicationPreferences applicationPreferences)
+    {
+        this.applicationPreferences = applicationPreferences;
+    }
 
 	public File getSaveDirectory()
 	{
@@ -120,6 +107,16 @@ public class PreferencesFile
 	{
 		this.simulationFiles = simulationFiles;
 	}
+	
+	public List<File> getSimulationDirectories()
+    {
+        return simulationDirectories;
+    }
+	
+	public void setSimulationDirectories(List<File> simulationDirectories)
+    {
+        this.simulationDirectories = simulationDirectories;
+    }
 	
 	public Level getLogLevel()
 	{

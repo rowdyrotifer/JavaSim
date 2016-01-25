@@ -34,7 +34,7 @@ public class Console extends JFrame implements Minimizable
 		getContentPane().add(textAreaScrollPane, BorderLayout.CENTER);
 		setAutoRequestFocus(false);
 		
-		if (!getHome().getPreferences().getConsoleBind())
+		if (!getHome().getApplicationPreferences().getConsoleBind())
 			textArea.append("Logger not bound to this console.\nTo bind, run without the \"noconsolebind\" argument.");
 	}
 
