@@ -100,7 +100,7 @@ public class HomeMenu implements ActionListener
 		{
 			try
 			{
-				Desktop.getDesktop().open(getHome().getApplicationPreferences().getMainDirectory());
+				Desktop.getDesktop().open(getHome().getApplicationPreferences().getSimulationsDirectory());
 			}
 			catch(IOException e1)
 			{

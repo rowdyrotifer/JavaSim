@@ -53,7 +53,7 @@ public class JavaSim
 				else if (preferences.isLinux())
 					preferencesFile = new File(File.separator + "var" + File.separator + "lib" + File.separator + "javasim" + File.separator + "preferences.json");
 				else
-					new File(System.getProperty("user.home") + File.separator + "JavaSim" + File.separator + "preferences.json");
+				    preferencesFile = new File(System.getProperty("user.home") + File.separator + "JavaSim" + File.separator + "preferences.json");
 				
 				JavaSim.getLogger().info("Resolved preferences file: {}", preferencesFile.getAbsolutePath());
 				

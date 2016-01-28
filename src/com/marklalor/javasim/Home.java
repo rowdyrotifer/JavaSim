@@ -107,7 +107,7 @@ public class Home extends JFrame implements ListSelectionListener, Minimizable
 	    JavaSim.getLogger().debug("Loading simulations.");
 	    
 		simulations = new ArrayList<SimulationInfo>();
-		for (File jar : getApplicationPreferences().getMainDirectory().listFiles(jarFilter))
+		for (File jar : getApplicationPreferences().getSimulationsDirectory().listFiles(jarFilter))
 		{
 			SimulationInfo info = new SimulationInfo(jar);
 			simulations.add(info);

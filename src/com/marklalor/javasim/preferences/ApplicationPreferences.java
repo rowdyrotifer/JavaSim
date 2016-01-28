@@ -31,9 +31,10 @@ import com.marklalor.javasim.preferences.serializers.LevelSerializer;
 public class ApplicationPreferences
 {
 	private String os;
-	private PreferencesFile preferences;
-	private CommandLineArgs arguments;
 	
+    private CommandLineArgs arguments;
+	
+	private PreferencesFile preferences;
 	private File file;
     private Gson gson;
 	
@@ -43,6 +44,7 @@ public class ApplicationPreferences
 		this.os = System.getProperty("os.name").toLowerCase();
 		
 		//Set up Gson.
+		//Wow I love Gson this is so nice. Tell me that's not nice.
 		gson = new GsonBuilder()
 		.setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_DASHES)
         .registerTypeAdapter(File.class, new FileSerializer())
@@ -149,14 +151,14 @@ public class ApplicationPreferences
 	
 	//PreferencesFile
 	
-	public File getMainDirectory()
+	public File getSimulationsDirectory()
 	{
-		return preferences.getMainDirectory();
+		return preferences.getSimulationsDirectory();
 	}
 	
-	public void setMainDirectory(File simulationDirectory)
+	public void setSimulationsDirectory(File simulationDirectory)
 	{
-		preferences.setMainDirectory(simulationDirectory);
+		preferences.setSimulationsDirectory(simulationDirectory);
 	}
 	
 	public File getSaveDirectory()

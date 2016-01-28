@@ -11,16 +11,13 @@ public class PreferencesFile
     //ApplicationPreferences parent wrapper class.
 	private transient ApplicationPreferences applicationPreferences;
 	
-	private File mainDirectory;
+	private File simulationsDirectory;
     private File saveDirectory;
 
     private List<File> simulationDirectories;
     private List<File> simulationFiles;
     
 	private Level logLevel;
-	
-	//Initialization option for the deserializer which doesn't know the transient variables.
-    public PreferencesFile() { }
 	
 	public PreferencesFile(ApplicationPreferences applicationPreferences)
 	{   
@@ -29,40 +26,36 @@ public class PreferencesFile
 
 	public void fillDefaults()
 	{
-	    saveDirectory = new File(
-	            System.getProperty("user.home") + 
-	            File.separator + "Documents" + 
-	            File.separator + "JavaSim");
+	    final File baseDirectory;
+	    if (getApplicationPreferences().isMacOSX())
+	        baseDirectory = new File(
+                    System.getProperty("user.home")  + 
+                    File.separator + "Library" + 
+                    File.separator + "Application Support" + 
+                    File.separator + "JavaSim");
+        else if (getApplicationPreferences().isWindows())
+            baseDirectory = new File(
+                    System.getenv("APPDATA") + 
+                    File.separator + "JavaSim");
+        else if (getApplicationPreferences().isLinux())
+            baseDirectory = new File(
+                    File.separator + "var" + 
+                    File.separator + "lib" + 
+                    File.separator + "javasim");
+        else
+            baseDirectory = new File(
+                    System.getProperty("user.home") + 
+                    File.separator + "JavaSim");
+        
+	    //"Simulations" folder in the base directory (lowercase linux, uppercase otherwise).
+        simulationsDirectory = new File(baseDirectory, getApplicationPreferences().isLinux()?"simulations":"Simulations");
+		simulationsDirectory.mkdirs();
+		
+        //"Saves" folder in the base directory (lowercase linux, uppercase otherwise).
+        saveDirectory = new File(baseDirectory, getApplicationPreferences().isLinux()?"saves":"Saves");
         saveDirectory.mkdirs();
-	    
-		if (getApplicationPreferences().isMacOSX())
-		    mainDirectory = new File(
-		            System.getProperty("user.home")  + 
-		            File.separator + "Library" + 
-		            File.separator + "Application Support" + 
-		            File.separator + "JavaSim" + 
-		            File.separator + "Simulations");
-		else if (getApplicationPreferences().isWindows())
-		    mainDirectory = new File(
-		            System.getenv("APPDATA") + 
-		            File.separator + "JavaSim" + 
-		            File.separator + "Simulations");
-		else if (getApplicationPreferences().isLinux())
-		    mainDirectory = new File(
-		            File.separator + "var" + 
-		            File.separator + "lib" + 
-		            File.separator + "javasim" + 
-		            File.separator + "simulations");
-		else
-		    mainDirectory = new File(
-		            System.getProperty("user.home") + 
-		            File.separator + "Documents" + 
-		            File.separator + "JavaSim" + 
-                    File.separator + "Simulations");
-		mainDirectory.mkdirs();
 		
 		simulationDirectories = new ArrayList<File>();
-		
 		simulationFiles = new ArrayList<File>();
 		
 		logLevel = Level.INFO;
@@ -88,14 +81,14 @@ public class PreferencesFile
 		this.saveDirectory = saveDirectory;
 	}
 	
-	public File getMainDirectory()
+	public File getSimulationsDirectory()
 	{
-		return mainDirectory;
+		return simulationsDirectory;
 	}
 	
-	public void setMainDirectory(File mainDirectory)
+	public void setSimulationsDirectory(File mainDirectory)
 	{
-		this.mainDirectory = mainDirectory;
+		this.simulationsDirectory = mainDirectory;
 	}
 	
 	public List<File> getSimulationFiles()

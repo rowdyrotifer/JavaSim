@@ -281,7 +281,7 @@ public class Menu implements ActionListener
 		{
 			try
 			{
-				Desktop.getDesktop().open(getSimulation().getHome().getApplicationPreferences().getMainDirectory());
+				Desktop.getDesktop().open(getSimulation().getHome().getApplicationPreferences().getSimulationsDirectory());
 			}
 			catch(IOException e1)
 			{
