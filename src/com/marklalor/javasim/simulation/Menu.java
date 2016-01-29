@@ -18,8 +18,6 @@ import javax.swing.KeyStroke;
 import com.marklalor.javasim.JavaSim;
 import com.marklalor.javasim.simulation.frames.Minimizable;
 
-import apple.dts.samplecode.osxadapter.OSXAdapter; //TODO: apple Application class can replace?
-
 public class Menu implements ActionListener
 {
 	private Simulation _simulation;
@@ -109,23 +107,7 @@ public class Menu implements ActionListener
         file.add(print);
 		
 		//Preferences
-		if(getSimulation().getHome().getApplicationPreferences().isMacOSX())
-		{
-			try
-			{
-				OSXAdapter.setPreferencesHandler(getSimulation(), getSimulation().getClass().getMethod("openPreferences", (Class[]) null));
-				OSXAdapter.setQuitHandler(getSimulation(), getSimulation().getClass().getMethod("delete", (Class[]) null));
-			}
-			catch(SecurityException e)
-			{
-				JavaSim.getLogger().error("SecurityException while trying to set OSXAdapter handlers.", e);
-			}
-			catch(NoSuchMethodException e)
-			{
-			    JavaSim.getLogger().error("NoSuchMethodException while trying to set OSXAdapter handlers.", e);
-			}
-		}
-		else
+		if(!getSimulation().getHome().getApplicationPreferences().isMacOSX())
 		{
 			file.addSeparator();
 			
@@ -290,7 +272,7 @@ public class Menu implements ActionListener
 		}
 		else if(e.getSource() == closeSimulation)
 		{
-			getSimulation().delete();
+		    getSimulation().getHome().removeSimulation(getSimulation());
 		}
 		else if(e.getSource() == print)
         {
@@ -298,7 +280,7 @@ public class Menu implements ActionListener
         }
 		else if(e.getSource() == openProperties)
 		{
-			getSimulation().openPreferences();
+			getSimulation().getHome().openPreferences();
 		}
 		else if(e.getSource() == copy)
 		{
@@ -338,7 +320,7 @@ public class Menu implements ActionListener
 		else if(e.getSource() == reloadSimulation)
 		{
 			getSimulation().getHome().run(getSimulation().getInfo());
-			getSimulation().delete();
+			getSimulation().close();
 		}
 		else if (e.getSource() == resizeMenuItem)
 		{

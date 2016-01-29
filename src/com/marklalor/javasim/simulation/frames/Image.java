@@ -67,7 +67,7 @@ public class Image implements Minimizable
 			@Override
 			public void windowClosing(WindowEvent e)
 			{
-				Image.this.getSimulation().delete();
+				Image.this.getSimulation().getHome().removeSimulation(getSimulation());
 				super.windowClosing(e);
 			}
 		});

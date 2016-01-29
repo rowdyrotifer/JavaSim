@@ -265,10 +265,10 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 			throw new RuntimeException("Do not call method com.marklalor.javasim.simulation.Simulation#preInitialize more than once (it is called once automatically by JavaSim Home)");
 		
 		//Set the Home this simulation was launched from.
-		setHome(home);
+		this.home = home;
 		
 		// Inherit the info read from its file earlier.
-		setInfo(info);
+		this.info = info;
 		
 		// Set the simulation's content directory and (make sure it exists).
 		contentDirectory = new File(getHome().getApplicationPreferences().getSaveDirectory(), info.getName());
@@ -664,6 +664,7 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 	
 	public void stop()
 	{
+	    JavaSim.getLogger().trace("Stopping timers.");
 		//Things for both normal animation and saving
 		stopForBreakpoint = false;
 		hertz = 0;
@@ -682,11 +683,6 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 			timerAnimationVariable.stop();
 			animationComplete();
 		}	
-	}
-	
-	public void openPreferences()
-	{
-		JavaSim.getLogger().info("Open Preferences");
 	}
 	
 	public void draw()
@@ -741,7 +737,7 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 	}
 	
 	//Stop and close the simulation.
-	public void delete()
+	public void close()
 	{
 		stop();
 		getImage().getFrame().dispose();

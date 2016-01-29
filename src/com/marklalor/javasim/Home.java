@@ -1,6 +1,7 @@
 package com.marklalor.javasim;
 
 import java.awt.Color;
+import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
@@ -17,6 +18,7 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -34,6 +36,8 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import org.apache.log4j.LogManager;
+
+import apple.dts.samplecode.osxadapter.OSXAdapter;
 
 import com.marklalor.javasim.misc.FileDropManager;
 import com.marklalor.javasim.misc.FileDropOverlay;
@@ -56,6 +60,8 @@ public class Home extends JFrame implements ListSelectionListener, Minimizable
 	private JList<SimulationInfo> simulationList;
 	private JPanel simulationInfoPanel;
 	
+	private List<Simulation> activeSimulations; 
+	
 	private JLabel name, date, author, version, description;
 	private JButton run;
 	
@@ -75,11 +81,13 @@ public class Home extends JFrame implements ListSelectionListener, Minimizable
 		this.setUpConsole();
 		this.loadSimulations();
 		this.setUpLayout();
+		if(getApplicationPreferences().isMacOSX())
+		    this.setUpOSXMenuHandlers();
 		this.setUpMenu();
 	}
 
 	//Set up operations.
-	
+
     private void setUpConsole()
 	{
 		console = new Console(this);
@@ -95,11 +103,40 @@ public class Home extends JFrame implements ListSelectionListener, Minimizable
 		JavaSim.getLogger().info("Console started.");
 		JavaSim.getLogger().info("JavaSim version: {}", JavaSim.getVersion());	
 	}
+    
+    private void setUpOSXMenuHandlers()
+    {
+        //Set up OSX preferences handler
+        try
+        {
+            OSXAdapter.setPreferencesHandler(this, this.getClass().getMethod("openPreferences", (Class[]) null));
+        }
+        catch(SecurityException e)
+        {
+            JavaSim.getLogger().error("SecurityException while trying to set OSXAdapter preferences handler.", e);
+        }
+        catch(NoSuchMethodException e)
+        {
+            JavaSim.getLogger().error("NoSuchMethodException while trying to set OSXAdapter preferences handler.", e);
+        }
+        
+        try
+        {
+            OSXAdapter.setQuitHandler(this, this.getClass().getMethod("quit", (Class[]) null));
+        }
+        catch(SecurityException e)
+        {
+            JavaSim.getLogger().error("SecurityException while trying to set OSXAdapter preferences handler.", e);
+        }
+        catch(NoSuchMethodException e)
+        {
+            JavaSim.getLogger().error("NoSuchMethodException while trying to set OSXAdapter preferences handler.", e);
+        }
+    }
 	
 	private static final FilenameFilter jarFilter = new FilenameFilter()
 	{
-		@Override
-		public boolean accept(File dir, String name) { return name.toLowerCase().endsWith("jar"); }
+		@Override public boolean accept(File dir, String name) { return name.toLowerCase().endsWith("jar"); }
 	};
 	
 	public void loadSimulations()
@@ -107,6 +144,8 @@ public class Home extends JFrame implements ListSelectionListener, Minimizable
 	    JavaSim.getLogger().debug("Loading simulations.");
 	    
 		simulations = new ArrayList<SimulationInfo>();
+		activeSimulations = new ArrayList<Simulation>();
+		
 		for (File jar : getApplicationPreferences().getSimulationsDirectory().listFiles(jarFilter))
 		{
 			SimulationInfo info = new SimulationInfo(jar);
@@ -290,6 +329,7 @@ public class Home extends JFrame implements ListSelectionListener, Minimizable
             //Create a new instance of a simulation.
             JavaSim.getLogger().info("Initializing {}", simClass.getName());
             Simulation simulation = simClass.newInstance();
+            activeSimulations.add(simulation);
             
             //Run all the initialization steps.
             simulation.preInitialize(this, info);
@@ -344,5 +384,38 @@ public class Home extends JFrame implements ListSelectionListener, Minimizable
     {
         this.fileDropVisible = fileDropVisible;
         this.fileDropOverlay.repaint();
+    }
+
+    public void openPreferences()
+    {
+        JavaSim.getLogger().info("Open Preferences");
+        
+        try
+        {
+            Desktop.getDesktop().open(getApplicationPreferences().getFile().getParentFile());
+        }
+        catch(IOException e)
+        {
+            JavaSim.getLogger().error("Could not open preferences file on native system.", e);
+        }
+    }
+    
+    //Close any simulations and then dispose of the home window itself.
+    public void quit()
+    {
+        Iterator<Simulation> iterator = activeSimulations.iterator();
+        while(iterator.hasNext())
+        {
+            Simulation simulation = iterator.next();
+            simulation.close();
+            iterator.remove();
+        }
+        this.dispose();
+    }
+    
+    public void removeSimulation(Simulation simulation)
+    {
+        simulation.close();
+        activeSimulations.remove(simulation);
     }
 }
