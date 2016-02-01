@@ -1,4 +1,4 @@
-package com.marklalor.javasim.simulation;
+    package com.marklalor.javasim.simulation;
 
 import java.awt.Desktop;
 import java.awt.FileDialog;
@@ -33,7 +33,6 @@ import javax.imageio.ImageIO;
 import javax.imageio.stream.FileImageOutputStream;
 import javax.imageio.stream.ImageOutputStream;
 import javax.swing.JFileChooser;
-import javax.swing.JFrame;
 import javax.swing.Timer;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -41,12 +40,14 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.apple.eawt.Application;
 import com.apple.eawt.FullScreenUtilities;
-
 import com.marklalor.javasim.Home;
 import com.marklalor.javasim.JavaSim;
 import com.marklalor.javasim.control.Control;
 import com.marklalor.javasim.imaging.GifSequenceWriter;
 import com.marklalor.javasim.imaging.TransferableImage;
+import com.marklalor.javasim.menu.SimulationMenu;
+import com.marklalor.javasim.menu.SimulationMenuHandler;
+import com.marklalor.javasim.simulation.frames.FrameHolder;
 import com.marklalor.javasim.simulation.frames.Image;
 import com.marklalor.javasim.simulation.frames.subframes.Animate;
 import com.marklalor.javasim.simulation.frames.subframes.Controls;
@@ -83,7 +84,7 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 	private boolean fullscreen = false;
 	
 	// Misc Main stucture;
-	private List<Menu> menus;
+	private List<SimulationMenu> menus;
 	
 	// Main Frames
 	private Image image;
@@ -414,11 +415,11 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 		// menu2 = new Menu(this);
 		// getAnimate().setJMenuBar(menu2.getMenuBar());
 		
-		menus = new ArrayList<Menu>();
-		addMenuTo(getImage().getFrame(), getImage());
-		addMenuTo(getControls().getFrame(), getControls());
-		addMenuTo(getResize().getFrame(), getResize());
-		addMenuTo(home.getConsole(), home.getConsole()); //TODO: this is not appropriate, it should just recognize the most recently active simulation.
+		menus = new ArrayList<SimulationMenu>();
+		addMenuTo(getImage());
+		addMenuTo(getControls());
+		addMenuTo(getResize());
+		addMenuTo(home.getConsole()); //TODO: this is not appropriate, it should just recognize the most recently active simulation.
 		
 		// Set sizes to the default dimensions
 		setWidth(DEFAULT_IMAGE_WIDTH);
@@ -461,7 +462,7 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 	{
 		//Relies on what the user initializes for animating over a variable.
 		animate = new Animate(getImage());
-		addMenuTo(getAnimate().getFrame(), getAnimate());
+		addMenuTo(getAnimate());
 	}
 	
 	private void setFullscreen(boolean fullscreen)
@@ -484,11 +485,11 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
 		this.fullscreen = !this.fullscreen;
 	}
 	
-	private void addMenuTo(JFrame frame, Object owner)
+	private void addMenuTo(FrameHolder frameHoldingInstance)
 	{
-		Menu menu = new Menu(this, frame, owner);
+		SimulationMenu menu = new SimulationMenu(frameHoldingInstance, new SimulationMenuHandler(this));
 		menus.add(menu);
-		frame.setJMenuBar(menu.getMenuBar());
+		frameHoldingInstance.getFrame().setJMenuBar(menu.getMenuBar());
 	}
 	
 	private void hertzCheck()

@@ -14,7 +14,7 @@ import javax.swing.JPanel;
 
 import com.marklalor.javasim.simulation.Simulation;
 
-public class Image implements Minimizable
+public class Image implements FrameHolder
 {
 	private Simulation simulation;
 	private JFrame frame;	
@@ -94,10 +94,17 @@ public class Image implements Minimizable
 		return draggable;
 	}
 	
+	@Override
 	public JFrame getFrame()
     {
         return frame;
     }
+	
+	@Override
+	public void setFrame(JFrame frame)
+	{
+	    this.frame = frame;
+	}
 	
 	//Set size making sure the top inset is considered.
 	public void setSize(int width, int height)
@@ -132,12 +139,5 @@ public class Image implements Minimizable
 			g.clearRect(0, 0, getWidth(), getHeight());
 			g.drawImage(parent.getSimulation().getCurrentImage(), 0, getInsets().top, null);
 		}
-	}
-
-	@Override
-	public void minimize()
-	{
-		if (frame.isVisible())
-			frame.setState(JFrame.ICONIFIED);
 	}
 }

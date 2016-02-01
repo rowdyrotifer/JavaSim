@@ -11,7 +11,7 @@ import javax.swing.text.PlainDocument;
 
 import com.marklalor.javasim.text.filter.IntegerFilter;
 
-public class SubFrame implements Minimizable
+public class SubFrame implements FrameHolder
 {	
     private JFrame frame;
     private Image image;
@@ -22,11 +22,6 @@ public class SubFrame implements Minimizable
 		this.frame.setAutoRequestFocus(false);
 		this.image = image;
 	}
-	
-	public JFrame getFrame()
-    {
-        return frame;
-    }
 	
 	public Image getImage()
     {
@@ -43,13 +38,6 @@ public class SubFrame implements Minimizable
         Dimension size = frame.getSize();
         return new Dimension(size.width, size.height - frame.getInsets().top);
     }
-
-	@Override
-	public void minimize()
-	{
-		if (frame.isVisible())
-		    frame.setState(JFrame.ICONIFIED);
-	}
 	
 	//TODO: remove and use the controls instead. Move this somewhere else...
     public static final int FILTER_NONE = -1;
@@ -65,5 +53,17 @@ public class SubFrame implements Minimizable
         group.add(new JLabel(label), BorderLayout.WEST);
         group.add(textField, BorderLayout.CENTER);
         return group;
+    }
+
+    @Override
+    public JFrame getFrame()
+    {
+        return this.frame;
+    }
+    
+    @Override
+    public void setFrame(JFrame frame)
+    {
+        this.frame = frame;
     }
 }

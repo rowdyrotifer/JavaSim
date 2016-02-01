@@ -14,8 +14,8 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
 import com.marklalor.javasim.JavaSim;
-import com.marklalor.javasim.preferences.serializers.FileSerializer;
-import com.marklalor.javasim.preferences.serializers.LevelSerializer;
+import com.marklalor.javasim.preferences.jsonserializers.FileSerializer;
+import com.marklalor.javasim.preferences.jsonserializers.LevelSerializer;
 
 /**
  * <p>

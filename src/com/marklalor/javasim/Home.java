@@ -39,18 +39,18 @@ import org.apache.log4j.LogManager;
 
 import apple.dts.samplecode.osxadapter.OSXAdapter;
 
+import com.marklalor.javasim.menu.HomeMenu;
 import com.marklalor.javasim.misc.FileDropManager;
 import com.marklalor.javasim.misc.FileDropOverlay;
 import com.marklalor.javasim.misc.FileDropManager.Listener;
 import com.marklalor.javasim.preferences.ApplicationPreferences;
-import com.marklalor.javasim.simulation.HomeMenu;
 import com.marklalor.javasim.simulation.Simulation;
 import com.marklalor.javasim.simulation.SimulationInfo;
-import com.marklalor.javasim.simulation.frames.Minimizable;
+import com.marklalor.javasim.simulation.frames.FrameHolder;
 import com.marklalor.javasim.text.Console;
 import com.marklalor.javasim.text.JavaSimConsoleAppender;
 
-public class Home extends JFrame implements ListSelectionListener, Minimizable
+public class Home extends JFrame implements ListSelectionListener, FrameHolder
 {
 	private static final long serialVersionUID = 6321955323521519657L;
 	
@@ -367,13 +367,6 @@ public class Home extends JFrame implements ListSelectionListener, Minimizable
 		this.version.setText("Version " + info.getVersion());
 		this.description.setText("<html><p>" + info.getDescription() + "</p></html>");
 	}
-	
-	@Override
-	public void minimize()
-	{
-		if (isVisible())
-			setState(ICONIFIED);
-	}
     
 	public boolean getFileDropVisible()
 	{
@@ -417,5 +410,17 @@ public class Home extends JFrame implements ListSelectionListener, Minimizable
     {
         simulation.close();
         activeSimulations.remove(simulation);
+    }
+
+    @Override
+    public JFrame getFrame()
+    {
+        return this;
+    }
+
+    @Override
+    public void setFrame(JFrame frame)
+    {
+        throw new RuntimeException("Cannot change the home frame. This will be removed in the future, when home will HAVE a JFrame / will not BE a JFrame.");
     }
 }

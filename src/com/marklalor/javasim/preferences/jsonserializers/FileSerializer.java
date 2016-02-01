@@ -1,4 +1,4 @@
-package com.marklalor.javasim.preferences.serializers;
+package com.marklalor.javasim.preferences.jsonserializers;
 
 import java.io.File;
 import java.lang.reflect.Type;

@@ -8,10 +8,10 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
 import com.marklalor.javasim.Home;
-import com.marklalor.javasim.simulation.frames.Minimizable;
+import com.marklalor.javasim.simulation.frames.FrameHolder;
 
 @SuppressWarnings("serial")
-public class Console extends JFrame implements Minimizable
+public class Console extends JFrame implements FrameHolder
 {
 	private Home home;
 	
@@ -42,16 +42,21 @@ public class Console extends JFrame implements Minimizable
 	{
 		return home;
 	}
-	
-	@Override
-	public void minimize()
-	{
-		if (isVisible())
-			setState(ICONIFIED);
-	}
 
 	public void append(String string)
 	{
 		textArea.append(string+"\n");
 	}
+
+	@Override
+    public JFrame getFrame()
+    {
+        return this;
+    }
+
+    @Override
+    public void setFrame(JFrame frame)
+    {
+        throw new RuntimeException("Cannot change the home frame. This will be removed in the future, when home will HAVE a JFrame / will not BE a JFrame.");
+    }
 }
