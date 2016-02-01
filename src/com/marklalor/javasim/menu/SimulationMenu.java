@@ -71,8 +71,8 @@ public class SimulationMenu extends Menu
 	@MenuItem(text="Increase Speed",        keyCode=KeyEvent.VK_CLOSE_BRACKET)                                                        private JMenuItem increaseSpeed;
 	
 	// SIMULATION
-	@MenuItem(text="Reset",                 keyCode=KeyEvent.VK_F5)                                                                   private JMenuItem reset;
-    @MenuItem(text="Reload",                keyCode=KeyEvent.VK_R,      keyModifiers={MenuItem.COMMAND_OR_CONTROL})                   private JMenuItem reloadSimulation;
+	@MenuItem(text="Reset",                 keyCode=KeyEvent.VK_R,      keyModifiers={MenuItem.COMMAND_OR_CONTROL})                   private JMenuItem reset;
+    @MenuItem(text="Reload",                keyCode=KeyEvent.VK_F5)                                                                   private JMenuItem reloadSimulation;
     @MenuItem(text="Resize")                                                                                                          private JMenuItem resizeMenuItem;
     @MenuItem(text="Enter Full Screen",     keyCode=KeyEvent.VK_F,      keyModifiers={MenuItem.COMMAND_OR_CONTROL, Event.CTRL_MASK})  private JMenuItem fullscreen;
     @MenuItem(text="Show Console",          keyCode=KeyEvent.VK_J,      keyModifiers={MenuItem.COMMAND_OR_CONTROL})                   private JMenuItem showConsole;
