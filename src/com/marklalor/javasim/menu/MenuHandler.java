@@ -39,7 +39,7 @@ public abstract class MenuHandler
     {
         menuHandlingMap.remove(menuItem);
     }
-
+    
     public void action(ActionEvent e)
     {
         Method handlingMethod = menuHandlingMap.get((e.getSource()));

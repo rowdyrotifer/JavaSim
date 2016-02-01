@@ -9,16 +9,18 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface MenuItem
 {
-    //Annotations can't be null... well, don't think anyone will ever be using this as a menu name.
+    // Annotations can't be null... well, don't think anyone will ever be using this as a menu name.
     public final static String AUTO_RESOLVE_TEXT = "{{AUTO_RESOLVE_TEXT}}";
-    //Nor will anyone try to use Integer.MAX_VALUE as a keycode...
+    // Nor will anyone try to use Integer.MAX_VALUE as a keycode...
     public final static int NO_ACCELERATOR_KEYCODE = Integer.MAX_VALUE;
-    //0 resolves to no key modifiers.
+    // 0 resolves to no key modifiers.
     public final static int NO_MODIFIERS = 0;
-    //-1 resolves to Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() in com.marklalor.javasim.menu.Menu#Menu().
+    // -1 resolves to Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() in com.marklalor.javasim.menu.Menu#Menu().
     public final static int COMMAND_OR_CONTROL = -1;
     
     String text() default AUTO_RESOLVE_TEXT;
+    
     int keyCode() default NO_ACCELERATOR_KEYCODE;
+    
     int[] keyModifiers() default NO_MODIFIERS;
 }

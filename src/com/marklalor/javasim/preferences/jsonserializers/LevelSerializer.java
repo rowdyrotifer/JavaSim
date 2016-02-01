@@ -18,7 +18,7 @@ public class LevelSerializer implements JsonSerializer<Level>, JsonDeserializer<
     {
         return Level.toLevel(json.getAsString());
     }
-
+    
     @Override
     public JsonElement serialize(Level src, Type typeOfSrc, JsonSerializationContext context)
     {

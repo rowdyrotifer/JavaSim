@@ -5,8 +5,8 @@ import com.marklalor.javasim.simulation.frames.SubFrame;
 
 public class Preferences extends SubFrame
 {
-	public Preferences(Image image)
-	{
-		super(image);
-	}
+    public Preferences(Image image)
+    {
+        super(image);
+    }
 }

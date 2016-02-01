@@ -23,7 +23,8 @@ import java.util.TooManyListenersException;
 import com.marklalor.javasim.Home;
 import com.marklalor.javasim.JavaSim;
 
-/**<p>
+/**
+ * <p>
  * I'm releasing this code into the Public Domain. Enjoy.
  * </p>
  * <p>
@@ -37,7 +38,7 @@ import com.marklalor.javasim.JavaSim;
  * @author rharder@users.sf.net
  * @version 1.0.1
  * 
- * Modified by Mark Lalor for use with JavaSim.
+ *          Modified by Mark Lalor for use with JavaSim.
  * 
  */
 public class FileDropManager
@@ -61,7 +62,9 @@ public class FileDropManager
             
             // This is called continually as long as the mouse is over the
             // drag target.
-            public void dragOver(DropTargetDragEvent evt) { }
+            public void dragOver(DropTargetDragEvent evt)
+            {
+            }
             
             public void drop(DropTargetDropEvent evt)
             {
@@ -264,8 +267,8 @@ public class FileDropManager
         int i = 0;
         while(!ok && i < flavors.length)
         {
-            //2007-09-12 Nathan Blomquist -- Linux (KDE/Gnome) support added.
-            //Is the flavor a file list?
+            // 2007-09-12 Nathan Blomquist -- Linux (KDE/Gnome) support added.
+            // Is the flavor a file list?
             final DataFlavor curFlavor = flavors[i];
             if(curFlavor.equals(DataFlavor.javaFileListFlavor) || curFlavor.isRepresentationClassReader())
                 ok = true;
@@ -276,11 +279,9 @@ public class FileDropManager
     } // end isDragOk
     
     /**
-     * Removes the drag-and-drop hooks from the component and optionally from
-     * the all children. You should call this if you add and remove components
-     * after you've set up the drag-and-drop. This will recursively unregister
-     * all components contained within <var>c</var> if <var>c</var> is a
-     * {@link java.awt.Container}.
+     * Removes the drag-and-drop hooks from the component and optionally from the all children. You should call this if
+     * you add and remove components after you've set up the drag-and-drop. This will recursively unregister all
+     * components contained within <var>c</var> if <var>c</var> is a {@link java.awt.Container}.
      *
      * @param c
      *            The component to unregister as a drop target
@@ -292,13 +293,11 @@ public class FileDropManager
     } // end remove
     
     /**
-     * Removes the drag-and-drop hooks from the component and optionally from
-     * the all children. You should call this if you add and remove components
-     * after you've set up the drag-and-drop.
+     * Removes the drag-and-drop hooks from the component and optionally from the all children. You should call this if
+     * you add and remove components after you've set up the drag-and-drop.
      *
      * @param out
-     *            Optional {@link java.io.PrintStream} for logging drag and drop
-     *            messages
+     *            Optional {@link java.io.PrintStream} for logging drag and drop messages
      * @param c
      *            The component to unregister
      * @param recursive
@@ -322,8 +321,8 @@ public class FileDropManager
     /* ******** I N N E R I N T E R F A C E L I S T E N E R ******** */
     
     /**
-     * Implement this inner interface to listen for when files are dropped. For
-     * example your class declaration may begin like this: <code><pre>
+     * Implement this inner interface to listen for when files are dropped. For example your class declaration may begin
+     * like this: <code><pre>
      *      public class MyClass implements FileDrop.Listener
      *      ...
      *      public void filesDropped( java.io.File[] files )
@@ -343,10 +342,8 @@ public class FileDropManager
     /* ******** I N N E R C L A S S ******** */
     
     /**
-     * This is the event that is passed to the
-     * {@link FileDropListener#filesDropped filesDropped(...)} method in your
-     * {@link FileDropListener} when files are dropped onto a registered drop
-     * target.
+     * This is the event that is passed to the {@link FileDropListener#filesDropped filesDropped(...)} method in your
+     * {@link FileDropListener} when files are dropped onto a registered drop target.
      *
      * <p>
      * I'm releasing this code into the Public Domain. Enjoy.
@@ -362,8 +359,8 @@ public class FileDropManager
         private File[] files;
         
         /**
-         * Constructs an {@link Event} with the array of files that were dropped
-         * and the {@link FileDropManager} that initiated the event.
+         * Constructs an {@link Event} with the array of files that were dropped and the {@link FileDropManager} that
+         * initiated the event.
          *
          * @param files
          *            The array of files that were dropped
@@ -377,8 +374,7 @@ public class FileDropManager
         } // end constructor
         
         /**
-         * Returns an array of files that were dropped on a registered drop
-         * target.
+         * Returns an array of files that were dropped on a registered drop target.
          *
          * @return array of files that were dropped
          * @since 1.1

@@ -48,7 +48,7 @@ public class SimulationMenu extends Menu
 	
 	@MenuHeader(text="Window", children={"minimize"}) private JMenu window;
     
-    
+    // FILE
 	@MenuItem(text="New Simulation",        keyCode=KeyEvent.VK_N,      keyModifiers={MenuItem.COMMAND_OR_CONTROL})                   private JMenuItem newSimulation;
 	@MenuItem(text="Save Image",            keyCode=KeyEvent.VK_S,      keyModifiers={MenuItem.COMMAND_OR_CONTROL})                   private JMenuItem saveImage;
 	@MenuItem(text="Save Image As",         keyCode=KeyEvent.VK_S,      keyModifiers={MenuItem.COMMAND_OR_CONTROL, Event.SHIFT_MASK}) private JMenuItem saveImageAs;
@@ -59,8 +59,10 @@ public class SimulationMenu extends Menu
 	@MenuItem(text="Print",                 keyCode=KeyEvent.VK_P,      keyModifiers={MenuItem.COMMAND_OR_CONTROL})                   private JMenuItem print;
 	@MenuItem(text="Properties",            keyCode=KeyEvent.VK_W,      keyModifiers={MenuItem.COMMAND_OR_CONTROL})                   private JMenuItem openProperties;
 	
+	// EDIT
 	@MenuItem(text="Copy",                  keyCode=KeyEvent.VK_C,      keyModifiers= MenuItem.COMMAND_OR_CONTROL)                    private JMenuItem copy;
 	
+	// ANIMATION
 	@MenuItem(text="Play",                  keyCode=KeyEvent.VK_L,      keyModifiers={MenuItem.COMMAND_OR_CONTROL})                   private JMenuItem play;
 	@MenuItem(text="Play Until Breakpoint", keyCode=KeyEvent.VK_L,      keyModifiers={MenuItem.COMMAND_OR_CONTROL, Event.SHIFT_MASK}) private JMenuItem playUntilBreakpoint;
 	@MenuItem(text="Stop",                  keyCode=KeyEvent.VK_PERIOD, keyModifiers={MenuItem.COMMAND_OR_CONTROL})                   private JMenuItem stop;
@@ -68,12 +70,14 @@ public class SimulationMenu extends Menu
 	@MenuItem(text="Decrease Speed",        keyCode=KeyEvent.VK_OPEN_BRACKET)                                                         private JMenuItem decreaseSpeed;
 	@MenuItem(text="Increase Speed",        keyCode=KeyEvent.VK_CLOSE_BRACKET)                                                        private JMenuItem increaseSpeed;
 	
+	// SIMULATION
 	@MenuItem(text="Reset",                 keyCode=KeyEvent.VK_F5)                                                                   private JMenuItem reset;
     @MenuItem(text="Reload",                keyCode=KeyEvent.VK_R,      keyModifiers={MenuItem.COMMAND_OR_CONTROL})                   private JMenuItem reloadSimulation;
     @MenuItem(text="Resize")                                                                                                          private JMenuItem resizeMenuItem;
     @MenuItem(text="Enter Full Screen",     keyCode=KeyEvent.VK_F,      keyModifiers={MenuItem.COMMAND_OR_CONTROL, Event.CTRL_MASK})  private JMenuItem fullscreen;
     @MenuItem(text="Show Console",          keyCode=KeyEvent.VK_J,      keyModifiers={MenuItem.COMMAND_OR_CONTROL})                   private JMenuItem showConsole;
-	
+    
+    // WINDOW
     @MenuItem(text="Minimize",              keyCode=KeyEvent.VK_M,      keyModifiers={MenuItem.COMMAND_OR_CONTROL})                   private JMenuItem minimize;
 	
 	public SimulationMenu(FrameHolder frameHolder, MenuHandler menuHandler)

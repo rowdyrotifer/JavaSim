@@ -21,7 +21,13 @@ public class TempFileShutdownHook implements Runnable
     {
         JavaSim.getLogger().debug("TempFileShutdownHook reached, deleting temporary directory {}", tempFile);
         
-        try { FileUtils.deleteDirectory(tempFile); }
-        catch(IOException e) { JavaSim.getLogger().debug("Could not delete temporary directory {}", tempFile); }
+        try
+        {
+            FileUtils.deleteDirectory(tempFile);
+        }
+        catch(IOException e)
+        {
+            JavaSim.getLogger().debug("Could not delete temporary directory {}", tempFile);
+        }
     }
 }

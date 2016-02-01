@@ -8,25 +8,25 @@ import org.apache.log4j.Level;
 
 public class PreferencesFile
 {
-    //ApplicationPreferences parent wrapper class.
-	private transient ApplicationPreferences applicationPreferences;
-	
-	private File simulationsDirectory;
+    // ApplicationPreferences parent wrapper class.
+    private transient ApplicationPreferences applicationPreferences;
+    
+    private File simulationsDirectory;
     private File saveDirectory;
-
+    
     private List<File> simulationDirectories;
     private List<File> simulationFiles;
     
-	private Level logLevel;
-	
-	public PreferencesFile(ApplicationPreferences applicationPreferences)
-	{   
-		this.applicationPreferences = applicationPreferences;
-	}
-
-	public void fillDefaults()
-	{
-	    final File baseDirectory;
+    private Level logLevel;
+    
+    public PreferencesFile(ApplicationPreferences applicationPreferences)
+    {
+        this.applicationPreferences = applicationPreferences;
+    }
+    
+    public void fillDefaults()
+    {
+        final File baseDirectory;
 	    if (getApplicationPreferences().isMacOSX())
 	        baseDirectory = new File(
                     System.getProperty("user.home")  + 
@@ -47,77 +47,77 @@ public class PreferencesFile
                     System.getProperty("user.home") + 
                     File.separator + "JavaSim");
         
-	    //"Simulations" folder in the base directory (lowercase linux, uppercase otherwise).
-        simulationsDirectory = new File(baseDirectory, getApplicationPreferences().isLinux()?"simulations":"Simulations");
-		simulationsDirectory.mkdirs();
-		
-        //"Saves" folder in the base directory (lowercase linux, uppercase otherwise).
-        saveDirectory = new File(baseDirectory, getApplicationPreferences().isLinux()?"saves":"Saves");
+        // "Simulations" folder in the base directory (lowercase linux, uppercase otherwise).
+        simulationsDirectory = new File(baseDirectory, getApplicationPreferences().isLinux() ? "simulations" : "Simulations");
+        simulationsDirectory.mkdirs();
+        
+        // "Saves" folder in the base directory (lowercase linux, uppercase otherwise).
+        saveDirectory = new File(baseDirectory, getApplicationPreferences().isLinux() ? "saves" : "Saves");
         saveDirectory.mkdirs();
-		
-		simulationDirectories = new ArrayList<File>();
-		simulationFiles = new ArrayList<File>();
-		
-		logLevel = Level.INFO;
-	}
-
-	public ApplicationPreferences getApplicationPreferences()
-	{
-		return applicationPreferences;
-	}
-
+        
+        simulationDirectories = new ArrayList<File>();
+        simulationFiles = new ArrayList<File>();
+        
+        logLevel = Level.INFO;
+    }
+    
+    public ApplicationPreferences getApplicationPreferences()
+    {
+        return applicationPreferences;
+    }
+    
     public void setApplicationPreferences(ApplicationPreferences applicationPreferences)
     {
         this.applicationPreferences = applicationPreferences;
     }
-
-	public File getSaveDirectory()
-	{
-		return saveDirectory;
-	}
-	
-	public void setSaveDirectory(File saveDirectory)
-	{
-		this.saveDirectory = saveDirectory;
-	}
-	
-	public File getSimulationsDirectory()
-	{
-		return simulationsDirectory;
-	}
-	
-	public void setSimulationsDirectory(File mainDirectory)
-	{
-		this.simulationsDirectory = mainDirectory;
-	}
-	
-	public List<File> getSimulationFiles()
-	{
-		return simulationFiles;
-	}
-	
-	public void setSimulationFiles(List<File> simulationFiles)
-	{
-		this.simulationFiles = simulationFiles;
-	}
-	
-	public List<File> getSimulationDirectories()
+    
+    public File getSaveDirectory()
+    {
+        return saveDirectory;
+    }
+    
+    public void setSaveDirectory(File saveDirectory)
+    {
+        this.saveDirectory = saveDirectory;
+    }
+    
+    public File getSimulationsDirectory()
+    {
+        return simulationsDirectory;
+    }
+    
+    public void setSimulationsDirectory(File mainDirectory)
+    {
+        this.simulationsDirectory = mainDirectory;
+    }
+    
+    public List<File> getSimulationFiles()
+    {
+        return simulationFiles;
+    }
+    
+    public void setSimulationFiles(List<File> simulationFiles)
+    {
+        this.simulationFiles = simulationFiles;
+    }
+    
+    public List<File> getSimulationDirectories()
     {
         return simulationDirectories;
     }
-	
-	public void setSimulationDirectories(List<File> simulationDirectories)
+    
+    public void setSimulationDirectories(List<File> simulationDirectories)
     {
         this.simulationDirectories = simulationDirectories;
     }
-	
-	public Level getLogLevel()
-	{
-		return logLevel;
-	}
-	
-	public void setLogLevel(Level logLevel)
-	{
-		this.logLevel = logLevel;
-	}
+    
+    public Level getLogLevel()
+    {
+        return logLevel;
+    }
+    
+    public void setLogLevel(Level logLevel)
+    {
+        this.logLevel = logLevel;
+    }
 }

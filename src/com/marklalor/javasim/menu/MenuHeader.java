@@ -13,5 +13,6 @@ public @interface MenuHeader
     public final static String SEPERATOR = "{{SEPERATOR}}";
     
     String text() default AUTO_RESOLVE_TEXT;
+    
     String[] children();
 }

@@ -34,51 +34,51 @@ public abstract class Menu implements ActionListener
         createMenuHeaders();
         finishInitializingMenuHeaders();
     }
-
+    
     private void createMenuItems()
     {
-        //Reflection ain't the prettiest behind the scenes.
-        //Parsing the menu names:
+        // Reflection ain't the prettiest behind the scenes.
+        // Parsing the menu names:
         try
         {
-            for (Field field : getClass().getDeclaredFields())
+            for(Field field : getClass().getDeclaredFields())
             {
-                if (field.getType().equals(JMenuItem.class) && field.isAnnotationPresent(MenuItem.class))
+                if(field.getType().equals(JMenuItem.class) && field.isAnnotationPresent(MenuItem.class))
                 {
                     field.setAccessible(true);
                     
-                    //Get all the info about this field from the name/annotations.
+                    // Get all the info about this field from the name/annotations.
                     final String fieldName = field.getName();
                     final String customText = field.getAnnotation(MenuItem.class).text();
                     final int keyCode = field.getAnnotation(MenuItem.class).keyCode();
                     final int[] keyModifiers = field.getAnnotation(MenuItem.class).keyModifiers();
                     
-                    //JMenuItem text
+                    // JMenuItem text
                     final String text;
                     
-                    //If there annotation is there, either auto-resolve or
-                    if (customText.equals(MenuItem.AUTO_RESOLVE_TEXT))
+                    // If there annotation is there, either auto-resolve or
+                    if(customText.equals(MenuItem.AUTO_RESOLVE_TEXT))
                         text = getMenuNameFromFieldName(fieldName);
                     else
                         text = customText;
                     
-                    //Create the menu item, with the specified text / accelerator / action listener.
+                    // Create the menu item, with the specified text / accelerator / action listener.
                     JMenuItem menuItem = new JMenuItem(text);
                     
-                    //Set this class's actionPerformed method to handle the menu action.
+                    // Set this class's actionPerformed method to handle the menu action.
                     menuItem.addActionListener(this);
                     
-                    //Find the appropriate method from the given MenuHandler to deal with the action.
-                    Method methodWithSameNameAsMenuItem = menuHandler.getClass().getDeclaredMethod(fieldName, new Class[]{});
+                    // Find the appropriate method from the given MenuHandler to deal with the action.
+                    Method methodWithSameNameAsMenuItem = menuHandler.getClass().getDeclaredMethod(fieldName, new Class[] {});
                     menuHandler.mapMenuItemToMethod(menuItem, methodWithSameNameAsMenuItem);
                     
-                    if (keyCode != MenuItem.NO_ACCELERATOR_KEYCODE)
+                    if(keyCode != MenuItem.NO_ACCELERATOR_KEYCODE)
                     {
-                        //Create the key modifier from all the bitmasks given.
+                        // Create the key modifier from all the bitmasks given.
                         int bitCombinedKeyModifier = 0;
-                        for (int modifier : keyModifiers)
+                        for(int modifier : keyModifiers)
                         {
-                            if (modifier == -1)
+                            if(modifier == -1)
                                 bitCombinedKeyModifier = bitCombinedKeyModifier | Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
                             else
                                 bitCombinedKeyModifier = bitCombinedKeyModifier | modifier;
@@ -101,9 +101,9 @@ public abstract class Menu implements ActionListener
     {
         try
         {
-            for (Field field : getClass().getDeclaredFields())
+            for(Field field : getClass().getDeclaredFields())
             {
-                if (field.getType().equals(JMenu.class) && field.isAnnotationPresent(MenuHeader.class))
+                if(field.getType().equals(JMenu.class) && field.isAnnotationPresent(MenuHeader.class))
                 {
                     field.setAccessible(true);
                     
@@ -113,22 +113,22 @@ public abstract class Menu implements ActionListener
                     
                     final String text;
                     
-                    //If there annotation is there, either auto-resolve or
-                    if (customText.equals(MenuHeader.AUTO_RESOLVE_TEXT))
+                    // If there annotation is there, either auto-resolve or
+                    if(customText.equals(MenuHeader.AUTO_RESOLVE_TEXT))
                         text = getMenuNameFromFieldName(fieldName);
                     else
                         text = customText;
                     
                     JMenu menu = new JMenu(text);
                     
-                    for (String child : children)
+                    for(String child : children)
                     {
-                        if (!child.equals(MenuHeader.SEPERATOR))
+                        if(!child.equals(MenuHeader.SEPERATOR))
                         {
                             JavaSim.getLogger().debug("Getting field {} from class {}.", child, this.getClass().getCanonicalName());
                             Field menuItemField = this.getClass().getDeclaredField(child);
                             menuItemField.setAccessible(true);
-                            JMenuItem item = (JMenuItem)menuItemField.get(this);
+                            JMenuItem item = (JMenuItem) menuItemField.get(this);
                             menu.add(item);
                         }
                         else
@@ -146,15 +146,16 @@ public abstract class Menu implements ActionListener
     }
     
     protected abstract void finishInitializingMenuItems();
+    
     protected abstract void finishInitializingMenuHeaders();
-
+    
     private static String getMenuNameFromFieldName(String fieldName)
     {
         String splitCamelCase = fieldName.replaceAll(String.format("%s|%s|%s",
-                        "(?<=[A-Z])(?=[A-Z][a-z])",
-                        "(?<=[^A-Z])(?=[A-Z])",
-                        "(?<=[A-Za-z])(?=[^A-Za-z])"
-                        ), " ");
+                "(?<=[A-Z])(?=[A-Z][a-z])",
+                "(?<=[^A-Z])(?=[A-Z])",
+                "(?<=[A-Za-z])(?=[^A-Za-z])"
+                ), " ");
         return splitCamelCase.substring(0, 1).toUpperCase() + splitCamelCase.substring(1);
     }
     

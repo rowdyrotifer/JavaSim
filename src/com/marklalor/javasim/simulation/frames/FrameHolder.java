@@ -4,6 +4,6 @@ import javax.swing.JFrame;
 
 public interface FrameHolder
 {
-    JFrame getFrame();   
+    JFrame getFrame();
     void setFrame(JFrame frame);
 }
