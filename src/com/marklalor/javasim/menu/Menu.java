@@ -21,7 +21,7 @@ public abstract class Menu implements ActionListener
     private MenuHandler menuHandler;
     private JMenuBar menuBar;
     
-    public Menu(FrameHolder frameHolder, MenuHandler menuHandler)
+    public void createMenu(FrameHolder frameHolder, MenuHandler menuHandler)
     {
         this.frameHolder = frameHolder;
         this.menuHandler = menuHandler;
@@ -173,6 +173,8 @@ public abstract class Menu implements ActionListener
     
     public JMenuBar getMenuBar()
     {
+        if (menuBar == null)
+            throw new MenuAccessException("The menu bar has not yet been created. Call Menu#createMenu() at some point before this, such as in the subclass' constructor.");
         return menuBar;
     }
     

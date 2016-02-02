@@ -1,4 +1,4 @@
-package com.marklalor.javasim.menu;
+package com.marklalor.javasim.menu.menus;
 
 import java.awt.Desktop;
 import java.io.IOException;
@@ -6,6 +6,7 @@ import java.io.IOException;
 import javax.swing.JFrame;
 
 import com.marklalor.javasim.JavaSim;
+import com.marklalor.javasim.menu.MenuHandler;
 import com.marklalor.javasim.simulation.Simulation;
 
 public class SimulationMenuHandler extends MenuHandler
@@ -25,6 +26,11 @@ public class SimulationMenuHandler extends MenuHandler
     public void newSimulation()
     {
         getSimulation().getHome().run(getSimulation().getInfo());
+    }
+    
+    public void openSimulation()
+    {
+        
     }
     
     public void saveImage()

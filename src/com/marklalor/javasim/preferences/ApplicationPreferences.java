@@ -32,7 +32,6 @@ public class ApplicationPreferences
     private String os;
     
     private CommandLineArgs arguments;
-    
     private PreferencesFile preferences;
     private File file;
     private Gson gson;

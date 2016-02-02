@@ -168,7 +168,7 @@ public class FileDropManager
         };
         
         // Make the component (and possibly children) drop targets
-        makeDropTarget(home);
+        makeDropTarget(home.getFrame());
     } // end constructor
     
     // BEGIN 2007-09-12 Nathan Blomquist -- Linux (KDE/Gnome) support added.

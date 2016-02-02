@@ -13,11 +13,6 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.WritableRaster;
@@ -45,8 +40,8 @@ import com.marklalor.javasim.JavaSim;
 import com.marklalor.javasim.control.Control;
 import com.marklalor.javasim.imaging.GifSequenceWriter;
 import com.marklalor.javasim.imaging.TransferableImage;
-import com.marklalor.javasim.menu.SimulationMenu;
-import com.marklalor.javasim.menu.SimulationMenuHandler;
+import com.marklalor.javasim.menu.menus.SimulationMenu;
+import com.marklalor.javasim.menu.menus.SimulationMenuHandler;
 import com.marklalor.javasim.simulation.frames.FrameHolder;
 import com.marklalor.javasim.simulation.frames.Image;
 import com.marklalor.javasim.simulation.frames.subframes.Animate;
@@ -70,7 +65,7 @@ import com.marklalor.javasim.simulation.preset.BlankImageSimulation;
  * @see #reset()
  * @see #draw(Graphics2D, Graphics2D)
  */
-public abstract class Simulation implements ClipboardOwner, MouseListener, MouseWheelListener, MouseMotionListener
+public abstract class Simulation implements ClipboardOwner
 {
     public static final int DEFAULT_IMAGE_WIDTH = 500, DEFAULT_IMAGE_HEIGHT = 500;
     public static final int DEFAULT_CONTROL_WIDTH = 100, DEFAULT_CONTROL_HEIGHT = 500;
@@ -506,7 +501,7 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
     
     private void addMenuTo(FrameHolder frameHoldingInstance)
     {
-        SimulationMenu menu = new SimulationMenu(frameHoldingInstance, new SimulationMenuHandler(this));
+        SimulationMenu menu = new SimulationMenu(this, frameHoldingInstance, new SimulationMenuHandler(this));
         menus.add(menu);
         frameHoldingInstance.getFrame().setJMenuBar(menu.getMenuBar());
     }
@@ -883,72 +878,6 @@ public abstract class Simulation implements ClipboardOwner, MouseListener, Mouse
     public Resize getResize()
     {
         return resize;
-    }
-    
-    // Wrapper for the control window.
-    
-    // Mouse Adapter Capabilities – Same as java.awt.event.MouseAdapter
-    /**
-     * {@inheritDoc}
-     */
-    public void mouseClicked(MouseEvent e)
-    {
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    public void mousePressed(MouseEvent e)
-    {
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    public void mouseReleased(MouseEvent e)
-    {
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    public void mouseEntered(MouseEvent e)
-    {
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    public void mouseExited(MouseEvent e)
-    {
-    }
-    
-    /**
-     * {@inheritDoc}
-     * 
-     * @since 1.6
-     */
-    public void mouseWheelMoved(MouseWheelEvent e)
-    {
-    }
-    
-    /**
-     * {@inheritDoc}
-     * 
-     * @since 1.6
-     */
-    public void mouseDragged(MouseEvent e)
-    {
-    }
-    
-    /**
-     * {@inheritDoc}
-     * 
-     * @since 1.6
-     */
-    public void mouseMoved(MouseEvent e)
-    {
-        
     }
     
     // Pseudo-print: opens the png in the system editor.

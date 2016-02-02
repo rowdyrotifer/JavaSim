@@ -114,7 +114,7 @@ public class HomeMenu implements ActionListener
         }
         else if(e.getSource() == close)
         {
-            getHome().dispose();
+            getHome().getFrame().dispose();
         }
         else if(e.getSource() == minimize)
         {

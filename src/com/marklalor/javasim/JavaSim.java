@@ -90,8 +90,8 @@ public class JavaSim
                 
                 // Finally, start the home panel.
                 Home home = new Home(preferences);
-                home.setSize(800, 500);
-                home.setVisible(true);
+                home.getFrame().setSize(800, 500);
+                home.getFrame().setVisible(true);
             }
         });
     }

@@ -24,7 +24,7 @@ public abstract class Control<T>
     
     public JPanel getPanel()
     {
-        if(this.panel == null)
+        if(this.panel == null) //TODO: put this in the constructor...?
             this.panel = createPanel();
         
         return this.panel;

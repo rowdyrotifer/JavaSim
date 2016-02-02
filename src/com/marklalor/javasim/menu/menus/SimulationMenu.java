@@ -1,4 +1,4 @@
-package com.marklalor.javasim.menu;
+package com.marklalor.javasim.menu.menus;
 
 import java.awt.Event;
 import java.awt.event.KeyEvent;
@@ -6,12 +6,21 @@ import java.awt.event.KeyEvent;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
+import com.marklalor.javasim.menu.Menu;
+import com.marklalor.javasim.menu.MenuHandler;
+import com.marklalor.javasim.menu.MenuHeader;
+import com.marklalor.javasim.menu.MenuItem;
+import com.marklalor.javasim.simulation.Simulation;
 import com.marklalor.javasim.simulation.frames.FrameHolder;
+import com.sun.org.apache.bcel.internal.generic.GETSTATIC;
 
 public class SimulationMenu extends Menu
 {
+    private Simulation simulation;
+    
 	@MenuHeader(text="File", children={
 	        "newSimulation",
+	        "openSimulation",
 	         MenuHeader.SEPERATOR,
 	        "saveImage",
 	        "saveImageAs",
@@ -24,7 +33,9 @@ public class SimulationMenu extends Menu
 	        "print"}
 	) private JMenu file;
 	
-	@MenuHeader(text="Edit", children={"copy"}) private JMenu edit;
+	@MenuHeader(text="Edit", children={
+	        "copy"}
+	) private JMenu edit;
 	
 	@MenuHeader(text="Animation", children={
             "play",
@@ -42,14 +53,17 @@ public class SimulationMenu extends Menu
             "reloadSimulation",
             MenuHeader.SEPERATOR,
             "resizeMenuItem",
-            "fullscreen",
-            "showConsole"}
+            "fullscreen"}
     ) private JMenu _simulation;
 	
-	@MenuHeader(text="Window", children={"minimize"}) private JMenu window;
+	@MenuHeader(text="Window", children={
+	        "showConsole",
+	        "minimize"}
+	) private JMenu window;
     
     // FILE
 	@MenuItem(text="New Simulation",        keyCode=KeyEvent.VK_N,      keyModifiers={MenuItem.COMMAND_OR_CONTROL})                   private JMenuItem newSimulation;
+	@MenuItem(text="Open Simulation",       keyCode=KeyEvent.VK_O,      keyModifiers={MenuItem.COMMAND_OR_CONTROL})                   private JMenuItem openSimulation;
 	@MenuItem(text="Save Image",            keyCode=KeyEvent.VK_S,      keyModifiers={MenuItem.COMMAND_OR_CONTROL})                   private JMenuItem saveImage;
 	@MenuItem(text="Save Image As",         keyCode=KeyEvent.VK_S,      keyModifiers={MenuItem.COMMAND_OR_CONTROL, Event.SHIFT_MASK}) private JMenuItem saveImageAs;
 	@MenuItem(text="Create Animated Gif",   keyCode=KeyEvent.VK_I,      keyModifiers={MenuItem.COMMAND_OR_CONTROL})                   private JMenuItem animateMenuItem;
@@ -75,20 +89,26 @@ public class SimulationMenu extends Menu
     @MenuItem(text="Reload",                keyCode=KeyEvent.VK_F5)                                                                   private JMenuItem reloadSimulation;
     @MenuItem(text="Resize")                                                                                                          private JMenuItem resizeMenuItem;
     @MenuItem(text="Enter Full Screen",     keyCode=KeyEvent.VK_F,      keyModifiers={MenuItem.COMMAND_OR_CONTROL, Event.CTRL_MASK})  private JMenuItem fullscreen;
-    @MenuItem(text="Show Console",          keyCode=KeyEvent.VK_J,      keyModifiers={MenuItem.COMMAND_OR_CONTROL})                   private JMenuItem showConsole;
     
     // WINDOW
+    @MenuItem(text="Show Console",          keyCode=KeyEvent.VK_J,      keyModifiers={MenuItem.COMMAND_OR_CONTROL})                   private JMenuItem showConsole;
     @MenuItem(text="Minimize",              keyCode=KeyEvent.VK_M,      keyModifiers={MenuItem.COMMAND_OR_CONTROL})                   private JMenuItem minimize;
 	
-	public SimulationMenu(FrameHolder frameHolder, MenuHandler menuHandler)
+	public SimulationMenu(Simulation simulation, FrameHolder frameHolder, MenuHandler menuHandler)
 	{
-	    super(frameHolder, menuHandler);
+        this.simulation = simulation;
+	    createMenu(frameHolder, menuHandler);
 	}
+
+    public Simulation getSimulation()
+    {
+        return simulation;
+    }
 
     @Override
     protected void finishInitializingMenuItems()
     {
-        // TODO Auto-generated method stub
+        newSimulation.setText("New " + getSimulation().getInfo().getName());
 //      //Fullscreen – Command + Shift + F (OS X) F11 (Windows)
 //      if (getSimulation().getHome().getApplicationPreferences().isMacOSX())
 //          fullscreen.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, (Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | InputEvent.CTRL_MASK)));
