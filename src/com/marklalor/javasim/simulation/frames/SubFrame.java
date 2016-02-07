@@ -9,6 +9,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.text.PlainDocument;
 
+import com.marklalor.javasim.simulation.frames.image.Image;
 import com.marklalor.javasim.text.filter.IntegerFilter;
 
 public class SubFrame implements FrameHolder

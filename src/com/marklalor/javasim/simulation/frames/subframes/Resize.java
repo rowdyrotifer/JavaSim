@@ -15,8 +15,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-import com.marklalor.javasim.simulation.frames.Image;
 import com.marklalor.javasim.simulation.frames.SubFrame;
+import com.marklalor.javasim.simulation.frames.image.Image;
 
 public class Resize extends SubFrame
 {
@@ -39,8 +39,8 @@ public class Resize extends SubFrame
         {
             public void componentShown(ComponentEvent e)
             {
-                initialWidth = Resize.this.getImage().getSimulation().getWidth();
-                initialHeight = Resize.this.getImage().getSimulation().getHeight();
+                initialWidth = Resize.this.getImage().getSimulation().getImage().getWidth();
+                initialHeight = Resize.this.getImage().getSimulation().getImage().getHeight();
                 resizeWidth.setText(String.valueOf(initialWidth));
                 resizeHeight.setText(String.valueOf(initialHeight));
             }

@@ -9,10 +9,8 @@ import java.awt.datatransfer.ClipboardOwner;
 import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.WritableRaster;
@@ -29,8 +27,6 @@ import javax.imageio.stream.FileImageOutputStream;
 import javax.imageio.stream.ImageOutputStream;
 import javax.swing.JFileChooser;
 import javax.swing.Timer;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.apple.eawt.Application;
@@ -43,7 +39,7 @@ import com.marklalor.javasim.imaging.TransferableImage;
 import com.marklalor.javasim.menu.menus.SimulationMenu;
 import com.marklalor.javasim.menu.menus.SimulationMenuHandler;
 import com.marklalor.javasim.simulation.frames.FrameHolder;
-import com.marklalor.javasim.simulation.frames.Image;
+import com.marklalor.javasim.simulation.frames.image.Image;
 import com.marklalor.javasim.simulation.frames.subframes.Animate;
 import com.marklalor.javasim.simulation.frames.subframes.Controls;
 import com.marklalor.javasim.simulation.frames.subframes.Resize;
@@ -71,8 +67,6 @@ public abstract class Simulation implements ClipboardOwner
     public static final int DEFAULT_CONTROL_WIDTH = 100, DEFAULT_CONTROL_HEIGHT = 500;
     public static final int DEFAULT_CONSOLE_WIDTH = 400, DEFAULT_CONSOLE_HEIGHT = 500;
     
-    public int imgType = BufferedImage.TYPE_INT_ARGB;
-    
     private Home home;
     private SimulationInfo info;
     private Integer jarId;
@@ -91,11 +85,6 @@ public abstract class Simulation implements ClipboardOwner
     // Other Frames
     private Animate animate;
     private Resize resize;
-    
-    // Relating to the image
-    private BufferedImage permanentImage, temporaryImage, combinedImage;
-    private boolean drawTemporaryImageFirst = false;
-    private int width, height;
     
     // Timer
     private Timer timerManual;
@@ -152,71 +141,6 @@ public abstract class Simulation implements ClipboardOwner
      * </p>
      */
     public abstract void initialize();
-    
-    /**
-     * <p>
-     * Called when the simulation should be logically reset. From the GUI, this is done by Simulation→Reset, but it can
-     * also be called programmatically by {@link #resetAction()}. Currently, the simulation is reset:
-     * </p>
-     * <ul>
-     * <li>After all initialization is completed.</li>
-     * <li>From the menu item Simulation→Reset</li>
-     * <li>At the beginning of creation of an animation.</li>
-     * <li>On resize of a window.</li>
-     * </ul>
-     * </p>
-     * 
-     * @param permanent
-     *            <code>Graphics2D</code> object which may be drawn on to logically reset the simulation. For example,
-     *            using {@link Graphics2D#fillRect(int, int, int, int)} to paint white on top of the whole image
-     *            effectively resets it.
-     */
-    public abstract void reset(Graphics2D permanent);
-    
-    /**
-     * <p>
-     * Called by an animation timer, typically the one started by Animation→Play, but also by File→Created Animated Gif.
-     * <code>permanent</code> and <code>temporary</code> are graphics objects intended to be drawn on by the
-     * implementer. Items drawn onto <code>permanent</code> persist throughout multiple frames, whereas items drawn onto
-     * <code>temporary</code> are removed after each frame.
-     * </p>
-     * 
-     * <p>
-     * Both can be used in conjunction depending on the needs of your app. For example, one might draw one shape onto
-     * <code>permanent</code> every frame in order to build up an image, while drawing a string onto the corner of
-     * <code>temporary</code> in order to keep track of variables that change each frame.
-     * </p>
-     * 
-     * @param permanent
-     *            <code>Graphics2D</code> object whose drawings persist each frame.
-     * @param temporary
-     *            <code>Graphics2D</code> object whose drawings are cleared each frame.
-     * @see Simulation
-     */
-    public abstract void draw(Graphics2D permanent, Graphics2D temporary);
-    
-    // Predefined listeners
-    private class AggregateListner implements ActionListener, ChangeListener
-    {
-        @Override
-        public void stateChanged(ChangeEvent e)
-        {
-            resetAction();
-        }
-        
-        @Override
-        public void actionPerformed(ActionEvent e)
-        {
-            resetAction();
-        }
-    }
-    
-    AggregateListner resetAction = new AggregateListner();
-    
-    public AggregateListner getResetAction()
-    {
-        return resetAction;
-    }
     
     /**
      * <p>
@@ -288,7 +212,6 @@ public abstract class Simulation implements ClipboardOwner
         
         // Create and set up the main image that goes with this simulation.
         image = new Image(this);
-        image.getFrame().pack();
         image.setSize(DEFAULT_IMAGE_WIDTH, DEFAULT_IMAGE_HEIGHT);
         image.getFrame().setLocationRelativeTo(null);
         refreshTitle();
@@ -349,7 +272,7 @@ public abstract class Simulation implements ClipboardOwner
                         !timerAnimation.isRunning())
                     try
                     {
-                        animationWriter.writeToSequence(combinedImage, delay);
+                        animationWriter.writeToSequence(getImage().getAggregateImage(), delay);
                     }
                     catch(IOException e1)
                     {
@@ -394,7 +317,7 @@ public abstract class Simulation implements ClipboardOwner
                 
                 try
                 {
-                    animationWriter.writeToSequence(combinedImage, delay);
+                    animationWriter.writeToSequence(getImage().getAggregateImage(), delay);
                 }
                 catch(IOException e1)
                 {
@@ -405,19 +328,6 @@ public abstract class Simulation implements ClipboardOwner
                     stop();
                 
                 variableAnimationN++;
-            }
-        });
-        
-        this.getImage().getFrame().addComponentListener(new ComponentAdapter()
-        {
-            @Override
-            public void componentResized(ComponentEvent e)
-            {
-                super.componentResized(e);
-                height = getImage().getFrame().getHeight() - getImage().getFrame().getInsets().top;
-                width = getImage().getFrame().getWidth();
-                setUpGraphics();
-                resetAction();
             }
         });
         
@@ -436,26 +346,15 @@ public abstract class Simulation implements ClipboardOwner
                                       // active simulation.
         
         // Set sizes to the default dimensions
-        setWidth(DEFAULT_IMAGE_WIDTH);
-        setHeight(DEFAULT_IMAGE_HEIGHT);
+        getImage().setSize(DEFAULT_IMAGE_WIDTH, DEFAULT_IMAGE_HEIGHT);
         
         if(System.getProperty("os.name").toLowerCase().startsWith("mac os x"))
         {
             // OS X fullscreen support:
             FullScreenUtilities.setWindowCanFullScreen(getImage().getFrame(), true);
             // Allow esc key to... well... escape fullscreen
-            getImage().getFrame().addKeyListener(new KeyListener()
+            getImage().getFrame().addKeyListener(new KeyAdapter()
             {
-                @Override
-                public void keyTyped(KeyEvent e)
-                {
-                }
-                
-                @Override
-                public void keyReleased(KeyEvent e)
-                {
-                }
-                
                 @Override
                 public void keyPressed(KeyEvent e)
                 {
@@ -464,9 +363,6 @@ public abstract class Simulation implements ClipboardOwner
                 }
             });
         }
-        
-        // Set up graphics.
-        setUpGraphics();
     }
     
     /**
@@ -537,16 +433,12 @@ public abstract class Simulation implements ClipboardOwner
         getImage().getFrame().setTitle(info.getName() + " – " + info.getAuthor() + " at " + (hertz == -1 ? "?" : hertz) + " Hz");
     }
     
-    private void setUpGraphics()
-    {
-        permanentImage = new BufferedImage(width, height, imgType);
-    }
     
     public void copyImageToClipboard()
     {
-        if(combinedImage != null)
+        if(getImage().getAggregateImage() != null)
         {
-            TransferableImage transferableImage = new TransferableImage(combinedImage);
+            TransferableImage transferableImage = new TransferableImage(getImage().getAggregateImage());
             Toolkit.getDefaultToolkit().getSystemClipboard().setContents(transferableImage, this);
         }
     }
@@ -554,8 +446,7 @@ public abstract class Simulation implements ClipboardOwner
     public void resetAction()
     {
         setFrameNumber(0);
-        reset();
-        combinedImage = permanentImage;
+        getImage().renderAggregateImage(true);
         getImage().repaint();
     }
     
@@ -616,7 +507,7 @@ public abstract class Simulation implements ClipboardOwner
     {
         try
         {
-            ImageIO.write(combinedImage, "png", file);
+            ImageIO.write(getImage().getAggregateImage(), "png", file);
             JavaSim.getLogger().info("Saved {}", file);
         }
         catch(IOException e)
@@ -634,7 +525,7 @@ public abstract class Simulation implements ClipboardOwner
         try
         {
             animationOut = new FileImageOutputStream(animate.getFile());
-            animationWriter = new GifSequenceWriter(animationOut, imgType, animate.getFrameDelay(), animate.getLoop());
+            animationWriter = new GifSequenceWriter(animationOut, BufferedImage.TYPE_INT_ARGB, animate.getFrameDelay(), animate.getLoop());
         }
         catch(Exception e)
         {
@@ -651,7 +542,7 @@ public abstract class Simulation implements ClipboardOwner
         try
         {
             animationOut = new FileImageOutputStream(animate.getFile());
-            animationWriter = new GifSequenceWriter(animationOut, imgType, animate.getFrameDelay(), animate.getLoop());
+            animationWriter = new GifSequenceWriter(animationOut, BufferedImage.TYPE_INT_ARGB, animate.getFrameDelay(), animate.getLoop());
         }
         catch(Exception e)
         {
@@ -670,10 +561,10 @@ public abstract class Simulation implements ClipboardOwner
         JavaSim.getLogger().info("Animation Completed!");
     }
     
-    public void reset()
-    {
-        reset(permanentImage.createGraphics());
-    }
+//    public void reset()
+//    {
+//        reset(permanentImage.createGraphics());
+//    }
     
     public void play()
     {
@@ -706,56 +597,15 @@ public abstract class Simulation implements ClipboardOwner
     
     public void draw()
     {
-        // Create a temporary image to pass along with the permanent image.
-        temporaryImage = new BufferedImage(permanentImage.getWidth(), permanentImage.getHeight(), imgType);
-        Graphics2D tempGraphics = temporaryImage.createGraphics();
-        Graphics2D permanentGraphics = permanentImage.createGraphics();
-        draw(permanentGraphics, tempGraphics);
-        
-        // Create a "combined" image of the same size.
-        combinedImage = new BufferedImage(permanentImage.getWidth(), permanentImage.getHeight(), imgType);
-        Graphics2D combinedGraphics = combinedImage.createGraphics();
-        
-        // Then draw the permanent and temporary images onto it.
-        if (!drawTemporaryImageFirst)
-        {
-            combinedGraphics.drawImage(permanentImage, 0, 0, null, null);
-            combinedGraphics.drawImage(temporaryImage, 0, 0, null, null);
-        }
-        else
-        {
-            combinedGraphics.drawImage(temporaryImage, 0, 0, null, null);
-            combinedGraphics.drawImage(permanentImage, 0, 0, null, null);
-        }
-        
-        // Dispose of graphics objects created.
-        tempGraphics.dispose();
-        permanentGraphics.dispose();
-        
-        // Repaint the image JFrame.
+        image.renderAggregateImage(false);
         image.repaint();
-    }
-    
-    public BufferedImage getPermanentImage()
-    {
-        return permanentImage;
-    }
-    
-    public BufferedImage getTemporaryImage()
-    {
-        return temporaryImage;
-    }
-    
-    public BufferedImage getCurrentImage()
-    {
-        return combinedImage;
     }
     
     public BufferedImage getCurrentImageDeepCopy()
     {
-        ColorModel cm = combinedImage.getColorModel();
+        ColorModel cm = getImage().getAggregateImage().getColorModel();
         boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
-        WritableRaster raster = combinedImage.copyData(null);
+        WritableRaster raster = getImage().getAggregateImage().copyData(null);
         return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
     }
     
@@ -768,8 +618,6 @@ public abstract class Simulation implements ClipboardOwner
     public void close()
     {
         stop();
-        getImage().getFrame().dispose();
-        getControls().getFrame().dispose();
         getHome().getJarManager().unloadFromId(getJarId());
     }
     
@@ -824,50 +672,6 @@ public abstract class Simulation implements ClipboardOwner
         return contentDirectory;
     }
     
-    /**
-     * Sets the width of the simulation so that the image becomes the specified size (not the window).
-     * 
-     * @param width
-     *            The desired image width, in pixels.
-     */
-    public void setWidth(int width)
-    {
-        getImage().setSize(width, getImage().getFrame().getHeight());
-        this.width = width;
-    }
-    
-    /**
-     * Gets the width of the underlying image for the simulation.
-     * 
-     * @return The simulation image width, in pixels.
-     */
-    public int getWidth()
-    {
-        return width;
-    }
-    
-    /**
-     * Sets the height of the simulation so that the image becomes the specified size (not the window).
-     * 
-     * @param width
-     *            The desired image height, in pixels.
-     */
-    public void setHeight(int height)
-    {
-        getImage().setSize(getImage().getFrame().getWidth(), height);
-        this.height = height;
-    }
-    
-    /**
-     * Gets the height of the underlying image for the simulation.
-     * 
-     * @return The simulation image height, in pixels.
-     */
-    public int getHeight()
-    {
-        return height;
-    }
-    
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-M-d_H-m-s-S");
     
     public static String getTimestamp()
@@ -899,16 +703,6 @@ public abstract class Simulation implements ClipboardOwner
         calculateHertz();
     }
     
-    public void setDrawTemporaryImageFirst(boolean drawTemporaryImageFirst)
-    {
-        this.drawTemporaryImageFirst = drawTemporaryImageFirst;
-    }
-    
-    public boolean getDrawTemporaryImageFirst()
-    {
-        return drawTemporaryImageFirst;
-    }
-    
     public Resize getResize()
     {
         return resize;
@@ -922,7 +716,7 @@ public abstract class Simulation implements ClipboardOwner
         // Save the file to the temporary file directory.
         try
         {
-            ImageIO.write(combinedImage, "png", tempFile);
+            ImageIO.write(getImage().getAggregateImage(), "png", tempFile);
         }
         catch(IOException e)
         {

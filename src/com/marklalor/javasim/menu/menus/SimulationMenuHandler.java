@@ -75,7 +75,9 @@ public class SimulationMenuHandler extends MenuHandler
     
     public void closeSimulation()
     {
-        getSimulation().getHome().removeSimulation(getSimulation());
+        JavaSim.getLogger().debug("Removing simulation on window (menu) close.");
+        getSimulation().getImage().getFrame().dispose();
+        JavaSim.getLogger().debug("Removed simulation on window (menu) close.");
     }
     
     public void print()

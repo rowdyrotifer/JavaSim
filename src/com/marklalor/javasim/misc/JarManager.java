@@ -3,6 +3,7 @@ package com.marklalor.javasim.misc;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -72,7 +73,9 @@ public class JarManager
     
     public void unloadFromId(Integer id)
     {
+        JavaSim.getLogger().debug("Unloading class loader {}. {}:{}", id, this.classes.get(id).getCanonicalName(), Arrays.asList(this.classLoaders.get(id).getURLs()));
         this.classLoaders.remove(id);
         this.classes.remove(id);
+        JavaSim.getLogger().debug("Removed class and classloader references.");
     }
 }

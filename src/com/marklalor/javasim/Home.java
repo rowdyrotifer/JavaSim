@@ -406,7 +406,7 @@ public class Home implements ListSelectionListener, FrameHolder
         while(iterator.hasNext())
         {
             Simulation simulation = iterator.next();
-            simulation.close();
+            simulation.getImage().getFrame().dispose();
             iterator.remove();
         }
         
@@ -416,7 +416,9 @@ public class Home implements ListSelectionListener, FrameHolder
     public void removeSimulation(Simulation simulation)
     {
         simulation.close();
+        JavaSim.getLogger().debug("Removing simulation {}[jarid={}] from active simulations.", simulation.getClass().getCanonicalName(), simulation.getJarId());
         activeSimulations.remove(simulation);
+        JavaSim.getLogger().debug("Removed simulation from active simulations.");
     }
     
     public JarManager getJarManager()

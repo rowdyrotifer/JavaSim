@@ -24,8 +24,8 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.marklalor.javasim.control.Control;
 import com.marklalor.javasim.simulation.Simulation;
-import com.marklalor.javasim.simulation.frames.Image;
 import com.marklalor.javasim.simulation.frames.SubFrame;
+import com.marklalor.javasim.simulation.frames.image.Image;
 
 public class Animate extends SubFrame
 {

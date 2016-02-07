@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 
 import com.marklalor.javasim.simulation.Simulation;
+import com.marklalor.javasim.simulation.frames.image.DrawHandler;
+import com.marklalor.javasim.simulation.frames.image.ImageLayer;
 
 /**
  * <p>
@@ -22,7 +24,7 @@ import com.marklalor.javasim.simulation.Simulation;
  */
 public abstract class BlankImageSimulation extends Simulation
 {
-    private Color backgroundColor = Color.white;
+    private Color backgroundColor;
     
     /**
      * Create a <code>Simulation</code> that fills the screen with white initially and on reset.
@@ -31,6 +33,7 @@ public abstract class BlankImageSimulation extends Simulation
      */
     public BlankImageSimulation()
     {
+        this(Color.WHITE);
     }
     
     /**
@@ -51,21 +54,31 @@ public abstract class BlankImageSimulation extends Simulation
     {
         // Simulation is intended for images, show the image pane.
         getImage().getFrame().setVisible(true);
+        
+        ImageLayer permanentLayer = new ImageLayer(0, false);
+        permanentLayer.setDrawHandler(new DrawHandler()
+        {
+            
+            @Override
+            public void reset(ImageLayer sender, Graphics2D graphics)
+            {
+                graphics.setColor(BlankImageSimulation.this.getBackgroundColor());
+                graphics.fillRect(0, 0, BlankImageSimulation.this.getImage().getWidth(), BlankImageSimulation.this.getImage().getHeight());
+                BlankImageSimulation.this.reset(graphics);
+            }
+            
+            @Override
+            public void draw(ImageLayer sender, Graphics2D graphics)
+            {
+                BlankImageSimulation.this.draw(graphics);
+            }
+        });
+        getImage().addLayer(permanentLayer);
     }
     
-    /**
-     * Fills the screen, from corner to corner, with the specified color (default white) when the simulation is reset
-     * (typically by Simulation→Reset).
-     * 
-     * @see #BlankImageSimulation(Color)
-     * @see #setBackgroundColor(Color)
-     */
-    @Override
-    public void reset(Graphics2D permanent)
-    {
-        permanent.setColor(backgroundColor);
-        permanent.fillRect(0, 0, getWidth(), getHeight());
-    }
+    public void reset(Graphics2D graphics){}
+    
+    public void draw(Graphics2D graphics){}
     
     /**
      * @return The background color which fills image on {@link #reset()}
