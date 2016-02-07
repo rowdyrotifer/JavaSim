@@ -75,6 +75,7 @@ public abstract class Simulation implements ClipboardOwner
     
     private Home home;
     private SimulationInfo info;
+    private Integer jarId;
     
     private File contentDirectory;
     
@@ -93,6 +94,7 @@ public abstract class Simulation implements ClipboardOwner
     
     // Relating to the image
     private BufferedImage permanentImage, temporaryImage, combinedImage;
+    private boolean drawTemporaryImageFirst = false;
     private int width, height;
     
     // Timer
@@ -266,7 +268,7 @@ public abstract class Simulation implements ClipboardOwner
         this.n++;
     }
     
-    public void preInitialize(Home home, SimulationInfo info)
+    public void preInitialize(Home home, Integer id, SimulationInfo info)
     {
         // Don't allow anyone to use this method a second time… just… no.
         if(getInfo() != null)
@@ -274,6 +276,8 @@ public abstract class Simulation implements ClipboardOwner
         
         // Set the Home this simulation was launched from.
         this.home = home;
+        
+        this.jarId = id;
         
         // Inherit the info read from its file earlier.
         this.info = info;
@@ -711,9 +715,18 @@ public abstract class Simulation implements ClipboardOwner
         // Create a "combined" image of the same size.
         combinedImage = new BufferedImage(permanentImage.getWidth(), permanentImage.getHeight(), imgType);
         Graphics2D combinedGraphics = combinedImage.createGraphics();
+        
         // Then draw the permanent and temporary images onto it.
-        combinedGraphics.drawImage(permanentImage, 0, 0, null, null);
-        combinedGraphics.drawImage(temporaryImage, 0, 0, null, null);
+        if (!drawTemporaryImageFirst)
+        {
+            combinedGraphics.drawImage(permanentImage, 0, 0, null, null);
+            combinedGraphics.drawImage(temporaryImage, 0, 0, null, null);
+        }
+        else
+        {
+            combinedGraphics.drawImage(temporaryImage, 0, 0, null, null);
+            combinedGraphics.drawImage(permanentImage, 0, 0, null, null);
+        }
         
         // Dispose of graphics objects created.
         tempGraphics.dispose();
@@ -757,12 +770,23 @@ public abstract class Simulation implements ClipboardOwner
         stop();
         getImage().getFrame().dispose();
         getControls().getFrame().dispose();
+        getHome().getJarManager().unloadFromId(getJarId());
     }
     
     public void breakpoint()
     {
         if(stopForBreakpoint)
             stop();
+    }
+    
+    public void setJarId(Integer jarId)
+    {
+        this.jarId = jarId;
+    }
+    
+    public Integer getJarId()
+    {
+        return jarId;
     }
     
     public void setInfo(SimulationInfo info)
@@ -873,6 +897,16 @@ public abstract class Simulation implements ClipboardOwner
         timerManual.setDelay(timerManual.getDelay() - changeInSpeed >= 1 ? timerManual.getDelay() - changeInSpeed : 0);
         hertz = -1;
         calculateHertz();
+    }
+    
+    public void setDrawTemporaryImageFirst(boolean drawTemporaryImageFirst)
+    {
+        this.drawTemporaryImageFirst = drawTemporaryImageFirst;
+    }
+    
+    public boolean getDrawTemporaryImageFirst()
+    {
+        return drawTemporaryImageFirst;
     }
     
     public Resize getResize()
