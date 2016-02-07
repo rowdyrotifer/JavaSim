@@ -43,6 +43,7 @@ import com.marklalor.javasim.menu.HomeMenu;
 import com.marklalor.javasim.misc.FileDropManager;
 import com.marklalor.javasim.misc.FileDropOverlay;
 import com.marklalor.javasim.misc.FileDropManager.Listener;
+import com.marklalor.javasim.misc.JarManager;
 import com.marklalor.javasim.preferences.ApplicationPreferences;
 import com.marklalor.javasim.simulation.Simulation;
 import com.marklalor.javasim.simulation.SimulationInfo;
@@ -55,6 +56,7 @@ public class Home implements ListSelectionListener, FrameHolder
     private JFrame frame;
     
     private ApplicationPreferences preferences;
+    private JarManager jarManager;
     
     private List<SimulationInfo> simulations;
     private JList<SimulationInfo> simulationList;
@@ -79,6 +81,7 @@ public class Home implements ListSelectionListener, FrameHolder
     public Home(ApplicationPreferences preferences)
     {
         this.preferences = preferences;
+        this.jarManager = new JarManager();
         
         this.setUpConsole();
         this.loadSimulations();
@@ -316,29 +319,15 @@ public class Home implements ListSelectionListener, FrameHolder
     {
         JavaSim.getLogger().info("Running {}", info.getName());
         
-        Class<? extends Simulation> simClass = null;
+        Integer id = getJarManager().loadJarFromSimulationInfo(info);
         
-        try
-        {
-            simClass = SimulationInfo.loadSimulationClass(info.getFile(), info.getMain() == null ? null : (info.getMain() == "" ? null : info.getMain()));
-        }
-        catch(ClassNotFoundException e)
-        {
-            if(info.getMain() == null)
-                JavaSim.getLogger().error("Could not automatically find a simulation class.", e);
-            else
-                JavaSim.getLogger().error("Could not find class {}", info.getMain(), e);
-        }
-        catch(IOException e)
-        {
-            JavaSim.getLogger().error("Could not load the simulation class", e);
-        }
-        
-        if(simClass == null)
+        if(id == null)
         {
             JavaSim.getLogger().error("Simulation class was not loaded. {}", info);
             return;
         }
+        
+        Class<? extends Simulation> simClass = getJarManager().getClassFromId(id);
         
         try
         {
@@ -348,7 +337,7 @@ public class Home implements ListSelectionListener, FrameHolder
             activeSimulations.add(simulation);
             
             // Run all the initialization steps.
-            simulation.preInitialize(this, info);
+            simulation.preInitialize(this, id, info);
             simulation.initialize();
             simulation.postInitialize();
             
@@ -428,6 +417,11 @@ public class Home implements ListSelectionListener, FrameHolder
     {
         simulation.close();
         activeSimulations.remove(simulation);
+    }
+    
+    public JarManager getJarManager()
+    {
+        return jarManager;
     }
     
     @Override

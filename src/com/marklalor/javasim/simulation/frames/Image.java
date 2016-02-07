@@ -1,29 +1,38 @@
 package com.marklalor.javasim.simulation.frames;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.geom.Point2D;
+import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
 
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 
+import com.marklalor.javasim.JavaSim;
 import com.marklalor.javasim.simulation.Simulation;
 
 public class Image implements FrameHolder
 {
-    private Simulation simulation;
     private JFrame frame;
+    
+    private Simulation simulation;
     
     // Draggable behavior
     private boolean draggable = false;
     private Point2D origin = null;
     
-    private ImageJPanel imagePanel;
+    private JLabel imageLabel;
     
     public Image(Simulation simulation)
     {
@@ -50,7 +59,6 @@ public class Image implements FrameHolder
 			@Override public void mouseEntered(MouseEvent e) { }
 			@Override public void mouseClicked(MouseEvent e) { }
         });
-        
         frame.addMouseMotionListener(new MouseMotionListener()
         {
             @Override
@@ -75,11 +83,11 @@ public class Image implements FrameHolder
                 super.windowClosing(e);
             }
         });
+
         
-        frame.setLayout(new BorderLayout());
-        
-        imagePanel = new ImageJPanel(this);
-        frame.getContentPane().add(imagePanel, BorderLayout.CENTER);
+        frame.getContentPane().setLayout(new BorderLayout());
+        imageLabel = new JLabel();
+        frame.getContentPane().add(imageLabel);
     }
     
     public Simulation getSimulation()
@@ -115,32 +123,56 @@ public class Image implements FrameHolder
         frame.setSize(width, height + frame.getInsets().top);
     }
     
-    public void paintImage()
+    public void repaint()
     {
+        BufferedImage image = getSimulation().getCurrentImage();
+        BufferedImage backgroundImage = createBackgroundImage();
+        
+        if (image.getWidth() != backgroundImage.getWidth())
+            JavaSim.getLogger().error("Image width does not equal background image width.");
+        if (image.getHeight() != backgroundImage.getHeight())
+            JavaSim.getLogger().error("Image height does not equal background image height.");
+        
+        
+        if (image.getColorModel().hasAlpha())
+        {
+            BufferedImage combined = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB);
+            Graphics g = combined.getGraphics();
+            g.drawImage(backgroundImage, 0, 0, null);
+            g.drawImage(image, 0, 0, null);
+            g.dispose();
+            imageLabel.setIcon(new ImageIcon(combined));
+        }
+        else
+            imageLabel.setIcon(new ImageIcon(image));
+        
         frame.repaint();
     }
+
+    private final int boxSize = 10;
+    private final Color boxColorLight = new Color(0xFFFFFF);
+    private final Color boxColorDark = new Color(0xC3C3C3);
     
-    // Drawing panel:
-    @SuppressWarnings("serial")
-    private class ImageJPanel extends JPanel
+    private BufferedImage createBackgroundImage()
     {
-        private Image parent;
+        int width  = getFrame().getWidth() - getFrame().getInsets().right - getFrame().getInsets().left;
+        int height = getFrame().getHeight() - getFrame().getInsets().top - getFrame().getInsets().bottom;
+        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        Graphics2D graphics = image.createGraphics();
         
-        public ImageJPanel(Image parent)
+        int ax = (int) Math.ceil(width / (double) boxSize);
+        int ay = (int) Math.ceil(height / (double) boxSize);
+        
+        for(int i = 0; i < ax; i++)
         {
-            super(true);
-            this.parent = parent;
-            // TODO: readd functionality in a more per-case method.
-            // this.addMouseMotionListener(this.parent.getSimulation());
-            // this.addMouseListener(this.parent.getSimulation());
-            // this.addMouseWheelListener(this.parent.getSimulation());
+            for(int j = 0; j < ay; j++)
+            {
+                graphics.setColor((i + j) % 2 == 0 ? boxColorLight : boxColorDark);
+                graphics.fillRect(i * boxSize, j * boxSize, boxSize, boxSize);
+            }
         }
         
-        @Override
-        protected void paintComponent(Graphics g)
-        {
-            g.clearRect(0, 0, getWidth(), getHeight());
-            g.drawImage(parent.getSimulation().getCurrentImage(), 0, getInsets().top, null);
-        }
+        graphics.dispose();
+        return image;
     }
 }

@@ -556,7 +556,7 @@ public abstract class Simulation implements ClipboardOwner
         setFrameNumber(0);
         reset();
         combinedImage = permanentImage;
-        getImage().paintImage();
+        getImage().repaint();
     }
     
     private void calculateHertz()
@@ -733,7 +733,7 @@ public abstract class Simulation implements ClipboardOwner
         permanentGraphics.dispose();
         
         // Repaint the image JFrame.
-        image.paintImage();
+        image.repaint();
     }
     
     public BufferedImage getPermanentImage()

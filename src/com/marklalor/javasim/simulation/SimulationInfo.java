@@ -8,12 +8,12 @@ import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -75,6 +75,65 @@ public class SimulationInfo implements Serializable
                 properties.get("description"));
     }
     
+//    @SuppressWarnings("unchecked")
+//    public static Class<? extends Simulation> loadSimulationClass(File file, String targetClassName) throws IOException, ClassNotFoundException
+//    {
+//        if(targetClassName == null)
+//            JavaSim.getLogger().trace("Automatically searching for Simulation subclass in {}", file);
+//        else
+//            JavaSim.getLogger().trace("Searching for {} in {}", targetClassName, file);
+//        
+//        JarFile jarFile = new JarFile(file);
+//        Enumeration<JarEntry> e = jarFile.entries();
+//        
+//        URL[] urls = { new URL("jar:file:" + file.getAbsolutePath() + "!/") };
+//        URLClassLoader cl = URLClassLoader.newInstance(urls);
+//        Class<? extends Simulation> returnClass = null;
+//        
+//        while(e.hasMoreElements())
+//        {
+//            JarEntry entry = (JarEntry) e.nextElement();
+//            if(entry.isDirectory() || !entry.getName().endsWith(".class"))
+//                continue;
+//            // -6 because of .class
+//            String className = entry.getName().substring(0, entry.getName().length() - 6);
+//            className = className.replace('/', '.');
+//            
+//            // Load it and return it if it's a simulation.
+//            try
+//            {
+//                JavaSim.getLogger().trace("Loading {}", className);
+//                if(targetClassName != null)
+//                {
+//                    if(className.equals(targetClassName))
+//                    {
+//                        Class<?> simClass = cl.loadClass(className);
+//                        if(!Simulation.class.isAssignableFrom(simClass))
+//                            throw new RuntimeException("The main class from " + INFO_FILE + ", " + targetClassName + ", does not extend Simulation");
+//                        returnClass = (Class<? extends Simulation>) simClass;
+//                    }
+//                }
+//                else
+//                {
+//                    Class<?> simClass = cl.loadClass(className);
+//                    if(Simulation.class.isAssignableFrom(simClass))
+//                    {
+//                        returnClass = (Class<? extends Simulation>) simClass;
+//                    }
+//                }
+//            }
+//            // Weird class files...?
+//            catch(Exception ex)
+//            {
+//                JavaSim.getLogger().error("Could not load classes from jar.", e);
+//            }
+//        }
+//        
+//        cl.close();
+//        jarFile.close();
+//        return returnClass;
+//    }
+    
     @SuppressWarnings("unchecked")
     public static Class<? extends Simulation> loadSimulationClass(File file, String targetClassName) throws IOException, ClassNotFoundException
     {
@@ -82,56 +141,26 @@ public class SimulationInfo implements Serializable
             JavaSim.getLogger().trace("Automatically searching for Simulation subclass in {}", file);
         else
             JavaSim.getLogger().trace("Searching for {} in {}", targetClassName, file);
+
+        URLClassLoader sysloader = (URLClassLoader) ClassLoader.getSystemClassLoader();
         
-        JarFile jarFile = new JarFile(file);
-        Enumeration<JarEntry> e = jarFile.entries();
-        
-        URL[] urls = { new URL("jar:file:" + file.getAbsolutePath() + "!/") };
-        URLClassLoader cl = URLClassLoader.newInstance(urls);
-        Class<? extends Simulation> returnClass = null;
-        
-        while(e.hasMoreElements())
+        try
         {
-            JarEntry entry = (JarEntry) e.nextElement();
-            if(entry.isDirectory() || !entry.getName().endsWith(".class"))
-                continue;
-            // -6 because of .class
-            String className = entry.getName().substring(0, entry.getName().length() - 6);
-            className = className.replace('/', '.');
-            
-            // Load it and return it if it's a simulation.
-            try
-            {
-                JavaSim.getLogger().trace("Loading {}", className);
-                if(targetClassName != null)
-                {
-                    if(className.equals(targetClassName))
-                    {
-                        Class<?> simClass = cl.loadClass(className);
-                        if(!Simulation.class.isAssignableFrom(simClass))
-                            throw new RuntimeException("The main class from " + INFO_FILE + ", " + targetClassName + ", does not extend Simulation");
-                        returnClass = (Class<? extends Simulation>) simClass;
-                    }
-                }
-                else
-                {
-                    Class<?> simClass = cl.loadClass(className);
-                    if(Simulation.class.isAssignableFrom(simClass))
-                    {
-                        returnClass = (Class<? extends Simulation>) simClass;
-                    }
-                }
-            }
-            // Weird class files...?
-            catch(Exception ex)
-            {
-                JavaSim.getLogger().error("Could not load classes from jar.", e);
-            }
+            Method method = URLClassLoader.class.getDeclaredMethod("addURL", new Class[] {URL.class});
+            method.setAccessible(true);
+            method.invoke(sysloader, new Object[] { file.toURI().toURL() });
         }
+        catch(Exception e)
+        {
+            JavaSim.getLogger().error("Error, could not add URL to system classloader.", e);
+        }
+
+        Class<?> simClass = sysloader.loadClass(targetClassName);
         
-        cl.close();
-        jarFile.close();
-        return returnClass;
+        if(!Simulation.class.isAssignableFrom(simClass))
+            throw new RuntimeException("The main class from " + INFO_FILE + ", " + targetClassName + ", does not extend Simulation");
+        
+        return (Class<? extends Simulation>) simClass;
     }
     
     private void setData(File file, String name, String main, String date, String author, String version, String description)
