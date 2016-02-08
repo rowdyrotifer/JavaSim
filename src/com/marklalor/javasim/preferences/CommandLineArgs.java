@@ -1,5 +1,7 @@
 package com.marklalor.javasim.preferences;
 
+import java.util.Arrays;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -15,7 +17,7 @@ public class CommandLineArgs
     private boolean consoleBind = true;
     private boolean useScreenMenuBar = true;
     
-    public CommandLineArgs(String[] args, ApplicationPreferences applicationPreferences)
+    public CommandLineArgs(String[] arguments, ApplicationPreferences applicationPreferences)
     {
         this.applicationPreferences = applicationPreferences;
         
@@ -24,13 +26,15 @@ public class CommandLineArgs
         // Define possible arguments.
         Options options = new Options();
         
+        JavaSim.getLogger().debug("String[] args = {}", Arrays.asList(arguments));
+        
         options.addOption("n", "noconsolebind", false, "Do not bind the logger to the console.");
         options.addOption(null, "noscreenmenubar", false, "Do not use the OS X menu bar.");
         
         try
         {
             // Parse arguments.
-            CommandLine cmd = parser.parse(options, args);
+            CommandLine cmd = parser.parse(options, arguments);
             
             consoleBind = !cmd.hasOption("noconsolebind");
             JavaSim.getLogger().debug("consoleBind: {}", consoleBind);

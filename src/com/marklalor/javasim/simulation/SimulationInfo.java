@@ -38,6 +38,7 @@ public class SimulationInfo implements Serializable
     
     public SimulationInfo(File jar)
     {
+        JavaSim.getLogger().debug("Creating simulation info from \"{}\"", jar.getAbsolutePath());
         JarFile jarfile = null;
         try
         {

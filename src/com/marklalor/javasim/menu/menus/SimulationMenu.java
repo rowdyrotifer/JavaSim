@@ -12,7 +12,6 @@ import com.marklalor.javasim.menu.MenuHeader;
 import com.marklalor.javasim.menu.MenuItem;
 import com.marklalor.javasim.simulation.Simulation;
 import com.marklalor.javasim.simulation.frames.FrameHolder;
-import com.sun.org.apache.bcel.internal.generic.GETSTATIC;
 
 public class SimulationMenu extends Menu
 {
