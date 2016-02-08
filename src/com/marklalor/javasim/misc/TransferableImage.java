@@ -1,4 +1,4 @@
-package com.marklalor.javasim.imaging;
+package com.marklalor.javasim.misc;
 
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
@@ -10,11 +10,12 @@ public class TransferableImage implements Transferable
 {
     private BufferedImage image;
     
-    public TransferableImage(BufferedImage i)
+    public TransferableImage(BufferedImage image)
     {
-        this.image = i;
+        this.image = image;
     }
     
+    @Override
     public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException
     {
         if(flavor.equals(DataFlavor.imageFlavor) && image != null)
@@ -23,6 +24,7 @@ public class TransferableImage implements Transferable
             throw new UnsupportedFlavorException(flavor);
     }
     
+    @Override
     public DataFlavor[] getTransferDataFlavors()
     {
         DataFlavor[] flavors = new DataFlavor[1];
@@ -30,6 +32,7 @@ public class TransferableImage implements Transferable
         return flavors;
     }
     
+    @Override
     public boolean isDataFlavorSupported(DataFlavor flavor)
     {
         DataFlavor[] flavors = getTransferDataFlavors();

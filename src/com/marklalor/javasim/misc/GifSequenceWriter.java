@@ -1,4 +1,4 @@
-package com.marklalor.javasim.imaging;
+package com.marklalor.javasim.misc;
 
 // 
 //  GifSequenceWriter.java
