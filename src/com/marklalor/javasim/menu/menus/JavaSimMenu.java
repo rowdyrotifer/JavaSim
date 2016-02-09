@@ -8,9 +8,9 @@ import javax.swing.JMenuItem;
 
 import com.marklalor.javasim.menu.Menu;
 import com.marklalor.javasim.menu.MenuHandler;
-import com.marklalor.javasim.menu.MenuHeader;
-import com.marklalor.javasim.menu.MenuItem;
 import com.marklalor.javasim.menu.MenuUtils;
+import com.marklalor.javasim.menu.annotations.MenuHeader;
+import com.marklalor.javasim.menu.annotations.MenuItem;
 import com.marklalor.javasim.simulation.Simulation;
 import com.marklalor.javasim.simulation.frames.FrameHolder;
 

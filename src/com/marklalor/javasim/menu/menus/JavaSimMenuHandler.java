@@ -5,13 +5,13 @@ import java.io.IOException;
 
 import javax.swing.JFrame;
 
-import com.marklalor.javasim.Home;
 import com.marklalor.javasim.JavaSim;
+import com.marklalor.javasim.home.Home;
 import com.marklalor.javasim.menu.MenuHandler;
 import com.marklalor.javasim.menu.MenuUtils;
 import com.marklalor.javasim.simulation.Simulation;
 import com.marklalor.javasim.simulation.frames.SubFrame;
-import com.marklalor.javasim.simulation.frames.image.Image;
+import com.marklalor.javasim.simulation.image.Image;
 
 public class JavaSimMenuHandler extends MenuHandler
 {

@@ -4,8 +4,8 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 
 import com.marklalor.javasim.simulation.Simulation;
-import com.marklalor.javasim.simulation.frames.image.DrawHandler;
-import com.marklalor.javasim.simulation.frames.image.ImageLayer;
+import com.marklalor.javasim.simulation.image.DrawHandler;
+import com.marklalor.javasim.simulation.image.ImageLayer;
 
 /**
  * <p>

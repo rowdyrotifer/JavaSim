@@ -11,8 +11,9 @@ import org.apache.log4j.PropertyConfigurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.marklalor.javasim.misc.OSXOpenFileHandler;
+import com.marklalor.javasim.home.Home;
 import com.marklalor.javasim.misc.TempFileShutdownHook;
+import com.marklalor.javasim.misc.osx.OSXOpenFileHandler;
 import com.marklalor.javasim.preferences.ApplicationPreferences;
 import com.marklalor.javasim.simulation.SimulationInfo;
 

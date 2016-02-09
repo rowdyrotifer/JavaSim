@@ -31,18 +31,18 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.apple.eawt.Application;
 import com.apple.eawt.FullScreenUtilities;
-import com.marklalor.javasim.Home;
 import com.marklalor.javasim.JavaSim;
-import com.marklalor.javasim.control.Control;
+import com.marklalor.javasim.home.Home;
 import com.marklalor.javasim.menu.menus.JavaSimMenu;
 import com.marklalor.javasim.menu.menus.JavaSimMenuHandler;
-import com.marklalor.javasim.misc.GifSequenceWriter;
-import com.marklalor.javasim.misc.TransferableImage;
+import com.marklalor.javasim.misc.image.GifSequenceWriter;
+import com.marklalor.javasim.misc.image.TransferableImage;
+import com.marklalor.javasim.simulation.control.Control;
 import com.marklalor.javasim.simulation.frames.FrameHolder;
-import com.marklalor.javasim.simulation.frames.image.Image;
 import com.marklalor.javasim.simulation.frames.subframes.Animate;
 import com.marklalor.javasim.simulation.frames.subframes.Controls;
 import com.marklalor.javasim.simulation.frames.subframes.Resize;
+import com.marklalor.javasim.simulation.image.Image;
 import com.marklalor.javasim.simulation.preset.BlankImageSimulation;
 
 /**

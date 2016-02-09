@@ -16,7 +16,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import com.marklalor.javasim.simulation.frames.SubFrame;
-import com.marklalor.javasim.simulation.frames.image.Image;
+import com.marklalor.javasim.simulation.image.Image;
 
 public class Resize extends SubFrame
 {

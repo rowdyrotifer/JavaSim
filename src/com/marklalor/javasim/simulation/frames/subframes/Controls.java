@@ -7,9 +7,9 @@ import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
 
-import com.marklalor.javasim.control.Control;
+import com.marklalor.javasim.simulation.control.Control;
 import com.marklalor.javasim.simulation.frames.SubFrame;
-import com.marklalor.javasim.simulation.frames.image.Image;
+import com.marklalor.javasim.simulation.image.Image;
 
 public class Controls extends SubFrame
 {

@@ -20,6 +20,8 @@ import javax.swing.JPopupMenu;
 import javax.swing.KeyStroke;
 
 import com.marklalor.javasim.JavaSim;
+import com.marklalor.javasim.menu.annotations.MenuHeader;
+import com.marklalor.javasim.menu.annotations.MenuItem;
 import com.marklalor.javasim.simulation.frames.FrameHolder;
 
 public abstract class Menu implements ActionListener
