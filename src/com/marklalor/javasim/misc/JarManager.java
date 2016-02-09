@@ -46,7 +46,7 @@ public class JarManager
             {
                 @SuppressWarnings("unchecked")
                 Class<? extends Simulation> simulationClass = (Class<? extends Simulation>) loadedMainClass;
-
+                
                 final Integer key = count;
                 count++;
                 

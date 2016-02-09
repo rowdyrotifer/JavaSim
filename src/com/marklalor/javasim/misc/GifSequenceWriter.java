@@ -17,12 +17,19 @@ package com.marklalor.javasim.misc;
 // Commons, 171 Second Street, Suite 300, San Francisco, California, 94105, USA.
 //
 
-import javax.imageio.*;
-import javax.imageio.metadata.*;
-import javax.imageio.stream.*;
-import java.awt.image.*;
-import java.io.*;
+import java.awt.image.RenderedImage;
+import java.io.IOException;
 import java.util.Iterator;
+
+import javax.imageio.IIOException;
+import javax.imageio.IIOImage;
+import javax.imageio.ImageIO;
+import javax.imageio.ImageTypeSpecifier;
+import javax.imageio.ImageWriteParam;
+import javax.imageio.ImageWriter;
+import javax.imageio.metadata.IIOMetadata;
+import javax.imageio.metadata.IIOMetadataNode;
+import javax.imageio.stream.ImageOutputStream;
 
 public class GifSequenceWriter
 {

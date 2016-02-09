@@ -6,6 +6,7 @@ import java.util.List;
 import com.apple.eawt.AppEvent;
 import com.apple.eawt.Application;
 import com.apple.eawt.OpenFilesHandler;
+
 import com.marklalor.javasim.JavaSim;
 
 public class OSXOpenFileHandler implements OpenFilesHandler
@@ -15,7 +16,7 @@ public class OSXOpenFileHandler implements OpenFilesHandler
     {
         List<File> files = e.getFiles();
         JavaSim.getLogger().info("OS X open: {}", files);
-        for (File file : files)
+        for(File file : files)
         {
             JavaSim.openFile(file);
         }
