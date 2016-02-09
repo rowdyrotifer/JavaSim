@@ -83,7 +83,8 @@
 			stubfile="osx/universalJavaApplicationStub"
 			bundleid="com.marklalor.javasim.JavaSim"
 			mainclass="com.marklalor.javasim.JavaSim"
-			jvmversion="1.7+" version="${version}"
+			jvmversion="1.7+"
+			version="${version}"
 			jar="dist/${filename}.jar"
 			copyright="JavaSim ${version}, © 2015–2016 Mark Lalor."
 			hiResCapable="true">
@@ -93,11 +94,18 @@
 				extensions="jsim"
 				role="Viewer"
 				iconfile="osx/jsim.icns"
-				utis="com.marklalor.jsim"/>
+				utis="com.marklalor.javasim"/>
 			<resourcefilelist dir=".">
 				<file name = "LICENSE.md" />
 			</resourcefilelist>
 		</jarbundler>
+		
+		<exec executable="rm">
+			<arg line="-rf /Applications/JavaSim.app" />
+		</exec>
+		<exec executable="cp">
+		    <arg line="-R dist/JavaSim.app /Applications/JavaSim.app" />
+		</exec>
 	</target>
 	
 	<target name="build_dmg" depends="build_osx">
@@ -105,16 +113,6 @@
 		<exec executable="/bin/sh">
 			<arg value="osx/build_dmg" />
 			<arg value="${version}" />
-		</exec>
-	</target>
-	<target name="run_jar">
-		<exec executable="open">
-			<arg value="dist/${filename}.jar" />
-		</exec>
-	</target>
-	<target name="run_osx">
-		<exec executable="open">
-			<arg value="dist/JavaSim.app" />
 		</exec>
 	</target>
 </project>
