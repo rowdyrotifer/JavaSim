@@ -15,10 +15,10 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-import com.marklalor.javasim.simulation.frames.SubFrame;
-import com.marklalor.javasim.simulation.image.Image;
+import com.marklalor.javasim.simulation.Simulation;
+import com.marklalor.javasim.simulation.frames.SimulationFrame;
 
-public class Resize extends SubFrame
+public class Resize extends SimulationFrame
 {
     // For preserving aspect ratio... if we didn't keep track of the initials,
     // and someone changed the numbers so that it went to (1, 1), then suddenly
@@ -32,17 +32,19 @@ public class Resize extends SubFrame
     private JCheckBox preserveAspectRatio;
     private JButton cancel, resize;
     
-    public Resize(Image image)
+    public Resize(Simulation simulation)
     {
-        super(image);
+        super(simulation);
+        
         getFrame().addComponentListener(new ComponentAdapter()
         {
             public void componentShown(ComponentEvent e)
             {
-                initialWidth = Resize.this.getImage().getSimulation().getImage().getWidth();
-                initialHeight = Resize.this.getImage().getSimulation().getImage().getHeight();
-                resizeWidth.setText(String.valueOf(initialWidth));
-                resizeHeight.setText(String.valueOf(initialHeight));
+                initialWidth = Resize.this.getSimulation().getImage().getSimulation().getImage().getWidth();
+                initialHeight = Resize.this.getSimulation().getImage().getSimulation().getImage().getHeight();
+                
+                Resize.this.resizeWidth.setText(String.valueOf(initialWidth));
+                Resize.this.resizeHeight.setText(String.valueOf(initialHeight));
             }
         });
         
@@ -60,8 +62,8 @@ public class Resize extends SubFrame
         preserveAspectRatio = new JCheckBox("Preserve Aspect Ratio");
         preserveAspectRatio.setSelected(false);
         
-        p1.add(SubFrame.labeledField("Width", resizeWidth, FILTER_INTEGER));
-        p1.add(SubFrame.labeledField("Height", resizeHeight, FILTER_INTEGER));
+        p1.add(SimulationFrame.labeledField("Width", resizeWidth, FILTER_INTEGER));
+        p1.add(SimulationFrame.labeledField("Height", resizeHeight, FILTER_INTEGER));
         p1.add(preserveAspectRatio);
         getFrame().add(p1);
         
@@ -73,7 +75,7 @@ public class Resize extends SubFrame
             @Override
             public void actionPerformed(ActionEvent e)
             {
-                Resize.this.getImage().setSize(getResizeWidth(), getResizeHeight());
+                Resize.this.getSimulation().getImage().setImageSize(getResizeWidth(), getResizeHeight());
                 Resize.this.getFrame().setVisible(false);
             }
         });

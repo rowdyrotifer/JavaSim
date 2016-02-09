@@ -7,17 +7,17 @@ import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
 
+import com.marklalor.javasim.simulation.Simulation;
 import com.marklalor.javasim.simulation.control.Control;
-import com.marklalor.javasim.simulation.frames.SubFrame;
-import com.marklalor.javasim.simulation.image.Image;
+import com.marklalor.javasim.simulation.frames.SimulationFrame;
 
-public class Controls extends SubFrame
+public class Controls extends SimulationFrame
 {
     private Map<String, Control<?>> controls;
     
-    public Controls(Image image)
+    public Controls(Simulation simulation)
     {
-        super(image);
+        super(simulation);
         this.controls = new HashMap<String, Control<?>>();
         getFrame().setTitle("Controls");
         getFrame().getContentPane().setLayout(new BoxLayout(getFrame().getContentPane(), BoxLayout.Y_AXIS));

@@ -24,10 +24,9 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.marklalor.javasim.simulation.Simulation;
 import com.marklalor.javasim.simulation.control.Control;
-import com.marklalor.javasim.simulation.frames.SubFrame;
-import com.marklalor.javasim.simulation.image.Image;
+import com.marklalor.javasim.simulation.frames.SimulationFrame;
 
-public class Animate extends SubFrame
+public class Animate extends SimulationFrame
 {
     private JTextField startN, stopN;
     private JCheckBox startFromBeginning, stopAtBreakpoint;
@@ -47,9 +46,9 @@ public class Animate extends SubFrame
     private JPanel normalTab, variableTab;
     private JTabbedPane tabbledPane;
     
-    public Animate(Image image)
+    public Animate(Simulation simulation)
     {
-        super(image);
+        super(simulation);
         getFrame().setTitle("Animation Options");
         getFrame().getContentPane().setLayout(new BoxLayout(getFrame().getContentPane(), BoxLayout.Y_AXIS));
         
@@ -68,8 +67,8 @@ public class Animate extends SubFrame
         stopDelay = new JTextField(4);
         stopDelay.setHorizontalAlignment(JTextField.CENTER);
         stopDelay.setText("10");
-        p3.add(SubFrame.labeledField("Initial Frame Delay (ms)", startDelay, FILTER_INTEGER));
-        p3.add(SubFrame.labeledField("End Frame Delay (ms)", stopDelay, FILTER_INTEGER));
+        p3.add(SimulationFrame.labeledField("Initial Frame Delay (ms)", startDelay, FILTER_INTEGER));
+        p3.add(SimulationFrame.labeledField("End Frame Delay (ms)", stopDelay, FILTER_INTEGER));
         getFrame().add(p3);
         
         // Row 3
@@ -77,11 +76,11 @@ public class Animate extends SubFrame
         frameDelay = new JTextField(4);
         frameDelay.setHorizontalAlignment(JTextField.CENTER);
         frameDelay.setText("10");
-        p4.add(SubFrame.labeledField("Intermediate Frame Delay (ms)", frameDelay, FILTER_INTEGER));
+        p4.add(SimulationFrame.labeledField("Intermediate Frame Delay (ms)", frameDelay, FILTER_INTEGER));
         saveEvery = new JTextField(2);
         saveEvery.setHorizontalAlignment(JTextField.CENTER);
         saveEvery.setText("5");
-        p4.add(SubFrame.labeledField("Save Every…", saveEvery, FILTER_INTEGER));
+        p4.add(SimulationFrame.labeledField("Save Every…", saveEvery, FILTER_INTEGER));
         loop = new JCheckBox("Loop");
         loop.setSelected(true);
         p4.add(loop);
@@ -93,7 +92,7 @@ public class Animate extends SubFrame
         JPanel p5 = new JPanel();
         fileLocation = new JTextField(20);
         fileLocation.setText(getDefaultText());
-        p5.add(SubFrame.labeledField("File: ", fileLocation, FILTER_NONE));
+        p5.add(SimulationFrame.labeledField("File: ", fileLocation, FILTER_NONE));
         browseFile = new JButton("Browse…");
         browseFile.addActionListener(new ActionListener()
         {
@@ -138,12 +137,12 @@ public class Animate extends SubFrame
             {
                 if(tabbledPane.getSelectedComponent().equals(normalTab))
                 {
-                    Animate.this.getImage().getSimulation().animate();
+                    Animate.this.getSimulation().animate();
                     Animate.this.getFrame().setVisible(false);
                 }
                 else if(tabbledPane.getSelectedComponent().equals(variableTab))
                 {
-                    Animate.this.getImage().getSimulation().animateVariable();
+                    Animate.this.getSimulation().animateVariable();
                     Animate.this.getFrame().setVisible(false);
                 }
             }
@@ -185,8 +184,8 @@ public class Animate extends SubFrame
         stopN.setHorizontalAlignment(JTextField.CENTER);
         stopN.setText("auto");
         stopN.setEnabled(false);
-        p1.add(SubFrame.labeledField("First Frame", startN, FILTER_INTEGER));
-        p1.add(SubFrame.labeledField("Last Frame", stopN, FILTER_INTEGER));
+        p1.add(SimulationFrame.labeledField("First Frame", startN, FILTER_INTEGER));
+        p1.add(SimulationFrame.labeledField("Last Frame", stopN, FILTER_INTEGER));
         normal.add(p1);
         
         // Row 2
@@ -242,18 +241,12 @@ public class Animate extends SubFrame
     private JPanel createVariableTab()
     {
         JPanel variable = new JPanel();
-        addedControls = new ArrayList<Control<?>>(getImage().getSimulation().getControls().getControls().size()); // should
-                                                                                                                  // be
-                                                                                                                  // able
-                                                                                                                  // to
-                                                                                                                  // know
-                                                                                                                  // max
-                                                                                                                  // length.
+        addedControls = new ArrayList<Control<?>>(getSimulation().getControls().getControls().size()); // should be able to know max length
         
         // Normal
         variable.setLayout(new BoxLayout(variable, BoxLayout.Y_AXIS));
         
-        Map<String, Control<?>> controls = getImage().getSimulation().getControls().getControls();
+        Map<String, Control<?>> controls = getSimulation().getControls().getControls();
         
         String[] keys = new String[controls.keySet().size()];
         List<String> keyList = new ArrayList<String>(controls.keySet());
@@ -271,7 +264,7 @@ public class Animate extends SubFrame
             @Override
             public void actionPerformed(ActionEvent e)
             {
-                Control<?> newControl = Animate.this.getImage().getSimulation().getControls().getControls().get(String.valueOf(Animate.this.controlSelection.getSelectedItem()));
+                Control<?> newControl = Animate.this.getSimulation().getControls().getControls().get(String.valueOf(Animate.this.controlSelection.getSelectedItem()));
                 JPanel controlPanel = newControl.createAnimatePanel();
                 if(controlPanel != null)
                 {
@@ -302,7 +295,7 @@ public class Animate extends SubFrame
     
     private String getDefaultText()
     {
-        return new File(this.getImage().getSimulation().getContentDirectory(), "animation_" + Simulation.getTimestamp() + ".gif").getAbsolutePath();
+        return new File(getSimulation().getContentDirectory(), "animation_" + Simulation.getTimestamp() + ".gif").getAbsolutePath();
     }
     
     public int getStartFrame()

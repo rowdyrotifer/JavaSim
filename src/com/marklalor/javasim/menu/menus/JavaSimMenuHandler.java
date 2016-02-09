@@ -10,7 +10,7 @@ import com.marklalor.javasim.home.Home;
 import com.marklalor.javasim.menu.MenuHandler;
 import com.marklalor.javasim.menu.MenuUtils;
 import com.marklalor.javasim.simulation.Simulation;
-import com.marklalor.javasim.simulation.frames.SubFrame;
+import com.marklalor.javasim.simulation.frames.SimulationFrame;
 import com.marklalor.javasim.simulation.image.Image;
 
 public class JavaSimMenuHandler extends MenuHandler
@@ -105,11 +105,11 @@ public class JavaSimMenuHandler extends MenuHandler
         else
         {
             getMenu().getFrameHolder().getFrame().setVisible(false);
-            if (getMenu().getFrameHolder() instanceof SubFrame)
+            if (getMenu().getFrameHolder() instanceof SimulationFrame)
             {
-                SubFrame subFrame = (SubFrame)getMenu().getFrameHolder();
-                subFrame.getImage().getFrame().toFront();
-                subFrame.getImage().getFrame().requestFocus();
+                SimulationFrame subFrame = (SimulationFrame)getMenu().getFrameHolder();
+                subFrame.getSimulation().getImage().getFrame().toFront();
+                subFrame.getSimulation().getImage().getFrame().requestFocus();
             }
         }
     }

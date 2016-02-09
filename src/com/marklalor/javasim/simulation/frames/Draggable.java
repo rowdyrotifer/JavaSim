@@ -7,7 +7,7 @@ import java.awt.geom.Point2D;
 
 import javax.swing.JFrame;
 
-public class Draggable implements FrameHolder
+public abstract class Draggable implements FrameHolder
 {
     private JFrame frame;
     

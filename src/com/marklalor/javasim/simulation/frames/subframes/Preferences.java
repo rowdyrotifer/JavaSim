@@ -1,12 +1,12 @@
 package com.marklalor.javasim.simulation.frames.subframes;
 
-import com.marklalor.javasim.simulation.frames.SubFrame;
-import com.marklalor.javasim.simulation.image.Image;
+import com.marklalor.javasim.simulation.Simulation;
+import com.marklalor.javasim.simulation.frames.SimulationFrame;
 
-public class Preferences extends SubFrame
+public class Preferences extends SimulationFrame
 {
-    public Preferences(Image image)
+    public Preferences(Simulation simulation)
     {
-        super(image);
+        super(simulation);
     }
 }

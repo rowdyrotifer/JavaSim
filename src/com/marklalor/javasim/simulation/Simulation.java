@@ -211,12 +211,12 @@ public abstract class Simulation implements ClipboardOwner
         
         // Create and set up the main image that goes with this simulation.
         image = new Image(this);
-        image.setSize(DEFAULT_IMAGE_WIDTH, DEFAULT_IMAGE_HEIGHT);
+        image.setImageSize(DEFAULT_IMAGE_WIDTH, DEFAULT_IMAGE_HEIGHT);
         image.getFrame().setLocationRelativeTo(null);
         refreshTitle();
         
         // Create and set up the main control panel for this simulation.
-        controls = new Controls(getImage());
+        controls = new Controls(this);
         controls.setSize(DEFAULT_CONTROL_WIDTH, DEFAULT_CONTROL_HEIGHT); // TODO: add more wrapper methods (only for
                                                                          // appropriate methods, though...)
         controls.getFrame().setLocationRelativeTo(getImage().getFrame());
@@ -233,7 +233,7 @@ public abstract class Simulation implements ClipboardOwner
 //        }
         
         // Other dialogs.
-        resize = new Resize(getImage());
+        resize = new Resize(this);
         
         // Make the general, manual animation timer.
         timerManual = new Timer(0, new ActionListener()
@@ -344,7 +344,7 @@ public abstract class Simulation implements ClipboardOwner
         addMenuTo(getResize());
         
         // Set sizes to the default dimensions
-        getImage().setSize(DEFAULT_IMAGE_WIDTH, DEFAULT_IMAGE_HEIGHT);
+        getImage().setImageSize(DEFAULT_IMAGE_WIDTH, DEFAULT_IMAGE_HEIGHT);
         
         if(System.getProperty("os.name").toLowerCase().startsWith("mac os x"))
         {
@@ -373,7 +373,7 @@ public abstract class Simulation implements ClipboardOwner
     public void postInitialize()
     {
         // Relies on what the user initializes for animating over a variable.
-        animate = new Animate(getImage());
+        animate = new Animate(this);
         addMenuTo(getAnimate());
     }
     

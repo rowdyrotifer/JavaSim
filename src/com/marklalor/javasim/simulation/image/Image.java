@@ -174,7 +174,7 @@ public class Image extends Draggable
         return simulation;
     }
     
-    public void setSize(int width, int height)
+    public void setImageSize(int width, int height)
     {
         setSize(new Dimension(width, height));
     }
@@ -194,7 +194,7 @@ public class Image extends Draggable
     
     public void setWidth(int width)
     {
-        setSize(width, getHeight());
+        setImageSize(width, getHeight());
     }
     
     public int getWidth()
@@ -204,7 +204,7 @@ public class Image extends Draggable
     
     public void setHeight(int height)
     {
-        setSize(getWidth(), height);
+        setImageSize(getWidth(), height);
     }
     
     public int getHeight()

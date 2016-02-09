@@ -10,24 +10,21 @@ import javax.swing.JTextField;
 import javax.swing.text.PlainDocument;
 
 import com.marklalor.javasim.misc.filter.IntegerFilter;
-import com.marklalor.javasim.simulation.image.Image;
+import com.marklalor.javasim.simulation.Simulation;
 
-public class SubFrame implements FrameHolder
+public class SimulationFrame implements FrameHolder, SimulationHolder
 {
     private JFrame frame;
-    private Image image;
+    private Simulation simulation;
     
-    public SubFrame(Image image)
+    public SimulationFrame(Simulation simulation)
     {
-        this.frame = new JFrame();
-        this.frame.setAutoRequestFocus(false);
-        this.image = image;
+        setFrame(new JFrame());
+        getFrame().setAutoRequestFocus(false);
+        setSimulation(simulation);
     }
     
-    public Image getImage()
-    {
-        return image;
-    }
+    //TODO: use preferredSize/pack.
     
     public void setSize(int width, int height)
     {
@@ -67,5 +64,17 @@ public class SubFrame implements FrameHolder
     public void setFrame(JFrame frame)
     {
         this.frame = frame;
+    }
+    
+    @Override
+    public Simulation getSimulation()
+    {
+        return simulation;
+    }
+
+    @Override
+    public void setSimulation(Simulation simulation)
+    {
+        this.simulation = simulation;
     }
 }
