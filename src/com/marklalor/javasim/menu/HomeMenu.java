@@ -122,7 +122,7 @@ public class HomeMenu implements ActionListener
         }
         else if(e.getSource() == showConsole)
         {
-            getHome().getConsole().setVisible(true);
+            getHome().getConsole().getFrame().setVisible(true);
         }
     }
     

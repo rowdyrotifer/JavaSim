@@ -4,7 +4,14 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -18,14 +25,22 @@ import com.marklalor.javasim.simulation.frames.FrameHolder;
 public abstract class Menu implements ActionListener
 {
     private FrameHolder frameHolder;
-    private MenuHandler menuHandler;
+    private List<MenuHandler> menuHandlers;
+    private Map<JMenuItem, Entry<Method, MenuHandler>> menuItemMappings;
     private JMenuBar menuBar;
     
-    public void createMenu(FrameHolder frameHolder, MenuHandler menuHandler)
+    public Menu(FrameHolder frameHolder, MenuHandler... menuHandlers)
     {
         this.frameHolder = frameHolder;
-        this.menuHandler = menuHandler;
-        this.menuHandler.setMenu(this);
+        
+        this.menuHandlers = new ArrayList<MenuHandler>();
+        this.menuItemMappings = new HashMap<JMenuItem, Entry<Method, MenuHandler>>();
+        
+        for (MenuHandler menuHandler : menuHandlers)
+        {
+            menuHandler.setMenu(this);
+            this.menuHandlers.add(menuHandler);
+        }
         
         this.menuBar = new JMenuBar();
         
@@ -69,8 +84,19 @@ public abstract class Menu implements ActionListener
                     menuItem.addActionListener(this);
                     
                     // Find the appropriate method from the given MenuHandler to deal with the action.
-                    Method methodWithSameNameAsMenuItem = menuHandler.getClass().getDeclaredMethod(fieldName, new Class[] {});
-                    menuHandler.mapMenuItemToMethod(menuItem, methodWithSameNameAsMenuItem);
+                    for(MenuHandler menuHandler : menuHandlers)
+                    {
+                        try
+                        {
+                            Method methodWithSameNameAsMenuItem = menuHandler.getClass().getDeclaredMethod(fieldName, new Class[] {});
+                            this.mapMenuItemToMethodAndInstance(menuItem, methodWithSameNameAsMenuItem, menuHandler);
+                            break;
+                        }
+                        catch(NoSuchMethodException e)
+                        {
+                            //On to the next...
+                        }
+                    }
                     
                     if(keyCode != MenuItem.NO_ACCELERATOR_KEYCODE)
                     {
@@ -91,12 +117,18 @@ public abstract class Menu implements ActionListener
                 }
             }
         }
-        catch(IllegalAccessException | SecurityException | IllegalArgumentException | NoSuchMethodException e)
+        catch(IllegalAccessException | SecurityException | IllegalArgumentException e)
         {
             JavaSim.getLogger().error("Error while resolving JMenuItem names. {}", e);
         }
     }
     
+    private void mapMenuItemToMethodAndInstance(JMenuItem menuItem, Method methodWithSameNameAsMenuItem, MenuHandler menuHandler)
+    {
+        Entry<Method, MenuHandler> value = new AbstractMap.SimpleEntry<Method, MenuHandler>(methodWithSameNameAsMenuItem, menuHandler);
+        menuItemMappings.put(menuItem, value);
+    }
+
     private void createMenuHeaders()
     {
         try
@@ -135,6 +167,7 @@ public abstract class Menu implements ActionListener
                             menu.addSeparator();
                     }
                     
+                    field.set(this, menu);
                     menuBar.add(menu);
                 }
             }
@@ -163,7 +196,24 @@ public abstract class Menu implements ActionListener
     public void actionPerformed(ActionEvent e)
     {
         JavaSim.getLogger().info("{}\u2192{}", ((JMenu) ((JPopupMenu) ((JMenuItem) e.getSource()).getParent()).getInvoker()).getText(), ((JMenuItem) e.getSource()).getText());
-        menuHandler.action(e);
+        
+        Entry<Method, MenuHandler> hit = menuItemMappings.get(e.getSource());
+        
+        if (hit != null)
+        {
+            Method method = hit.getKey();
+            MenuHandler menuHandler = hit.getValue();
+            try
+            {
+                method.invoke(menuHandler, new Object[]{});
+            }
+            catch(IllegalAccessException | IllegalArgumentException | InvocationTargetException e1)
+            {
+                JavaSim.getLogger().error("Could not invoke menu handler method.", e);
+            }
+        }
+        else
+            JavaSim.getLogger().debug("No menu handler method found for this menu item.");
     }
     
     public FrameHolder getFrameHolder()
@@ -176,10 +226,5 @@ public abstract class Menu implements ActionListener
         if (menuBar == null)
             throw new MenuAccessException("The menu bar has not yet been created. Call Menu#createMenu() at some point before this, such as in the subclass' constructor.");
         return menuBar;
-    }
-    
-    public MenuHandler getMenuHandler()
-    {
-        return menuHandler;
     }
 }

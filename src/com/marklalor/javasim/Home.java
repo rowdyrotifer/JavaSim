@@ -8,8 +8,8 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
@@ -27,7 +27,6 @@ import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JLayeredPane;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -39,10 +38,11 @@ import org.apache.log4j.LogManager;
 
 import apple.dts.samplecode.osxadapter.OSXAdapter;
 
-import com.marklalor.javasim.menu.HomeMenu;
+import com.marklalor.javasim.menu.menus.JavaSimMenu;
+import com.marklalor.javasim.menu.menus.JavaSimMenuHandler;
 import com.marklalor.javasim.misc.FileDropManager;
-import com.marklalor.javasim.misc.FileDropOverlay;
 import com.marklalor.javasim.misc.FileDropManager.Listener;
+import com.marklalor.javasim.misc.FileDropOverlay;
 import com.marklalor.javasim.misc.JarManager;
 import com.marklalor.javasim.preferences.ApplicationPreferences;
 import com.marklalor.javasim.simulation.Simulation;
@@ -59,23 +59,22 @@ public class Home implements ListSelectionListener, FrameHolder
     private JarManager jarManager;
     
     private List<SimulationInfo> simulations;
-    private JList<SimulationInfo> simulationList;
-    private JPanel simulationInfoPanel;
     
     private List<Simulation> activeSimulations;
     
-    private JLabel name, date, author, version, description;
-    private JButton run;
-    
-    private HomeMenu menu;
     private Console console;
     
-    // Top level JComponents. The JLayeredPane holds main, which contains all the normal content of the home screen
-    // Along with a FileDropOverlay JComponent that is shown on top of the main pane when a file is being dropped.
-    private JLayeredPane layeredPane;
-    private JPanel main;
-    private FileDropOverlay fileDropOverlay;
     
+    //Main panel.
+    private JPanel main;
+    //Simulation list.
+    private JList<SimulationInfo> simulationList;
+    //Info panel.
+    private JPanel simulationInfoPanel;
+    private JLabel name, date, author, version, description;
+    private JButton run;
+    //Overlay panel.
+    private FileDropOverlay fileDropOverlay;
     private boolean fileDropVisible;
     
     public Home(ApplicationPreferences preferences)
@@ -167,9 +166,9 @@ public class Home implements ListSelectionListener, FrameHolder
         JavaSim.getLogger().debug("Setting up Home layout.");
         
         this.frame = new JFrame("Java Simulation Home");
-        this.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        getFrame().setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         
-        layeredPane = this.frame.getLayeredPane();
+        getFrame().getLayeredPane();
         // Seperate into two layers: a main pane and a glass pane for the FileDropOverlay
         main = new JPanel();
         fileDropOverlay = new FileDropOverlay(this);
@@ -272,10 +271,9 @@ public class Home implements ListSelectionListener, FrameHolder
             
         });
         
-        layeredPane.add(main, Integer.valueOf(1));
-        layeredPane.add(fileDropOverlay, Integer.valueOf(2));
-        
-        layeredPane.addComponentListener(new ComponentListener()
+        getFrame().getLayeredPane().add(main, Integer.valueOf(1));
+        getFrame().getLayeredPane().add(fileDropOverlay, Integer.valueOf(2));
+        getFrame().getLayeredPane().addComponentListener(new ComponentAdapter()
         {
             @Override
             public void componentResized(ComponentEvent e)
@@ -283,28 +281,13 @@ public class Home implements ListSelectionListener, FrameHolder
                 Home.this.fileDropOverlay.setSize(Home.this.getFrame().getWidth(), Home.this.getFrame().getHeight());
                 Home.this.main.setSize(Home.this.getFrame().getWidth(), Home.this.getFrame().getHeight());
             }
-            
-            @Override
-            public void componentMoved(ComponentEvent e)
-            {
-            }
-            
-            @Override
-            public void componentShown(ComponentEvent e)
-            {
-            }
-            
-            @Override
-            public void componentHidden(ComponentEvent e)
-            {
-            }
         });
     }
     
     private void setUpMenu()
     {
         JavaSim.getLogger().debug("Setting up Home menu bar.");
-        menu = new HomeMenu(this);
+        JavaSimMenu menu = new JavaSimMenu(null, this, new JavaSimMenuHandler(this, null));
         this.getFrame().setJMenuBar(menu.getMenuBar());
     }
     
@@ -424,6 +407,11 @@ public class Home implements ListSelectionListener, FrameHolder
     public JarManager getJarManager()
     {
         return jarManager;
+    }
+    
+    public JList<SimulationInfo> getSimulationList()
+    {
+        return simulationList;
     }
     
     @Override

@@ -5,17 +5,38 @@ import java.io.IOException;
 
 import javax.swing.JFrame;
 
+import com.marklalor.javasim.Home;
 import com.marklalor.javasim.JavaSim;
 import com.marklalor.javasim.menu.MenuHandler;
+import com.marklalor.javasim.menu.MenuUtils;
 import com.marklalor.javasim.simulation.Simulation;
+import com.marklalor.javasim.simulation.frames.SubFrame;
+import com.marklalor.javasim.simulation.frames.image.Image;
 
-public class SimulationMenuHandler extends MenuHandler
+public class JavaSimMenuHandler extends MenuHandler
 {
     private Simulation simulation;
+    private Home home;
     
-    public SimulationMenuHandler(Simulation simulation)
+    public JavaSimMenuHandler(Home home, Simulation simulation)
+    {
+        this.home = home;
+        this.simulation = simulation;
+    }
+    
+    public void setHome(Home home)
+    {
+        this.home = home;
+    }
+    
+    public void setSimulation(Simulation simulation)
     {
         this.simulation = simulation;
+    }
+   
+    public Home getHome()
+    {
+        return home;
     }
     
     public Simulation getSimulation()
@@ -25,7 +46,7 @@ public class SimulationMenuHandler extends MenuHandler
     
     public void newSimulation()
     {
-        getSimulation().getHome().run(getSimulation().getInfo());
+        getHome().run(getSimulation().getInfo());
     }
     
     public void openSimulation()
@@ -45,8 +66,12 @@ public class SimulationMenuHandler extends MenuHandler
     
     public void animateMenuItem()
     {
-        getSimulation().getAnimate().getFrame().setLocationRelativeTo(getSimulation().getImage().getFrame());
-        getSimulation().getAnimate().getFrame().setVisible(true);
+        MenuUtils.showRelative(getSimulation().getAnimate(), getSimulation().getImage());
+    }
+    
+    public void refresh()
+    {
+        
     }
     
     public void openContentFolder()
@@ -65,7 +90,7 @@ public class SimulationMenuHandler extends MenuHandler
     {
         try
         {
-            Desktop.getDesktop().open(getSimulation().getHome().getApplicationPreferences().getSimulationsDirectory());
+            Desktop.getDesktop().open(getHome().getApplicationPreferences().getSimulationsDirectory());
         }
         catch(IOException e1)
         {
@@ -73,11 +98,25 @@ public class SimulationMenuHandler extends MenuHandler
         }
     }
     
-    public void closeSimulation()
+    public void close()
     {
-        JavaSim.getLogger().debug("Removing simulation on window (menu) close.");
-        getSimulation().getImage().getFrame().dispose();
-        JavaSim.getLogger().debug("Removed simulation on window (menu) close.");
+        if (getMenu().getFrameHolder() instanceof Image)
+            getMenu().getFrameHolder().getFrame().dispose();
+        else
+        {
+            getMenu().getFrameHolder().getFrame().setVisible(false);
+            if (getMenu().getFrameHolder() instanceof SubFrame)
+            {
+                SubFrame subFrame = (SubFrame)getMenu().getFrameHolder();
+                subFrame.getImage().getFrame().toFront();
+                subFrame.getImage().getFrame().requestFocus();
+            }
+        }
+    }
+    
+    public void closeAll()
+    {
+        JavaSim.getLogger().debug("Closing all simulations.");
     }
     
     public void print()
@@ -87,7 +126,7 @@ public class SimulationMenuHandler extends MenuHandler
     
     public void openProperties()
     {
-        getSimulation().getHome().openPreferences();
+        getHome().openPreferences();
     }
     
     public void copy()
@@ -135,14 +174,13 @@ public class SimulationMenuHandler extends MenuHandler
     
     public void reloadSimulation()
     {
-        getSimulation().getHome().run(getSimulation().getInfo());
+        getHome().run(getSimulation().getInfo());
         getSimulation().close();
     }
     
     public void resizeMenuItem()
     {
-        getSimulation().getResize().getFrame().setLocationRelativeTo(getSimulation().getImage().getFrame());
-        getSimulation().getResize().getFrame().setVisible(true);
+        MenuUtils.showRelative(getSimulation().getResize(), getSimulation().getImage());
     }
     
     public void fullscreen()
@@ -150,9 +188,21 @@ public class SimulationMenuHandler extends MenuHandler
         getSimulation().toggleFullscreen();
     }
     
-    public void showConsole()
+    public void home()
     {
-        getSimulation().getHome().getConsole().setVisible(true);
+        getHome().getFrame().setVisible(true);
+        getHome().getFrame().toFront();
+        getHome().getSimulationList().requestFocus();
+    }
+    
+    public void console()
+    {
+        MenuUtils.show(getHome().getConsole());
+    }
+    
+    public void controls()
+    {
+        MenuUtils.show(getSimulation().getControls());
     }
     
     public void minimize()

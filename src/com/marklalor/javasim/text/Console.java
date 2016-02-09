@@ -8,12 +8,15 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
 import com.marklalor.javasim.Home;
+import com.marklalor.javasim.menu.menus.JavaSimMenu;
+import com.marklalor.javasim.menu.menus.JavaSimMenuHandler;
 import com.marklalor.javasim.simulation.frames.FrameHolder;
 
-@SuppressWarnings("serial")
-public class Console extends JFrame implements FrameHolder
+public class Console implements FrameHolder
 {
     private Home home;
+    
+    private JFrame frame;
     
     private JTextArea textArea;
     
@@ -21,21 +24,24 @@ public class Console extends JFrame implements FrameHolder
     {
         this.home = home;
         
-        setTitle("JavaSim Console");
-        setSize(500, 500);
+        setFrame(new JFrame("JavaSim Console"));
+        getFrame().setSize(500, 500);
         
         textArea = new JTextArea();
         textArea.setEditable(false);
         
-        getContentPane().setLayout(new BorderLayout());
+        getFrame().getContentPane().setLayout(new BorderLayout());
         
         JScrollPane textAreaScrollPane = new JScrollPane(textArea);
         textAreaScrollPane.setBorder(BorderFactory.createEmptyBorder());
-        getContentPane().add(textAreaScrollPane, BorderLayout.CENTER);
-        setAutoRequestFocus(false);
+        getFrame().getContentPane().add(textAreaScrollPane, BorderLayout.CENTER);
+        getFrame().setAutoRequestFocus(false);
         
         if(!getHome().getApplicationPreferences().getConsoleBind())
             textArea.append("Logger not bound to this console.\nTo bind, run without the \"noconsolebind\" argument.");
+        
+        JavaSimMenu menu = new JavaSimMenu(null, this, new JavaSimMenuHandler(getHome(), null));
+        getFrame().setJMenuBar(menu.getMenuBar());
     }
     
     public Home getHome()
@@ -51,12 +57,12 @@ public class Console extends JFrame implements FrameHolder
     @Override
     public JFrame getFrame()
     {
-        return this;
+        return frame;
     }
     
     @Override
     public void setFrame(JFrame frame)
     {
-        throw new RuntimeException("Cannot change the home frame. This will be removed in the future, when home will HAVE a JFrame / will not BE a JFrame.");
+        this.frame = frame;
     }
 }

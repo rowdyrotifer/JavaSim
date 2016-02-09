@@ -57,6 +57,6 @@ public class HomeMenuHandler extends MenuHandler
     
     public void showConsole()
     {
-        getHome().getConsole().setVisible(true);
+        getHome().getConsole().getFrame().setVisible(true);
     }
 }

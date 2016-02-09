@@ -34,8 +34,8 @@ import com.apple.eawt.FullScreenUtilities;
 import com.marklalor.javasim.Home;
 import com.marklalor.javasim.JavaSim;
 import com.marklalor.javasim.control.Control;
-import com.marklalor.javasim.menu.menus.SimulationMenu;
-import com.marklalor.javasim.menu.menus.SimulationMenuHandler;
+import com.marklalor.javasim.menu.menus.JavaSimMenu;
+import com.marklalor.javasim.menu.menus.JavaSimMenuHandler;
 import com.marklalor.javasim.misc.GifSequenceWriter;
 import com.marklalor.javasim.misc.TransferableImage;
 import com.marklalor.javasim.simulation.frames.FrameHolder;
@@ -65,7 +65,6 @@ public abstract class Simulation implements ClipboardOwner
 {
     public static final int DEFAULT_IMAGE_WIDTH = 500, DEFAULT_IMAGE_HEIGHT = 500;
     public static final int DEFAULT_CONTROL_WIDTH = 100, DEFAULT_CONTROL_HEIGHT = 500;
-    public static final int DEFAULT_CONSOLE_WIDTH = 400, DEFAULT_CONSOLE_HEIGHT = 500;
     
     private Home home;
     private SimulationInfo info;
@@ -76,7 +75,7 @@ public abstract class Simulation implements ClipboardOwner
     private boolean fullscreen = false;
     
     // Misc Main stucture;
-    private List<SimulationMenu> menus;
+    private List<JavaSimMenu> menus;
     
     // Main Frames
     private Image image;
@@ -223,14 +222,15 @@ public abstract class Simulation implements ClipboardOwner
         controls.getFrame().setLocationRelativeTo(getImage().getFrame());
         controls.getFrame().setLocation(getControls().getFrame().getLocation().x - (getImage().getFrame().getWidth() / 2) - (getControls().getFrame().getWidth() / 2), getImage().getFrame().getY());
         
+        //TODO: keeping comment for reference for now, useful to position console.
         // Reposition the console (but skip if the console is not bound)
-        if(getHome().getApplicationPreferences().getConsoleBind())
-        {
-            getHome().getConsole().setSize(DEFAULT_CONSOLE_WIDTH, DEFAULT_CONSOLE_HEIGHT);
-            getHome().getConsole().setLocationRelativeTo(getImage().getFrame());
-            getHome().getConsole().setLocation(getHome().getConsole().getLocation().x + (getImage().getFrame().getWidth() / 2) + (getHome().getConsole().getWidth() / 2), getImage().getFrame().getY());
-            getHome().getConsole().setVisible(true);
-        }
+//        if(getHome().getApplicationPreferences().getConsoleBind())
+//        {
+//            getHome().getConsole().getFrame().setSize(DEFAULT_CONSOLE_WIDTH, DEFAULT_CONSOLE_HEIGHT);
+//            getHome().getConsole().getFrame().setLocationRelativeTo(getImage().getFrame());
+//            getHome().getConsole().getFrame().setLocation(getHome().getConsole().getLocation().x + (getImage().getFrame().getWidth() / 2) + (getHome().getConsole().getWidth() / 2), getImage().getFrame().getY());
+//            getHome().getConsole().getFrame().setVisible(true);
+//        }
         
         // Other dialogs.
         resize = new Resize(getImage());
@@ -338,12 +338,10 @@ public abstract class Simulation implements ClipboardOwner
         // menu2 = new Menu(this);
         // getAnimate().setJMenuBar(menu2.getMenuBar());
         
-        menus = new ArrayList<SimulationMenu>();
+        menus = new ArrayList<JavaSimMenu>();
         addMenuTo(getImage());
         addMenuTo(getControls());
         addMenuTo(getResize());
-        addMenuTo(home.getConsole()); // TODO: this is not appropriate, it should just recognize the most recently
-                                      // active simulation.
         
         // Set sizes to the default dimensions
         getImage().setSize(DEFAULT_IMAGE_WIDTH, DEFAULT_IMAGE_HEIGHT);
@@ -401,7 +399,7 @@ public abstract class Simulation implements ClipboardOwner
     
     private void addMenuTo(FrameHolder frameHoldingInstance)
     {
-        SimulationMenu menu = new SimulationMenu(this, frameHoldingInstance, new SimulationMenuHandler(this));
+        JavaSimMenu menu = new JavaSimMenu(this, frameHoldingInstance, new JavaSimMenuHandler(getHome(), this));
         menus.add(menu);
         frameHoldingInstance.getFrame().setJMenuBar(menu.getMenuBar());
     }
