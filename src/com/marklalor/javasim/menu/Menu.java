@@ -159,7 +159,6 @@ public abstract class Menu implements ActionListener
                     {
                         if(!child.equals(MenuHeader.SEPERATOR))
                         {
-                            JavaSim.getLogger().debug("Getting field {} from class {}.", child, this.getClass().getCanonicalName());
                             Field menuItemField = this.getClass().getDeclaredField(child);
                             menuItemField.setAccessible(true);
                             JMenuItem item = (JMenuItem) menuItemField.get(this);
