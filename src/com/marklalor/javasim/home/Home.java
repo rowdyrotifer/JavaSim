@@ -36,16 +36,14 @@ import javax.swing.event.ListSelectionListener;
 
 import org.apache.log4j.LogManager;
 
-import apple.dts.samplecode.osxadapter.OSXAdapter;
-
 import com.marklalor.javasim.JavaSim;
 import com.marklalor.javasim.console.Console;
 import com.marklalor.javasim.console.JavaSimConsoleAppender;
 import com.marklalor.javasim.menu.menus.JavaSimMenu;
 import com.marklalor.javasim.menu.menus.JavaSimMenuHandler;
 import com.marklalor.javasim.misc.filedrop.FileDropManager;
-import com.marklalor.javasim.misc.filedrop.FileDropOverlay;
 import com.marklalor.javasim.misc.filedrop.FileDropManager.Listener;
+import com.marklalor.javasim.misc.filedrop.FileDropOverlay;
 import com.marklalor.javasim.preferences.ApplicationPreferences;
 import com.marklalor.javasim.simulation.Simulation;
 import com.marklalor.javasim.simulation.SimulationInfo;
@@ -85,8 +83,6 @@ public class Home implements ListSelectionListener, FrameHolder
         this.setUpConsole();
         this.loadSimulations();
         this.setUpLayout();
-        if(getApplicationPreferences().isMacOSX())
-            this.setUpOSXMenuHandlers();
         this.setUpMenu();
     }
     
@@ -106,36 +102,6 @@ public class Home implements ListSelectionListener, FrameHolder
         
         JavaSim.getLogger().info("Console started.");
         JavaSim.getLogger().info("JavaSim version: {}", JavaSim.getVersion());
-    }
-    
-    private void setUpOSXMenuHandlers()
-    {
-        // Set up OSX preferences handler
-        try
-        {
-            OSXAdapter.setPreferencesHandler(this, this.getClass().getMethod("openPreferences", (Class[]) null));
-        }
-        catch(SecurityException e)
-        {
-            JavaSim.getLogger().error("SecurityException while trying to set OSXAdapter preferences handler.", e);
-        }
-        catch(NoSuchMethodException e)
-        {
-            JavaSim.getLogger().error("NoSuchMethodException while trying to set OSXAdapter preferences handler.", e);
-        }
-        
-        try
-        {
-            OSXAdapter.setQuitHandler(this, this.getClass().getMethod("quit", (Class[]) null));
-        }
-        catch(SecurityException e)
-        {
-            JavaSim.getLogger().error("SecurityException while trying to set OSXAdapter preferences handler.", e);
-        }
-        catch(NoSuchMethodException e)
-        {
-            JavaSim.getLogger().error("NoSuchMethodException while trying to set OSXAdapter preferences handler.", e);
-        }
     }
     
     private static final FilenameFilter jarFilter = new FilenameFilter()
@@ -394,6 +360,11 @@ public class Home implements ListSelectionListener, FrameHolder
         }
         
         this.getFrame().dispose();
+    }
+    
+    public List<Simulation> getActiveSimulations()
+    {
+        return activeSimulations;
     }
     
     public void removeSimulation(Simulation simulation)

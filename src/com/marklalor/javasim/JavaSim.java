@@ -13,35 +13,31 @@ import org.slf4j.LoggerFactory;
 
 import com.marklalor.javasim.home.Home;
 import com.marklalor.javasim.misc.TempFileShutdownHook;
-import com.marklalor.javasim.misc.osx.OSXOpenFileHandler;
+import com.marklalor.javasim.misc.osx.OSXUtils;
 import com.marklalor.javasim.preferences.ApplicationPreferences;
-import com.marklalor.javasim.simulation.SimulationInfo;
 
 public class JavaSim
 {
     private static Logger logger;
     private static Home home;
     
-    public static Logger getLogger()
-    {
-        return logger;
-    }
-    
     public static void main(final String[] arguments)
     {
         initializeLogger();
         setNativeSystemLookAndFeel();
         
-        JavaSim.getLogger().debug("Opening Home normally.");
         SwingUtilities.invokeLater(new Runnable()
         {
             @Override
             public void run()
             {
-                OSXOpenFileHandler.register();
                 // Create the preferences object (it will let us detect the
                 // OS cleanly to find the OS-dependent preferences file).
                 ApplicationPreferences preferences = createApplicationPreferences(arguments);
+                
+                //This one seems to need to be registered earlier.
+                if (preferences.isMacOSX())
+                    OSXUtils.registerFullyQualifiedClassName("com.marklalor.javasim.misc.osx.OSXOpenFilesHandler");
                 
                 // Use OS X native menu bar (should pretty much always be yes, only disable to debug).
                 if(preferences.getUseScreenMenuBar())
@@ -53,6 +49,16 @@ public class JavaSim
                 home = new Home(preferences);
                 home.getFrame().setSize(800, 500);
                 home.getFrame().setVisible(true);
+                
+                //Might as well register these ones later because at least at this point in the thread we KNOW home has been initialized.
+                if (preferences.isMacOSX())
+                {
+                    OSXUtils.registerFullyQualifiedClassName("com.marklalor.javasim.misc.osx.OSXPreferencesHandler");
+                    OSXUtils.registerFullyQualifiedClassName("com.marklalor.javasim.misc.osx.OSXAppReOpenedHandler");
+                    OSXUtils.registerFullyQualifiedClassName("com.marklalor.javasim.misc.osx.OSXQuitHandler");
+                    //No need for this just yet... the default apple one is good for now.
+                    //OSXUtils.registerfullyQualifiedClassName("com.marklalor.javasim.misc.osx.OSXAboutHandler");
+                }
             }
         });
     }
@@ -125,21 +131,13 @@ public class JavaSim
         return JavaSim.class.getPackage().getSpecificationVersion();
     }
     
+    public static Logger getLogger()
+    {
+        return logger;
+    }
+    
     public static Home getHome()
     {
         return home;
-    }
-    
-    public static void openFile(final File file)
-    {
-        SwingUtilities.invokeLater(new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                JavaSim.getLogger().debug("Running opened simulation from initialized Home.");
-                home.run(new SimulationInfo(file));
-            }
-        });
     }
 }

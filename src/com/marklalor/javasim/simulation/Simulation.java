@@ -731,4 +731,9 @@ public abstract class Simulation implements ClipboardOwner
             JavaSim.getLogger().error("Could not print temporary image.", e);
         }
     }
+    
+    public boolean isCreatingAnimation()
+    {
+        return timerAnimation.isRunning() || timerAnimationVariable.isRunning();
+    }
 }

@@ -80,9 +80,9 @@ public class JavaSimMenuHandler extends MenuHandler
         {
             Desktop.getDesktop().open(getSimulation().getContentDirectory());
         }
-        catch(IOException e1)
+        catch(IOException e)
         {
-            JavaSim.getLogger().error("Could not open content folder on native system.", e1);
+            JavaSim.getLogger().error("Could not open content folder on native system.", e);
         }
     }
     
