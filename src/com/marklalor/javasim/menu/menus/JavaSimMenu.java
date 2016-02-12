@@ -75,7 +75,7 @@ public class JavaSimMenu extends Menu implements SimulationHolder, HomeHolder
     // FILE
     @MenuItem(text = "New Simulation", keyCode = KeyEvent.VK_N, keyModifiers = { MenuItem.COMMAND_OR_CONTROL })
     private JMenuItem newSimulation;
-    @MenuItem(text = "Open Simulation", keyCode = KeyEvent.VK_O, keyModifiers = { MenuItem.COMMAND_OR_CONTROL })
+    @MenuItem(text = "Open Simulation...", keyCode = KeyEvent.VK_O, keyModifiers = { MenuItem.COMMAND_OR_CONTROL })
     private JMenuItem openSimulation;
     @MenuItem(text = "Close", keyCode = KeyEvent.VK_W, keyModifiers = { MenuItem.COMMAND_OR_CONTROL })
     private JMenuItem close;
@@ -83,9 +83,9 @@ public class JavaSimMenu extends Menu implements SimulationHolder, HomeHolder
     private JMenuItem closeAll;
     @MenuItem(text = "Save Image", keyCode = KeyEvent.VK_S, keyModifiers = { MenuItem.COMMAND_OR_CONTROL })
     private JMenuItem saveImage;
-    @MenuItem(text = "Save Image As", keyCode = KeyEvent.VK_S, keyModifiers = { MenuItem.COMMAND_OR_CONTROL, Event.SHIFT_MASK })
+    @MenuItem(text = "Save Image As...", keyCode = KeyEvent.VK_S, keyModifiers = { MenuItem.COMMAND_OR_CONTROL, Event.SHIFT_MASK })
     private JMenuItem saveImageAs;
-    @MenuItem(text = "Create Animated Gif", keyCode = KeyEvent.VK_I, keyModifiers = { MenuItem.COMMAND_OR_CONTROL })
+    @MenuItem(text = "Create Animated Gif...", keyCode = KeyEvent.VK_I, keyModifiers = { MenuItem.COMMAND_OR_CONTROL })
     private JMenuItem animateMenuItem;
     @MenuItem(text = "Refresh Simulations", keyCode = KeyEvent.VK_F5, keyModifiers = { MenuItem.COMMAND_OR_CONTROL })
     private JMenuItem refresh;
@@ -93,9 +93,9 @@ public class JavaSimMenu extends Menu implements SimulationHolder, HomeHolder
     private JMenuItem openHomeFolder;
     @MenuItem(text = "Open Content Folder", keyCode = KeyEvent.VK_D, keyModifiers = { MenuItem.COMMAND_OR_CONTROL, Event.SHIFT_MASK })
     private JMenuItem openContentFolder;
-    @MenuItem(text = "Print", keyCode = KeyEvent.VK_P, keyModifiers = { MenuItem.COMMAND_OR_CONTROL })
+    @MenuItem(text = "Print...", keyCode = KeyEvent.VK_P, keyModifiers = { MenuItem.COMMAND_OR_CONTROL })
     private JMenuItem print;
-    @MenuItem(text = "Properties", keyCode = KeyEvent.VK_W, keyModifiers = { MenuItem.COMMAND_OR_CONTROL })
+    @MenuItem(text = "Properties...", keyCode = KeyEvent.VK_W, keyModifiers = { MenuItem.COMMAND_OR_CONTROL })
     private JMenuItem openProperties;
     
     // EDIT

@@ -225,6 +225,7 @@ public class Home implements ListSelectionListener, FrameHolder
         
         simulationList.setSelectedIndex(0);
         
+        //TODO: Figure out the rest of this class... improve it (why should it make an instance...?)
         new FileDropManager(this, new Listener()
         {
             @Override
