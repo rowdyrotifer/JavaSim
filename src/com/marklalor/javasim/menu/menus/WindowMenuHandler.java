@@ -16,6 +16,9 @@ public class WindowMenuHandler extends MenuHandler<JavaSimMenu>
     
     public void console()
     {
+        getMenu().getHome().getConsole().getFrame().setLocationRelativeTo(getMenu().getFrameHolder().getFrame());
+        getMenu().getHome().getConsole().getFrame().setLocation(getMenu().getHome().getConsole().getFrame().getLocation().x + (getMenu().getFrameHolder().getFrame().getWidth() / 2) + (getMenu().getHome().getConsole().getFrame().getWidth() / 2), getMenu().getFrameHolder().getFrame().getY());
+        getMenu().getHome().getConsole().getFrame().setVisible(true);
         MenuUtils.show(getMenu().getHome().getConsole());
     }
     

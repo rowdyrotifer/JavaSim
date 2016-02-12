@@ -23,7 +23,8 @@ public class AnimationMenuHandler extends MenuHandler<JavaSimMenu>
     
     public void nextFrame()
     {
-        getMenu().getSimulation().draw();
+        getMenu().getSimulation().getImage().renderAggregateImage(false);
+        getMenu().getSimulation().getImage().repaint();
         getMenu().getSimulation().incrementFrameNumber();
     }
     

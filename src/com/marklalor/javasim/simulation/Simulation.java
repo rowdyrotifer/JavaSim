@@ -16,10 +16,8 @@ import java.awt.image.ColorModel;
 import java.awt.image.WritableRaster;
 import java.io.File;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
 import javax.imageio.ImageIO;
@@ -34,10 +32,12 @@ import com.apple.eawt.FullScreenUtilities;
 import com.marklalor.javasim.JavaSim;
 import com.marklalor.javasim.home.Home;
 import com.marklalor.javasim.menu.menus.JavaSimMenu;
+import com.marklalor.javasim.misc.MiscUtil;
 import com.marklalor.javasim.misc.image.GifSequenceWriter;
 import com.marklalor.javasim.misc.image.TransferableImage;
 import com.marklalor.javasim.simulation.control.Control;
 import com.marklalor.javasim.simulation.frames.FrameHolder;
+import com.marklalor.javasim.simulation.frames.HomeHolder;
 import com.marklalor.javasim.simulation.frames.subframes.Animate;
 import com.marklalor.javasim.simulation.frames.subframes.Controls;
 import com.marklalor.javasim.simulation.frames.subframes.Resize;
@@ -60,7 +60,7 @@ import com.marklalor.javasim.simulation.preset.BlankImageSimulation;
  * @see #reset()
  * @see #draw(Graphics2D, Graphics2D)
  */
-public abstract class Simulation implements ClipboardOwner
+public abstract class Simulation implements ClipboardOwner, HomeHolder
 {
     public static final int DEFAULT_IMAGE_WIDTH = 500, DEFAULT_IMAGE_HEIGHT = 500;
     public static final int DEFAULT_CONTROL_WIDTH = 100, DEFAULT_CONTROL_HEIGHT = 500;
@@ -72,9 +72,6 @@ public abstract class Simulation implements ClipboardOwner
     private File contentDirectory;
     
     private boolean fullscreen = false;
-    
-    // Misc Main stucture;
-    private List<JavaSimMenu> menus;
     
     // Main Frames
     private Image image;
@@ -212,7 +209,7 @@ public abstract class Simulation implements ClipboardOwner
         image = new Image(this);
         image.setImageSize(DEFAULT_IMAGE_WIDTH, DEFAULT_IMAGE_HEIGHT);
         image.getFrame().setLocationRelativeTo(null);
-        refreshTitle();
+        resolveTitle();
         
         // Create and set up the main control panel for this simulation.
         controls = new Controls(this);
@@ -220,16 +217,6 @@ public abstract class Simulation implements ClipboardOwner
                                                                          // appropriate methods, though...)
         controls.getFrame().setLocationRelativeTo(getImage().getFrame());
         controls.getFrame().setLocation(getControls().getFrame().getLocation().x - (getImage().getFrame().getWidth() / 2) - (getControls().getFrame().getWidth() / 2), getImage().getFrame().getY());
-        
-        //TODO: keeping comment for reference for now, useful to position console.
-        // Reposition the console (but skip if the console is not bound)
-//        if(getHome().getApplicationPreferences().getConsoleBind())
-//        {
-//            getHome().getConsole().getFrame().setSize(DEFAULT_CONSOLE_WIDTH, DEFAULT_CONSOLE_HEIGHT);
-//            getHome().getConsole().getFrame().setLocationRelativeTo(getImage().getFrame());
-//            getHome().getConsole().getFrame().setLocation(getHome().getConsole().getLocation().x + (getImage().getFrame().getWidth() / 2) + (getHome().getConsole().getWidth() / 2), getImage().getFrame().getY());
-//            getHome().getConsole().getFrame().setVisible(true);
-//        }
         
         // Other dialogs.
         resize = new Resize(this);
@@ -240,7 +227,8 @@ public abstract class Simulation implements ClipboardOwner
             @Override
             public void actionPerformed(ActionEvent e)
             {
-                draw();
+                getImage().renderAggregateImage(false);
+                getImage().repaint();
                 incrementFrameNumber();
                 hertzCheck();
             }
@@ -252,7 +240,8 @@ public abstract class Simulation implements ClipboardOwner
             @Override
             public void actionPerformed(ActionEvent e)
             {
-                draw();
+                getImage().renderAggregateImage(false);
+                getImage().repaint();
                 hertzCheck();
                 
                 // Determine the delay depending on where we are in the animation (use start, stop, or intermediate
@@ -330,14 +319,6 @@ public abstract class Simulation implements ClipboardOwner
             }
         });
         
-        // //Set up the JMenuBar
-        // menu = new Menu(this);
-        // getImage().setJMenuBar(menu.getMenuBar());
-        //
-        // menu2 = new Menu(this);
-        // getAnimate().setJMenuBar(menu2.getMenuBar());
-        
-        menus = new ArrayList<JavaSimMenu>();
         addMenuTo(getImage());
         addMenuTo(getControls());
         addMenuTo(getResize());
@@ -399,7 +380,6 @@ public abstract class Simulation implements ClipboardOwner
     private void addMenuTo(FrameHolder frameHolder)
     {
         JavaSimMenu menu = new JavaSimMenu(getHome(), this, frameHolder);
-        menus.add(menu);
         frameHolder.getFrame().setJMenuBar(menu.getMenuBar());
     }
     
@@ -409,13 +389,13 @@ public abstract class Simulation implements ClipboardOwner
         {
             if(calculateCount == 0)
             {
-                refreshTitle();
+                resolveTitle();
                 startTime = System.nanoTime();
             }
             else if(calculateCount == calculateCountMax)
             {
                 hertz = (int) ((double) (calculateCount) / (System.nanoTime() - startTime) * 1000000000);
-                refreshTitle();
+                resolveTitle();
                 calculating = false;
             }
             calculateCount++;
@@ -425,7 +405,7 @@ public abstract class Simulation implements ClipboardOwner
             calculateHertz();
     }
     
-    private void refreshTitle()
+    private void resolveTitle()
     {
         getImage().getFrame().setTitle(info.getName() + " – " + info.getAuthor() + " at " + (hertz == -1 ? "?" : hertz) + " Hz");
     }
@@ -458,7 +438,7 @@ public abstract class Simulation implements ClipboardOwner
     
     public File getDefaultFile()
     {
-        return new File(getContentDirectory(), "frame_" + getTimestamp() + ".png");
+        return new File(getContentDirectory(), "frame_" + MiscUtil.getTimestamp() + ".png");
     }
     
     public void saveAs()
@@ -558,11 +538,6 @@ public abstract class Simulation implements ClipboardOwner
         JavaSim.getLogger().info("Animation Completed!");
     }
     
-//    public void reset()
-//    {
-//        reset(permanentImage.createGraphics());
-//    }
-    
     public void play()
     {
         if(!timerManual.isRunning())
@@ -575,7 +550,7 @@ public abstract class Simulation implements ClipboardOwner
         // Things for both normal animation and saving
         stopForBreakpoint = false;
         hertz = 0;
-        refreshTitle();
+        resolveTitle();
         // Things for the user-controlled timer.
         if(timerManual.isRunning())
             timerManual.stop();
@@ -590,12 +565,6 @@ public abstract class Simulation implements ClipboardOwner
             timerAnimationVariable.stop();
             animationComplete();
         }
-    }
-    
-    public void draw()
-    {
-        image.renderAggregateImage(false);
-        image.repaint();
     }
     
     public BufferedImage getCurrentImageDeepCopy()
@@ -644,11 +613,13 @@ public abstract class Simulation implements ClipboardOwner
         return info;
     }
     
+    @Override
     public Home getHome()
     {
         return home;
     }
     
+    @Override
     public void setHome(Home home)
     {
         this.home = home;
@@ -667,13 +638,6 @@ public abstract class Simulation implements ClipboardOwner
     public File getContentDirectory()
     {
         return contentDirectory;
-    }
-    
-    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-M-d_H-m-s-S");
-    
-    public static String getTimestamp()
-    {
-        return dateFormat.format(new Date());
     }
     
     public Animate getAnimate()
@@ -708,7 +672,7 @@ public abstract class Simulation implements ClipboardOwner
     // Pseudo-print: opens the png in the system editor.
     public void print()
     {
-        File tempFile = new File(getHome().getApplicationPreferences().getTempDirectory(), getInfo().getName() + "_" + getTimestamp() + ".png");
+        File tempFile = new File(getHome().getApplicationPreferences().getTempDirectory(), getInfo().getName() + "_" + MiscUtil.getTimestamp() + ".png");
         
         // Save the file to the temporary file directory.
         try

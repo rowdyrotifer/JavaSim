@@ -22,6 +22,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import com.marklalor.javasim.misc.MiscUtil;
 import com.marklalor.javasim.simulation.Simulation;
 import com.marklalor.javasim.simulation.control.Control;
 import com.marklalor.javasim.simulation.frames.SimulationFrame;
@@ -295,7 +296,7 @@ public class Animate extends SimulationFrame
     
     private String getDefaultText()
     {
-        return new File(getSimulation().getContentDirectory(), "animation_" + Simulation.getTimestamp() + ".gif").getAbsolutePath();
+        return new File(getSimulation().getContentDirectory(), "animation_" + MiscUtil.getTimestamp() + ".gif").getAbsolutePath();
     }
     
     public int getStartFrame()

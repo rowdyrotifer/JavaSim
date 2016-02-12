@@ -11,6 +11,6 @@ public class DrawTemporaryAdapter implements DrawHandler
     
     public void reset(ImageLayer sender, Graphics2D graphics)
     {
-        throw new RuntimeException("Should not reset a temporary layer.");
+        throw new RuntimeException("Should not reset a temporary layer (if you really need to do this, draw differently at frame 0).");
     }
 }
