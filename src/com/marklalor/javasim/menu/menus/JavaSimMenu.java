@@ -68,6 +68,10 @@ public class JavaSimMenu extends Menu implements SimulationHolder, HomeHolder
             "controls" })
     private JMenu window;
     
+    @MenuHeader(text = "Help", children = {
+            "openGitHub" })
+    private JMenu help;
+    
     // FILE
     @MenuItem(text = "New Simulation", keyCode = KeyEvent.VK_N, keyModifiers = { MenuItem.COMMAND_OR_CONTROL })
     private JMenuItem newSimulation;
@@ -131,6 +135,10 @@ public class JavaSimMenu extends Menu implements SimulationHolder, HomeHolder
     private JMenuItem console;
     @MenuItem(text = "Controls", keyCode = KeyEvent.VK_2, keyModifiers = { MenuItem.COMMAND_OR_CONTROL })
     private JMenuItem controls;
+    
+    @MenuItem(text = "Open GitHub Page")
+    private JMenuItem openGitHub;
+    
     
     private Simulation simulation;
     private Home home;
