@@ -4,6 +4,6 @@ import com.marklalor.javasim.simulation.Simulation;
 
 public interface SimulationHolder
 {
-    Simulation getSimulation();
     void setSimulation(Simulation simulation);
+    Simulation getSimulation();
 }

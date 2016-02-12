@@ -34,7 +34,6 @@ import com.apple.eawt.FullScreenUtilities;
 import com.marklalor.javasim.JavaSim;
 import com.marklalor.javasim.home.Home;
 import com.marklalor.javasim.menu.menus.JavaSimMenu;
-import com.marklalor.javasim.menu.menus.JavaSimMenuHandler;
 import com.marklalor.javasim.misc.image.GifSequenceWriter;
 import com.marklalor.javasim.misc.image.TransferableImage;
 import com.marklalor.javasim.simulation.control.Control;
@@ -397,11 +396,11 @@ public abstract class Simulation implements ClipboardOwner
         this.fullscreen = !this.fullscreen;
     }
     
-    private void addMenuTo(FrameHolder frameHoldingInstance)
+    private void addMenuTo(FrameHolder frameHolder)
     {
-        JavaSimMenu menu = new JavaSimMenu(this, frameHoldingInstance, new JavaSimMenuHandler(getHome(), this));
+        JavaSimMenu menu = new JavaSimMenu(getHome(), this, frameHolder);
         menus.add(menu);
-        frameHoldingInstance.getFrame().setJMenuBar(menu.getMenuBar());
+        frameHolder.getFrame().setJMenuBar(menu.getMenuBar());
     }
     
     private void hertzCheck()

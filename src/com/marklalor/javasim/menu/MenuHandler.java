@@ -1,15 +1,17 @@
 package com.marklalor.javasim.menu;
 
-public abstract class MenuHandler
+public abstract class MenuHandler<T extends Menu>
 {
-    private Menu menu;
+    private T menu;
     
+    //User needs to make sure Menu subclass is T.
+    @SuppressWarnings("unchecked")
     public void setMenu(Menu menu)
     {
-        this.menu = menu;
+        this.menu = (T) menu;
     }
     
-    public Menu getMenu()
+    public T getMenu()
     {
         return menu;
     }

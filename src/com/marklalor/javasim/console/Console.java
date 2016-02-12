@@ -9,15 +9,12 @@ import javax.swing.JTextArea;
 
 import com.marklalor.javasim.home.Home;
 import com.marklalor.javasim.menu.menus.JavaSimMenu;
-import com.marklalor.javasim.menu.menus.JavaSimMenuHandler;
 import com.marklalor.javasim.simulation.frames.FrameHolder;
 
 public class Console implements FrameHolder
 {
-    private Home home;
-    
     private JFrame frame;
-    
+    private Home home;
     private JTextArea textArea;
     
     public Console(Home home)
@@ -40,7 +37,7 @@ public class Console implements FrameHolder
         if(!getHome().getApplicationPreferences().getConsoleBind())
             textArea.append("Logger not bound to this console.\nTo bind, run without the \"noconsolebind\" argument.");
         
-        JavaSimMenu menu = new JavaSimMenu(null, this, new JavaSimMenuHandler(getHome(), null));
+        JavaSimMenu menu = new JavaSimMenu(getHome(), null, this);
         getFrame().setJMenuBar(menu.getMenuBar());
     }
     

@@ -40,7 +40,6 @@ import com.marklalor.javasim.JavaSim;
 import com.marklalor.javasim.console.Console;
 import com.marklalor.javasim.console.JavaSimConsoleAppender;
 import com.marklalor.javasim.menu.menus.JavaSimMenu;
-import com.marklalor.javasim.menu.menus.JavaSimMenuHandler;
 import com.marklalor.javasim.misc.filedrop.FileDropManager;
 import com.marklalor.javasim.misc.filedrop.FileDropManager.Listener;
 import com.marklalor.javasim.misc.filedrop.FileDropOverlay;
@@ -253,7 +252,7 @@ public class Home implements ListSelectionListener, FrameHolder
     private void setUpMenu()
     {
         JavaSim.getLogger().debug("Setting up Home menu bar.");
-        JavaSimMenu menu = new JavaSimMenu(null, this, new JavaSimMenuHandler(this, null));
+        JavaSimMenu menu = new JavaSimMenu(this, null, this);
         this.getFrame().setJMenuBar(menu.getMenuBar());
     }
     

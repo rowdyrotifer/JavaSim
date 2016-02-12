@@ -6,18 +6,18 @@ import java.awt.event.KeyEvent;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
+import com.marklalor.javasim.home.Home;
 import com.marklalor.javasim.menu.Menu;
-import com.marklalor.javasim.menu.MenuHandler;
 import com.marklalor.javasim.menu.MenuUtils;
 import com.marklalor.javasim.menu.annotations.MenuHeader;
 import com.marklalor.javasim.menu.annotations.MenuItem;
 import com.marklalor.javasim.simulation.Simulation;
 import com.marklalor.javasim.simulation.frames.FrameHolder;
+import com.marklalor.javasim.simulation.frames.HomeHolder;
+import com.marklalor.javasim.simulation.frames.SimulationHolder;
 
-public class JavaSimMenu extends Menu
-{
-    private Simulation simulation;
-    
+public class JavaSimMenu extends Menu implements SimulationHolder, HomeHolder
+{   
     @MenuHeader(text = "File", children = {
             "newSimulation",
             "openSimulation",
@@ -63,7 +63,7 @@ public class JavaSimMenu extends Menu
     @MenuHeader(text = "Window", children = {
             "minimize",
             MenuHeader.SEPERATOR,
-            "home",
+            "homeItem",
             "console",
             "controls" })
     private JMenu window;
@@ -126,27 +126,45 @@ public class JavaSimMenu extends Menu
     @MenuItem(text = "Minimize", keyCode = KeyEvent.VK_M, keyModifiers = { MenuItem.COMMAND_OR_CONTROL })
     private JMenuItem minimize;
     @MenuItem(text = "Home", keyCode = KeyEvent.VK_0, keyModifiers = { MenuItem.COMMAND_OR_CONTROL })
-    private JMenuItem home;
+    private JMenuItem homeItem;
     @MenuItem(text = "Console", keyCode = KeyEvent.VK_1, keyModifiers = { MenuItem.COMMAND_OR_CONTROL })
     private JMenuItem console;
     @MenuItem(text = "Controls", keyCode = KeyEvent.VK_2, keyModifiers = { MenuItem.COMMAND_OR_CONTROL })
     private JMenuItem controls;
     
-    public JavaSimMenu(Simulation simulation, FrameHolder frameHolder, MenuHandler menuHandler)
+    private Simulation simulation;
+    private Home home;
+    
+    public JavaSimMenu(Home home, Simulation simulation, FrameHolder frameHolder)
     {
-        super(frameHolder, menuHandler);
+        super(frameHolder);
+        setHome(home);
         setSimulation(simulation);
     }
 
+    @Override
     public Simulation getSimulation()
     {
         return simulation;
     }
     
+    @Override
     public void setSimulation(Simulation simulation)
     {
         this.simulation = simulation;
         checkHasSimulation();
+    }
+    
+    @Override
+    public Home getHome()
+    {
+        return home; 
+    }
+    
+    @Override
+    public void setHome(Home home)
+    {
+        this.home = home;
     }
     
     private void checkHasSimulation()

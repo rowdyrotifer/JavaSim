@@ -23,8 +23,9 @@ import javax.swing.JLabel;
 import com.marklalor.javasim.JavaSim;
 import com.marklalor.javasim.simulation.Simulation;
 import com.marklalor.javasim.simulation.frames.Draggable;
+import com.marklalor.javasim.simulation.frames.SimulationHolder;
 
-public class Image extends Draggable
+public class Image extends Draggable implements SimulationHolder
 {
     private Simulation simulation;
     private Dimension size;
@@ -169,9 +170,16 @@ public class Image extends Draggable
         return image;
     }
     
+    @Override
     public Simulation getSimulation()
     {
         return simulation;
+    }
+    
+    @Override
+    public void setSimulation(Simulation simulation)
+    {
+        this.simulation = simulation;
     }
     
     public void setImageSize(int width, int height)
