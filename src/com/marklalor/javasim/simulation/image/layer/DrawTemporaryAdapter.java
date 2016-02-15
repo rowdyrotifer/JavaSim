@@ -1,4 +1,4 @@
-package com.marklalor.javasim.simulation.image;
+package com.marklalor.javasim.simulation.image.layer;
 
 import java.awt.Graphics2D;
 

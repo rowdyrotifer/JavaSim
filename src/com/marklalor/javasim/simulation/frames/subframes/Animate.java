@@ -138,12 +138,12 @@ public class Animate extends SimulationFrame
             {
                 if(tabbledPane.getSelectedComponent().equals(normalTab))
                 {
-                    Animate.this.getSimulation().animate();
+                    Animate.this.getSimulation().getPlayManager().startAnimate();
                     Animate.this.getFrame().setVisible(false);
                 }
                 else if(tabbledPane.getSelectedComponent().equals(variableTab))
                 {
-                    Animate.this.getSimulation().animateVariable();
+                    Animate.this.getSimulation().getPlayManager().startAnimateVariable();
                     Animate.this.getFrame().setVisible(false);
                 }
             }

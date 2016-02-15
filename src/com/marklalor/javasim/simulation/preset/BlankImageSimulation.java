@@ -3,9 +3,10 @@ package com.marklalor.javasim.simulation.preset;
 import java.awt.Color;
 import java.awt.Graphics2D;
 
+import com.marklalor.javasim.JavaSim;
 import com.marklalor.javasim.simulation.Simulation;
-import com.marklalor.javasim.simulation.image.DrawHandler;
-import com.marklalor.javasim.simulation.image.ImageLayer;
+import com.marklalor.javasim.simulation.image.layer.DrawHandler;
+import com.marklalor.javasim.simulation.image.layer.ImageLayer;
 
 /**
  * <p>
@@ -62,6 +63,7 @@ public abstract class BlankImageSimulation extends Simulation
             @Override
             public void reset(ImageLayer sender, Graphics2D graphics)
             {
+                JavaSim.getLogger().trace("BlankImageSimulation reset");
                 graphics.setColor(BlankImageSimulation.this.getBackgroundColor());
                 graphics.fillRect(0, 0, BlankImageSimulation.this.getImage().getWidth(), BlankImageSimulation.this.getImage().getHeight());
                 BlankImageSimulation.this.reset(graphics);
@@ -70,6 +72,7 @@ public abstract class BlankImageSimulation extends Simulation
             @Override
             public void draw(ImageLayer sender, Graphics2D graphics)
             {
+                JavaSim.getLogger().trace("BlankImageSimulation draw");
                 BlankImageSimulation.this.draw(graphics);
             }
         });

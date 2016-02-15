@@ -17,7 +17,7 @@ public class OSXQuitHandler implements OSXRegisterableHandler, QuitHandler
         {
             for(Simulation simulation : JavaSim.getHome().getActiveSimulations())
             {
-                if (simulation.isCreatingAnimation())
+                if (simulation.getPlayManager().isCreatingAnimation())
                 {
                     r.cancelQuit();
                     return;
@@ -25,7 +25,7 @@ public class OSXQuitHandler implements OSXRegisterableHandler, QuitHandler
             }
         }
         
-        //No pre-quit actions are done here because that's better don with a cross-platform shutdown thread.
+        //No pre-quit actions are done here because that's better done with a cross-platform shutdown thread.
         
         //If it was not cancelled, perform quit.
         r.performQuit();

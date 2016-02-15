@@ -24,6 +24,7 @@ import com.marklalor.javasim.JavaSim;
 import com.marklalor.javasim.simulation.Simulation;
 import com.marklalor.javasim.simulation.frames.Draggable;
 import com.marklalor.javasim.simulation.frames.SimulationHolder;
+import com.marklalor.javasim.simulation.image.layer.ImageLayer;
 
 public class Image extends Draggable implements SimulationHolder
 {

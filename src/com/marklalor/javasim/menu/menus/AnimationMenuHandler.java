@@ -6,35 +6,35 @@ public class AnimationMenuHandler extends MenuHandler<JavaSimMenu>
 {
     public void play()
     {
-        getMenu().getSimulation().setStopForBreakpoint(false);
-        getMenu().getSimulation().play();
+        getMenu().getSimulation().getPlayManager().setStopAtBreakpoint(false);
+        getMenu().getSimulation().getPlayManager().play();
     }
     
     public void playUntilBreakpoint()
     {
-        getMenu().getSimulation().setStopForBreakpoint(true);
-        getMenu().getSimulation().play();
+        getMenu().getSimulation().getPlayManager().setStopAtBreakpoint(true);
+        getMenu().getSimulation().getPlayManager().play();
     }
     
     public void stop()
     {
-        getMenu().getSimulation().stop();
+        getMenu().getSimulation().getPlayManager().stop();
     }
     
     public void nextFrame()
     {
+        getMenu().getSimulation().getPlayManager().incrementFrameNumber();
         getMenu().getSimulation().getImage().renderAggregateImage(false);
         getMenu().getSimulation().getImage().repaint();
-        getMenu().getSimulation().incrementFrameNumber();
     }
     
     public void decreaseSpeed()
     {
-        getMenu().getSimulation().decreaseAnimationSpeed();
+        getMenu().getSimulation().getPlayManager().decreaseAnimationSpeed();
     }
     
     public void increaseSpeed()
     {
-        getMenu().getSimulation().increaseAnimationSpeed();
+        getMenu().getSimulation().getPlayManager().increaseAnimationSpeed();
     }
 }

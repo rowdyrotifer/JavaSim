@@ -7,8 +7,6 @@ import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.ClipboardOwner;
 import java.awt.datatransfer.Transferable;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
@@ -16,15 +14,9 @@ import java.awt.image.ColorModel;
 import java.awt.image.WritableRaster;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 import javax.imageio.ImageIO;
-import javax.imageio.stream.FileImageOutputStream;
-import javax.imageio.stream.ImageOutputStream;
 import javax.swing.JFileChooser;
-import javax.swing.Timer;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.apple.eawt.Application;
@@ -33,7 +25,6 @@ import com.marklalor.javasim.JavaSim;
 import com.marklalor.javasim.home.Home;
 import com.marklalor.javasim.menu.menus.JavaSimMenu;
 import com.marklalor.javasim.misc.MiscUtil;
-import com.marklalor.javasim.misc.image.GifSequenceWriter;
 import com.marklalor.javasim.misc.image.TransferableImage;
 import com.marklalor.javasim.simulation.control.Control;
 import com.marklalor.javasim.simulation.frames.FrameHolder;
@@ -42,6 +33,7 @@ import com.marklalor.javasim.simulation.frames.subframes.Animate;
 import com.marklalor.javasim.simulation.frames.subframes.Controls;
 import com.marklalor.javasim.simulation.frames.subframes.Resize;
 import com.marklalor.javasim.simulation.image.Image;
+import com.marklalor.javasim.simulation.manager.play.PlayManager;
 import com.marklalor.javasim.simulation.preset.BlankImageSimulation;
 
 /**
@@ -73,6 +65,9 @@ public abstract class Simulation implements ClipboardOwner, HomeHolder
     
     private boolean fullscreen = false;
     
+    //Controllers / Managers
+    private PlayManager playManager;
+    
     // Main Frames
     private Image image;
     private Controls controls;
@@ -80,31 +75,6 @@ public abstract class Simulation implements ClipboardOwner, HomeHolder
     // Other Frames
     private Animate animate;
     private Resize resize;
-    
-    // Timer
-    private Timer timerManual;
-    // For finding refresh rate
-    private int hertz = 0;
-    private long startTime;
-    private boolean calculating = true;
-    private int calculateCount = 0;
-    private static final int calculateCountMax = 10;
-    private static final int autoRefreshTime = 1; // seconds;
-    
-    // Breakpoint
-    private boolean stopForBreakpoint = false;
-    
-    // Animation
-    private Timer timerAnimation;
-    private Timer timerAnimationVariable;
-    
-    private List<Control<?>> animationControls;
-    private Control<?> currentAnimationControl;
-    private List<Object> currentAnimationControlValueQueue;
-    private int variableAnimationN = 0;
-    
-    private ImageOutputStream animationOut;
-    private GifSequenceWriter animationWriter;
     
     // Simulation abstract methods:
     
@@ -137,56 +107,6 @@ public abstract class Simulation implements ClipboardOwner, HomeHolder
      */
     public abstract void initialize();
     
-    /**
-     * <p>
-     * Simulation frame number.
-     * </p>
-     * <p>
-     * This field is protected instead of privated for the convenience of the child class. It is shorthand for
-     * {@link #getFrameNumber()}.
-     * </p>
-     * 
-     * @see #getFrameNumber()
-     */
-    protected int n = 0;
-    
-    /**
-     * <p>
-     * Gets the current frame of the simulation. This starts at 0 and is automatically incremented by 1 as the
-     * simulation is played. It is reset back to 0 when the simulation is reset.
-     * </p>
-     * <p>
-     * Use {@link #n} as a shorthand, if you wish. {@link #getFrameNumber()} simply returns {@link #n}.
-     * </p>
-     * 
-     * @see {@link Simulation#n}
-     * @return The simulation frame number.
-     */
-    public int getFrameNumber()
-    {
-        return this.n;
-    }
-    
-    /**
-     * @param n
-     *            the new frame for the simulation.
-     * @see #getFrameNumber()
-     */
-    public void setFrameNumber(int n)
-    {
-        this.n = n;
-    }
-    
-    /**
-     * Increments the current frame number by 1.
-     * 
-     * @see #getFrameNumber()
-     */
-    public void incrementFrameNumber()
-    {
-        this.n++;
-    }
-    
     public void preInitialize(Home home, Integer id, SimulationInfo info)
     {
         // Don't allow anyone to use this method a second time… just… no.
@@ -200,6 +120,8 @@ public abstract class Simulation implements ClipboardOwner, HomeHolder
         
         // Inherit the info read from its file earlier.
         this.info = info;
+        
+        this.playManager = new PlayManager(this);
         
         // Set the simulation's content directory and (make sure it exists).
         contentDirectory = new File(getHome().getApplicationPreferences().getSaveDirectory(), info.getName());
@@ -220,104 +142,6 @@ public abstract class Simulation implements ClipboardOwner, HomeHolder
         
         // Other dialogs.
         resize = new Resize(this);
-        
-        // Make the general, manual animation timer.
-        timerManual = new Timer(0, new ActionListener()
-        {
-            @Override
-            public void actionPerformed(ActionEvent e)
-            {
-                getImage().renderAggregateImage(false);
-                getImage().repaint();
-                incrementFrameNumber();
-                hertzCheck();
-            }
-        });
-        
-        // Make the special, animation window timer.
-        timerAnimation = new Timer(0, new ActionListener()
-        {
-            @Override
-            public void actionPerformed(ActionEvent e)
-            {
-                getImage().renderAggregateImage(false);
-                getImage().repaint();
-                hertzCheck();
-                
-                // Determine the delay depending on where we are in the animation (use start, stop, or intermediate
-                // delay)
-                int delay = 0;
-                if(getFrameNumber() == animate.getStartFrame())
-                    delay = animate.getStartDelay();
-                if(getFrameNumber() != animate.getStopFrame() && getFrameNumber() != animate.getStartFrame())
-                    delay = animate.getFrameDelay();
-                if(getFrameNumber() == animate.getStopFrame() || !timerAnimation.isRunning())
-                    delay = animate.getStopDelay();
-                
-                if(getFrameNumber() % animate.getSaveEvery() == 0 ||
-                        getFrameNumber() == animate.getStartFrame() ||
-                        getFrameNumber() == animate.getStopFrame() ||
-                        !timerAnimation.isRunning())
-                    try
-                    {
-                        animationWriter.writeToSequence(getImage().getAggregateImage(), delay);
-                    }
-                    catch(IOException e1)
-                    {
-                        JavaSim.getLogger().error("Could not write animation frame to file.", e1);
-                    }
-                
-                if(getFrameNumber() == animate.getStopFrame())
-                    stop();
-                
-                incrementFrameNumber();
-            }
-        });
-        
-        // Make the special, animation window timer.
-        timerAnimationVariable = new Timer(0, new ActionListener()
-        {
-            @Override
-            public void actionPerformed(ActionEvent e)
-            {
-                if(currentAnimationControl == null || currentAnimationControlValueQueue.size() == 0)
-                {
-                    currentAnimationControl = animationControls.remove(0);
-                    currentAnimationControlValueQueue = new ArrayList<Object>(Arrays.asList(currentAnimationControl.getAnimateValues()));
-                }
-                
-                Object value = currentAnimationControlValueQueue.remove(0);
-                currentAnimationControl.setValue(value);
-                
-                resetAction();
-                hertzCheck();
-                
-                int delay = 0;
-                if(variableAnimationN == 0)
-                    delay = animate.getStartDelay();
-                else
-                    delay = animate.getFrameDelay();
-                
-                boolean last = (animationControls.isEmpty() && currentAnimationControlValueQueue.isEmpty());
-                
-                if(last)
-                    delay = animate.getStopDelay();
-                
-                try
-                {
-                    animationWriter.writeToSequence(getImage().getAggregateImage(), delay);
-                }
-                catch(IOException e1)
-                {
-                    JavaSim.getLogger().error("Could not write (variable) animation frame to file.", e1);
-                }
-                
-                if(last)
-                    stop();
-                
-                variableAnimationN++;
-            }
-        });
         
         addMenuTo(getImage());
         addMenuTo(getControls());
@@ -383,31 +207,10 @@ public abstract class Simulation implements ClipboardOwner, HomeHolder
         frameHolder.getFrame().setJMenuBar(menu.getMenuBar());
     }
     
-    private void hertzCheck()
+    public void resolveTitle()
     {
-        if(calculating)
-        {
-            if(calculateCount == 0)
-            {
-                resolveTitle();
-                startTime = System.nanoTime();
-            }
-            else if(calculateCount == calculateCountMax)
-            {
-                hertz = (int) ((double) (calculateCount) / (System.nanoTime() - startTime) * 1000000000);
-                resolveTitle();
-                calculating = false;
-            }
-            calculateCount++;
-        }
-        
-        if((System.nanoTime() - startTime) / 1000000000 > autoRefreshTime)
-            calculateHertz();
-    }
-    
-    private void resolveTitle()
-    {
-        getImage().getFrame().setTitle(info.getName() + " – " + info.getAuthor() + " at " + (hertz == -1 ? "?" : hertz) + " Hz");
+        int freq = getPlayManager().getFrequencyMonitor().getFrequency();
+        getImage().getFrame().setTitle(info.getName() + " – " + info.getAuthor() + " at " + (freq == -1 ? "?" : freq) + " Hz");
     }
     
     
@@ -422,19 +225,10 @@ public abstract class Simulation implements ClipboardOwner, HomeHolder
     
     public void resetAction()
     {
-        setFrameNumber(0);
+        getPlayManager().setFrameNumber(0);
         getImage().renderAggregateImage(true);
         getImage().repaint();
     }
-    
-    private void calculateHertz()
-    {
-        calculating = true;
-        calculateCount = 0;
-    }
-    
-    private static final int changeInSpeed = 10; // TODO: maybe make this scale in some way to
-                                                 // accommodate for the 1/x behavior.
     
     public File getDefaultFile()
     {
@@ -493,80 +287,6 @@ public abstract class Simulation implements ClipboardOwner, HomeHolder
         }
     }
     
-    public void animate()
-    {
-        stopForBreakpoint = animate.getStopAtBreakpoint();
-        
-        resetAction();
-        
-        try
-        {
-            animationOut = new FileImageOutputStream(animate.getFile());
-            animationWriter = new GifSequenceWriter(animationOut, BufferedImage.TYPE_INT_ARGB, animate.getFrameDelay(), animate.getLoop());
-        }
-        catch(Exception e)
-        {
-            JavaSim.getLogger().error("Could not start animation.", e);
-        }
-        
-        timerAnimation.start();
-    }
-    
-    public void animateVariable()
-    {
-        resetAction();
-        
-        try
-        {
-            animationOut = new FileImageOutputStream(animate.getFile());
-            animationWriter = new GifSequenceWriter(animationOut, BufferedImage.TYPE_INT_ARGB, animate.getFrameDelay(), animate.getLoop());
-        }
-        catch(Exception e)
-        {
-            JavaSim.getLogger().error("Could not start (variable) animation.", e);
-        }
-        
-        animationControls = new ArrayList<Control<?>>(getAnimate().getAddedControls());
-        currentAnimationControl = null;
-        variableAnimationN = 0;
-        
-        timerAnimationVariable.start();
-    }
-    
-    public void animationComplete()
-    {
-        JavaSim.getLogger().info("Animation Completed!");
-    }
-    
-    public void play()
-    {
-        if(!timerManual.isRunning())
-            timerManual.start();
-    }
-    
-    public void stop()
-    {
-        JavaSim.getLogger().trace("Stopping timers.");
-        // Things for both normal animation and saving
-        stopForBreakpoint = false;
-        hertz = 0;
-        resolveTitle();
-        // Things for the user-controlled timer.
-        if(timerManual.isRunning())
-            timerManual.stop();
-        // Things for the animator-controlled timer.
-        if(timerAnimation.isRunning())
-        {
-            timerAnimation.stop();
-            animationComplete();
-        }
-        if(timerAnimationVariable.isRunning())
-        {
-            timerAnimationVariable.stop();
-            animationComplete();
-        }
-    }
-    
     public BufferedImage getCurrentImageDeepCopy()
     {
         ColorModel cm = getImage().getAggregateImage().getColorModel();
@@ -583,14 +303,14 @@ public abstract class Simulation implements ClipboardOwner, HomeHolder
     // Stop and close the simulation.
     public void close()
     {
-        stop();
+        getPlayManager().stop();
         getHome().getJarManager().unloadFromId(getJarId());
     }
     
     public void breakpoint()
     {
-        if(stopForBreakpoint)
-            stop();
+        if(getPlayManager().shouldStopForBreakpoint())
+            getPlayManager().stop();
     }
     
     public void setJarId(Integer jarId)
@@ -645,28 +365,14 @@ public abstract class Simulation implements ClipboardOwner, HomeHolder
         return animate;
     }
     
-    public void setStopForBreakpoint(boolean stopForBreakpoint)
-    {
-        this.stopForBreakpoint = stopForBreakpoint;
-    }
-    
-    public void decreaseAnimationSpeed()
-    {
-        timerManual.setDelay(timerManual.getDelay() + changeInSpeed);
-        hertz = -1;
-        calculateHertz();
-    }
-    
-    public void increaseAnimationSpeed()
-    {
-        timerManual.setDelay(timerManual.getDelay() - changeInSpeed >= 1 ? timerManual.getDelay() - changeInSpeed : 0);
-        hertz = -1;
-        calculateHertz();
-    }
-    
     public Resize getResize()
     {
         return resize;
+    }
+    
+    public PlayManager getPlayManager()
+    {
+        return playManager;
     }
     
     // Pseudo-print: opens the png in the system editor.
@@ -693,10 +399,5 @@ public abstract class Simulation implements ClipboardOwner, HomeHolder
         {
             JavaSim.getLogger().error("Could not print temporary image.", e);
         }
-    }
-    
-    public boolean isCreatingAnimation()
-    {
-        return timerAnimation.isRunning() || timerAnimationVariable.isRunning();
     }
 }

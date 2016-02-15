@@ -233,8 +233,7 @@ public class Home implements ListSelectionListener, FrameHolder
             {
                 for(File file : files)
                     JavaSim.getLogger().info(file.getAbsolutePath());
-            }
-            
+            }    
         });
         
         getFrame().getLayeredPane().add(main, Integer.valueOf(1));

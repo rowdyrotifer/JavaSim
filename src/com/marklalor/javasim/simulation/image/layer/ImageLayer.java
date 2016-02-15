@@ -1,8 +1,10 @@
-package com.marklalor.javasim.simulation.image;
+package com.marklalor.javasim.simulation.image.layer;
 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.Collections;
+
+import com.marklalor.javasim.simulation.image.Image;
 
 public class ImageLayer implements Comparable<ImageLayer>
 {
