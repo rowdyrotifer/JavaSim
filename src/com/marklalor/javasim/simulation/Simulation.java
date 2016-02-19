@@ -131,6 +131,8 @@ public abstract class Simulation implements ClipboardOwner, HomeHolder
         image = new Image(this);
         image.setImageSize(DEFAULT_IMAGE_WIDTH, DEFAULT_IMAGE_HEIGHT);
         image.getFrame().setLocationRelativeTo(null);
+        image.getFrame().getRootPane().putClientProperty("Window.documentFile", getInfo().getFile());
+        image.getFrame().getRootPane().putClientProperty("Window.documentModified", false);
         resolveTitle();
         
         // Create and set up the main control panel for this simulation.
