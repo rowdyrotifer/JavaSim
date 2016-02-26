@@ -21,15 +21,19 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 
 import com.marklalor.javasim.JavaSim;
+import com.marklalor.javasim.menu.menus.JavaSimMenu;
 import com.marklalor.javasim.simulation.Simulation;
 import com.marklalor.javasim.simulation.frames.Draggable;
+import com.marklalor.javasim.simulation.frames.MenuHolder;
 import com.marklalor.javasim.simulation.frames.SimulationHolder;
 import com.marklalor.javasim.simulation.image.layer.ImageLayer;
 
-public class Image extends Draggable implements SimulationHolder
+public class Image extends Draggable implements SimulationHolder, MenuHolder<JavaSimMenu>
 {
     private Simulation simulation;
+    private JavaSimMenu menu;
     private Dimension size;
+    private ImagePopupMenu popupMenu;
     
     private BufferedImage aggregateImage;
     
@@ -72,6 +76,12 @@ public class Image extends Draggable implements SimulationHolder
         getFrame().getContentPane().setLayout(new BorderLayout());
         imageLabel = new JLabel();
         getFrame().getContentPane().add(imageLabel, BorderLayout.CENTER);
+        
+        popupMenu = new ImagePopupMenu(getSimulation());
+        imageLabel.setComponentPopupMenu(popupMenu.getMenu());
+        
+        getFrame().getRootPane().putClientProperty("Window.documentFile", getSimulation().getInfo().getFile());
+        getFrame().getRootPane().putClientProperty("Window.documentModified", false);
     }
     
     public void addLayer(ImageLayer layer)
@@ -183,6 +193,11 @@ public class Image extends Draggable implements SimulationHolder
         this.simulation = simulation;
     }
     
+    public JLabel getImageLabel()
+    {
+        return imageLabel;
+    }
+    
     public void setImageSize(int width, int height)
     {
         setSize(new Dimension(width, height));
@@ -219,5 +234,17 @@ public class Image extends Draggable implements SimulationHolder
     public int getHeight()
     {
         return (int) getSize().getHeight();
+    }
+
+    @Override
+    public void setMenu(JavaSimMenu menu)
+    {
+        this.menu = menu;
+    }
+
+    @Override
+    public JavaSimMenu getMenu()
+    {
+        return this.menu;
     }
 }

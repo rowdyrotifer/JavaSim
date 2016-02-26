@@ -35,11 +35,11 @@ public class JavaSimMenu extends Menu implements SimulationHolder, HomeHolder
             "openContentFolder",
             MenuHeader.SEPERATOR,
             "print" })
-    private JMenu file;
+    public JMenu file;
     
     @MenuHeader(text = "Edit", children = {
             "copy" })
-    private JMenu edit;
+    public JMenu edit;
     
     @MenuHeader(text = "Animation", children = {
             "play",
@@ -50,7 +50,7 @@ public class JavaSimMenu extends Menu implements SimulationHolder, HomeHolder
             MenuHeader.SEPERATOR,
             "decreaseSpeed",
             "increaseSpeed" })
-    private JMenu animation;
+    public JMenu animation;
     
     @MenuHeader(text = "Simulation", children = {
             "reset",
@@ -58,7 +58,7 @@ public class JavaSimMenu extends Menu implements SimulationHolder, HomeHolder
             MenuHeader.SEPERATOR,
             "resizeMenuItem",
             "fullscreen" })
-    private JMenu _simulation;
+    public JMenu _simulation;
     
     @MenuHeader(text = "Window", children = {
             "minimize",
@@ -66,78 +66,78 @@ public class JavaSimMenu extends Menu implements SimulationHolder, HomeHolder
             "homeItem",
             "console",
             "controls" })
-    private JMenu window;
+    public JMenu window;
     
     @MenuHeader(text = "Help", children = {
             "openGitHub" })
-    private JMenu help;
+    public JMenu help;
     
     // FILE
     @MenuItem(text = "New Simulation", keyCode = KeyEvent.VK_N, keyModifiers = { MenuItem.COMMAND_OR_CONTROL })
-    private JMenuItem newSimulation;
+    public JMenuItem newSimulation;
     @MenuItem(text = "Open Simulation...", keyCode = KeyEvent.VK_O, keyModifiers = { MenuItem.COMMAND_OR_CONTROL })
-    private JMenuItem openSimulation;
+    public JMenuItem openSimulation;
     @MenuItem(text = "Close", keyCode = KeyEvent.VK_W, keyModifiers = { MenuItem.COMMAND_OR_CONTROL })
-    private JMenuItem close;
+    public JMenuItem close;
     @MenuItem(text = "Close All Simulations", keyCode = KeyEvent.VK_W, keyModifiers = { MenuItem.COMMAND_OR_CONTROL, Event.SHIFT_MASK })
-    private JMenuItem closeAll;
+    public JMenuItem closeAll;
     @MenuItem(text = "Save Image", keyCode = KeyEvent.VK_S, keyModifiers = { MenuItem.COMMAND_OR_CONTROL })
-    private JMenuItem saveImage;
+    public JMenuItem saveImage;
     @MenuItem(text = "Save Image As...", keyCode = KeyEvent.VK_S, keyModifiers = { MenuItem.COMMAND_OR_CONTROL, Event.SHIFT_MASK })
-    private JMenuItem saveImageAs;
+    public JMenuItem saveImageAs;
     @MenuItem(text = "Create Animated Gif...", keyCode = KeyEvent.VK_I, keyModifiers = { MenuItem.COMMAND_OR_CONTROL })
-    private JMenuItem animateMenuItem;
+    public JMenuItem animateMenuItem;
     @MenuItem(text = "Refresh Simulations", keyCode = KeyEvent.VK_F5, keyModifiers = { MenuItem.COMMAND_OR_CONTROL })
-    private JMenuItem refresh;
+    public JMenuItem refresh;
     @MenuItem(text = "Open Home Folder", keyCode = KeyEvent.VK_D, keyModifiers = { MenuItem.COMMAND_OR_CONTROL })
-    private JMenuItem openHomeFolder;
+    public JMenuItem openHomeFolder;
     @MenuItem(text = "Open Content Folder", keyCode = KeyEvent.VK_D, keyModifiers = { MenuItem.COMMAND_OR_CONTROL, Event.SHIFT_MASK })
-    private JMenuItem openContentFolder;
+    public JMenuItem openContentFolder;
     @MenuItem(text = "Print...", keyCode = KeyEvent.VK_P, keyModifiers = { MenuItem.COMMAND_OR_CONTROL })
-    private JMenuItem print;
+    public JMenuItem print;
     @MenuItem(text = "Properties...", keyCode = KeyEvent.VK_W, keyModifiers = { MenuItem.COMMAND_OR_CONTROL })
-    private JMenuItem openProperties;
+    public JMenuItem openProperties;
     
     // EDIT
     @MenuItem(text = "Copy", keyCode = KeyEvent.VK_C, keyModifiers = MenuItem.COMMAND_OR_CONTROL)
-    private JMenuItem copy;
+    public JMenuItem copy;
     
     // ANIMATION
     @MenuItem(text = "Play", keyCode = KeyEvent.VK_L, keyModifiers = { MenuItem.COMMAND_OR_CONTROL })
-    private JMenuItem play;
+    public JMenuItem play;
     @MenuItem(text = "Play Until Breakpoint", keyCode = KeyEvent.VK_L, keyModifiers = { MenuItem.COMMAND_OR_CONTROL, Event.SHIFT_MASK })
-    private JMenuItem playUntilBreakpoint;
+    public JMenuItem playUntilBreakpoint;
     @MenuItem(text = "Stop", keyCode = KeyEvent.VK_PERIOD, keyModifiers = { MenuItem.COMMAND_OR_CONTROL })
-    private JMenuItem stop;
+    public JMenuItem stop;
     @MenuItem(text = "Next Frame", keyCode = KeyEvent.VK_SPACE)
-    private JMenuItem nextFrame;
+    public JMenuItem nextFrame;
     @MenuItem(text = "Decrease Speed", keyCode = KeyEvent.VK_OPEN_BRACKET)
-    private JMenuItem decreaseSpeed;
+    public JMenuItem decreaseSpeed;
     @MenuItem(text = "Increase Speed", keyCode = KeyEvent.VK_CLOSE_BRACKET)
-    private JMenuItem increaseSpeed;
+    public JMenuItem increaseSpeed;
     
     // SIMULATION
     @MenuItem(text = "Reset", keyCode = KeyEvent.VK_R, keyModifiers = { MenuItem.COMMAND_OR_CONTROL })
-    private JMenuItem reset;
+    public JMenuItem reset;
     @MenuItem(text = "Reload", keyCode = KeyEvent.VK_F5)
-    private JMenuItem reloadSimulation;
+    public JMenuItem reloadSimulation;
     @MenuItem(text = "Resize")
-    private JMenuItem resizeMenuItem;
+    public JMenuItem resizeMenuItem;
     @MenuItem(text = "Enter Full Screen", keyCode = KeyEvent.VK_F, keyModifiers = { MenuItem.COMMAND_OR_CONTROL, Event.CTRL_MASK })
-    private JMenuItem fullscreen;
+    public JMenuItem fullscreen;
     
     // WINDOW
     @MenuItem(text = "Minimize", keyCode = KeyEvent.VK_M, keyModifiers = { MenuItem.COMMAND_OR_CONTROL })
-    private JMenuItem minimize;
+    public JMenuItem minimize;
     @MenuItem(text = "Home", keyCode = KeyEvent.VK_0, keyModifiers = { MenuItem.COMMAND_OR_CONTROL })
-    private JMenuItem homeItem;
+    public JMenuItem homeItem;
     @MenuItem(text = "Console", keyCode = KeyEvent.VK_1, keyModifiers = { MenuItem.COMMAND_OR_CONTROL })
-    private JMenuItem console;
+    public JMenuItem console;
     @MenuItem(text = "Controls", keyCode = KeyEvent.VK_2, keyModifiers = { MenuItem.COMMAND_OR_CONTROL })
-    private JMenuItem controls;
+    public JMenuItem controls;
     
     @MenuItem(text = "Open GitHub Page")
-    private JMenuItem openGitHub;
+    public JMenuItem openGitHub;
     
     
     private Simulation simulation;

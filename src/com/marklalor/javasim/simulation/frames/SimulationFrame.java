@@ -9,13 +9,15 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.text.PlainDocument;
 
+import com.marklalor.javasim.menu.menus.JavaSimMenu;
 import com.marklalor.javasim.misc.filter.IntegerFilter;
 import com.marklalor.javasim.simulation.Simulation;
 
-public class SimulationFrame implements FrameHolder, SimulationHolder
+public class SimulationFrame implements FrameHolder, MenuHolder<JavaSimMenu>, SimulationHolder
 {
-    private JFrame frame;
     private Simulation simulation;
+    private JFrame frame;
+    private JavaSimMenu menu;
     
     public SimulationFrame(Simulation simulation)
     {
@@ -55,6 +57,18 @@ public class SimulationFrame implements FrameHolder, SimulationHolder
     }
     
     @Override
+    public Simulation getSimulation()
+    {
+        return simulation;
+    }
+
+    @Override
+    public void setSimulation(Simulation simulation)
+    {
+        this.simulation = simulation;
+    }
+    
+    @Override
     public JFrame getFrame()
     {
         return this.frame;
@@ -65,16 +79,16 @@ public class SimulationFrame implements FrameHolder, SimulationHolder
     {
         this.frame = frame;
     }
-    
+
     @Override
-    public Simulation getSimulation()
+    public void setMenu(JavaSimMenu menu)
     {
-        return simulation;
+        this.menu = menu;
     }
 
     @Override
-    public void setSimulation(Simulation simulation)
+    public JavaSimMenu getMenu()
     {
-        this.simulation = simulation;
+        return this.menu;
     }
 }

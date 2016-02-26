@@ -29,6 +29,7 @@ import com.marklalor.javasim.misc.image.TransferableImage;
 import com.marklalor.javasim.simulation.control.Control;
 import com.marklalor.javasim.simulation.frames.FrameHolder;
 import com.marklalor.javasim.simulation.frames.HomeHolder;
+import com.marklalor.javasim.simulation.frames.MenuHolder;
 import com.marklalor.javasim.simulation.frames.subframes.Animate;
 import com.marklalor.javasim.simulation.frames.subframes.Controls;
 import com.marklalor.javasim.simulation.frames.subframes.Resize;
@@ -131,8 +132,6 @@ public abstract class Simulation implements ClipboardOwner, HomeHolder
         image = new Image(this);
         image.setImageSize(DEFAULT_IMAGE_WIDTH, DEFAULT_IMAGE_HEIGHT);
         image.getFrame().setLocationRelativeTo(null);
-        image.getFrame().getRootPane().putClientProperty("Window.documentFile", getInfo().getFile());
-        image.getFrame().getRootPane().putClientProperty("Window.documentModified", false);
         resolveTitle();
         
         // Create and set up the main control panel for this simulation.
@@ -203,10 +202,14 @@ public abstract class Simulation implements ClipboardOwner, HomeHolder
         this.fullscreen = !this.fullscreen;
     }
     
-    private void addMenuTo(FrameHolder frameHolder)
+    private void addMenuTo(MenuHolder<JavaSimMenu> menuHolder)
     {
-        JavaSimMenu menu = new JavaSimMenu(getHome(), this, frameHolder);
-        frameHolder.getFrame().setJMenuBar(menu.getMenuBar());
+        if (!(menuHolder instanceof FrameHolder))
+            throw new RuntimeException("If you add a menu to a MenuHolder, they have to also be a FrameHolder!");
+        
+        menuHolder.setMenu(new JavaSimMenu(getHome(), this, (FrameHolder) menuHolder));
+        
+        ((FrameHolder) menuHolder).getFrame().setJMenuBar(menuHolder.getMenu().getMenuBar());
     }
     
     public void resolveTitle()
