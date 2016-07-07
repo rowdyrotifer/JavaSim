@@ -11,7 +11,8 @@ public class FrequencyMonitor extends SimulationManager
     }
 
     private static final int calculateCountMax = 10;
-    private static final float autoRefreshTime = 0.5f; // seconds;
+    private static final long autoRefreshTime = (long) 0.5e9; // 0.5 seconds in nanoseconds;
+    public static final int NO_FREQUENCY = -1;
     
 
     // For finding refresh rate
@@ -28,7 +29,7 @@ public class FrequencyMonitor extends SimulationManager
     
     public void calculateFrequency()
     {
-        frequency = -1;
+        frequency = NO_FREQUENCY;
         calculating = true;
         calculateCount = 0;
     }
@@ -49,7 +50,7 @@ public class FrequencyMonitor extends SimulationManager
         }
         else
         {
-            if((System.nanoTime() - startTime) / 1000000000 > autoRefreshTime)
+            if(System.nanoTime() - startTime > autoRefreshTime)
                 calculateFrequency();
         }
     }
