@@ -12,3 +12,4 @@ lib
 #I think Eclipse generates these with markdown preview.
 .LICENSE.md.html
 .README.md.html
+/target/

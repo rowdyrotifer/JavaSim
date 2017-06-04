@@ -34,6 +34,7 @@ import com.marklalor.javasim.simulation.frames.subframes.Animate;
 import com.marklalor.javasim.simulation.frames.subframes.Controls;
 import com.marklalor.javasim.simulation.frames.subframes.Resize;
 import com.marklalor.javasim.simulation.image.Image;
+import com.marklalor.javasim.simulation.manager.play.FrequencyMonitor;
 import com.marklalor.javasim.simulation.manager.play.PlayManager;
 import com.marklalor.javasim.simulation.preset.BlankImageSimulation;
 
@@ -215,7 +216,10 @@ public abstract class Simulation implements ClipboardOwner, HomeHolder
     public void resolveTitle()
     {
         int freq = getPlayManager().getFrequencyMonitor().getFrequency();
-        getImage().getFrame().setTitle(info.getName() + " – " + info.getAuthor() + " at " + (freq == -1 ? "?" : freq) + " Hz");
+        getImage().getFrame().setTitle(
+                info.getName() + " – " + 
+                info.getAuthor() + " at " + 
+                (freq == FrequencyMonitor.NO_FREQUENCY ? "?" : freq) + " Hz");
     }
     
     
