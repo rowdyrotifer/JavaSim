@@ -7,14 +7,19 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.SystemUtils;
 import org.apache.log4j.PropertyConfigurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.marklalor.javasim.content.interfacing.sim.Simulation;
 import com.marklalor.javasim.home.Home;
 import com.marklalor.javasim.misc.TempFileShutdownHook;
 import com.marklalor.javasim.misc.osx.OSXUtils;
+import com.marklalor.javasim.newsimulation.SimulationAdministrator;
+import com.marklalor.javasim.newsimulation.SimulationLaunchParameters;
 import com.marklalor.javasim.preferences.ApplicationPreferences;
+import com.marklalor.javasim.util.PathUtils;
 
 public class JavaSim
 {
@@ -35,11 +40,12 @@ public class JavaSim
                 // OS cleanly to find the OS-dependent preferences file).
                 ApplicationPreferences preferences = createApplicationPreferences(arguments);
                 
-                //This one seems to need to be registered earlier.
-                if (preferences.isMacOSX())
+                // This one seems to need to be registered earlier.
+                if(SystemUtils.IS_OS_MAC)
                     OSXUtils.registerFullyQualifiedClassName("com.marklalor.javasim.misc.osx.OSXOpenFilesHandler");
                 
-                // Use OS X native menu bar (should pretty much always be yes, only disable to debug).
+                // Use OS X native menu bar (should pretty much always be yes,
+                // only disable to debug).
                 if(preferences.getUseScreenMenuBar())
                     System.setProperty("apple.laf.useScreenMenuBar", "true");
                 
@@ -50,14 +56,16 @@ public class JavaSim
                 home.getFrame().setSize(800, 500);
                 home.getFrame().setVisible(true);
                 
-                //Might as well register these ones later because at least at this point in the thread we KNOW home has been initialized.
-                if (preferences.isMacOSX())
+                // Might as well register these ones later because at least at
+                // this point in the thread we KNOW home has been initialized.
+                if(SystemUtils.IS_OS_MAC)
                 {
                     OSXUtils.registerFullyQualifiedClassName("com.marklalor.javasim.misc.osx.OSXPreferencesHandler");
                     OSXUtils.registerFullyQualifiedClassName("com.marklalor.javasim.misc.osx.OSXAppReOpenedHandler");
                     OSXUtils.registerFullyQualifiedClassName("com.marklalor.javasim.misc.osx.OSXQuitHandler");
-                    //No need for this just yet... the default apple one is good for now.
-                    //OSXUtils.registerfullyQualifiedClassName("com.marklalor.javasim.misc.osx.OSXAboutHandler");
+                    // No need for this just yet... the default apple one is
+                    // good for now.
+                    // OSXUtils.registerfullyQualifiedClassName("com.marklalor.javasim.misc.osx.OSXAboutHandler");
                 }
             }
         });
@@ -81,22 +89,10 @@ public class JavaSim
         }
     }
     
-    private static File resolvePreferencesFile(ApplicationPreferences preferences)
-    {
-        if(preferences.isMacOSX())
-            return new File(System.getProperty("user.home") + File.separator + "Library" + File.separator + "Application Support" + File.separator + "JavaSim" + File.separator + "preferences.json");
-        else if(preferences.isWindows())
-            return new File(System.getenv("APPDATA") + File.separator + "JavaSim" + File.separator + "preferences.json");
-        else if(preferences.isLinux())
-            return new File(File.separator + "var" + File.separator + "lib" + File.separator + "javasim" + File.separator + "preferences.json");
-        else
-            return new File(System.getProperty("user.home") + File.separator + "JavaSim" + File.separator + "preferences.json");
-    }
-    
     private static ApplicationPreferences createApplicationPreferences(String[] arguments)
     {
         ApplicationPreferences preferences = new ApplicationPreferences();
-        File preferencesFile = resolvePreferencesFile(preferences);
+        File preferencesFile = new File(PathUtils.getBaseDirectory(), "preferences.json");
         JavaSim.getLogger().info("Resolved preferences file: {}", preferencesFile.getAbsolutePath());
         
         preferences.parseCommandLineArguments(arguments);
@@ -107,7 +103,8 @@ public class JavaSim
     
     private static void setTemporaryFolderDeletionThread(ApplicationPreferences preferences)
     {
-        // Set the shutdown hook to delete the temporary directory on program exit.
+        // Set the shutdown hook to delete the temporary directory on program
+        // exit.
         Thread deleteTempFolderThread = new Thread(new TempFileShutdownHook(preferences.getTempDirectory()));
         deleteTempFolderThread.setName("TempFolderDelete");
         Runtime.getRuntime().addShutdownHook(deleteTempFolderThread);
@@ -139,5 +136,20 @@ public class JavaSim
     public static Home getHome()
     {
         return home;
+    }
+
+    public static void launch(Class<? extends Simulation> clazz)
+    {
+        JavaSim.launch(clazz, SimulationLaunchParameters.DEFAULT);
+    }
+    
+    public static void launch(Class<? extends Simulation> clazz, String[] args)
+    {
+        JavaSim.launch(clazz, new SimulationLaunchParameters(args));
+    }
+
+    public static void launch(Class<? extends Simulation> clazz, SimulationLaunchParameters params)
+    {
+        new SimulationAdministrator().launch(clazz, params);
     }
 }

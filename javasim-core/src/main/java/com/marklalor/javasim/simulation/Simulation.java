@@ -19,6 +19,8 @@ import javax.imageio.ImageIO;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import org.apache.commons.lang3.SystemUtils;
+
 import com.apple.eawt.Application;
 import com.apple.eawt.FullScreenUtilities;
 import com.marklalor.javasim.JavaSim;
@@ -187,7 +189,7 @@ public abstract class Simulation implements ClipboardOwner, HomeHolder
     {
         if(this.fullscreen != fullscreen)
         {
-            if(getHome().getApplicationPreferences().isMacOSX())
+            if(SystemUtils.IS_OS_MAC)
                 Application.getApplication().requestToggleFullScreen(getImage().getFrame());
             // TODO: Windows, Linux fullscreen.
             
@@ -197,7 +199,7 @@ public abstract class Simulation implements ClipboardOwner, HomeHolder
     
     public void toggleFullscreen()
     {
-        if(getHome().getApplicationPreferences().isMacOSX())
+        if(SystemUtils.IS_OS_MAC)
             Application.getApplication().requestToggleFullScreen(getImage().getFrame());
         
         this.fullscreen = !this.fullscreen;
@@ -246,7 +248,7 @@ public abstract class Simulation implements ClipboardOwner, HomeHolder
     
     public void saveAs()
     {
-        if(getHome().getApplicationPreferences().isMacOSX())
+        if(SystemUtils.IS_OS_MAC)
         {
             // Native file dialog, but with less options / cross platform support.
             FileDialog dialog = new FileDialog(getImage().getFrame(), "Choose a file", FileDialog.SAVE);

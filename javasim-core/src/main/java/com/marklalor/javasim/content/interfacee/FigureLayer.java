@@ -1,4 +1,4 @@
-package com.marklalor.javasim.content.figure;
+package com.marklalor.javasim.content.interfacee;
 
 import java.awt.Graphics2D;
 import java.awt.Image;

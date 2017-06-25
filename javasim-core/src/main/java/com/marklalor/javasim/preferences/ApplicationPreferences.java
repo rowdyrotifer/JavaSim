@@ -29,8 +29,6 @@ import com.marklalor.javasim.preferences.jsonserializers.LevelSerializer;
  */
 public class ApplicationPreferences
 {
-    private String os;
-    
     private CommandLineArgs arguments;
     private PreferencesFile preferences;
     private File file;
@@ -38,9 +36,6 @@ public class ApplicationPreferences
     
     public ApplicationPreferences()
     {
-        // Detect operating system.
-        this.os = System.getProperty("os.name").toLowerCase();
-        
         // Set up Gson.
         // Wow I love Gson this is so nice. Tell me that's not nice.
         gson = new GsonBuilder()
@@ -54,7 +49,7 @@ public class ApplicationPreferences
     public void parsePreferencesFile(File file)
     {
         this.file = file;
-        this.preferences = new PreferencesFile(this);
+        this.preferences = new PreferencesFile();
         
         if(file.exists())
         {
@@ -89,7 +84,6 @@ public class ApplicationPreferences
         try
         {
             this.preferences = gson.fromJson(new FileReader(getFile()), PreferencesFile.class);
-            this.preferences.setApplicationPreferences(this);
         }
         catch(JsonSyntaxException e)
         {
@@ -189,31 +183,6 @@ public class ApplicationPreferences
     public void setUseScreenMenuBar(boolean useScreenMenuBar)
     {
         arguments.setUseScreenMenuBar(useScreenMenuBar);
-    }
-    
-    // Operating system variables.
-    
-    /**
-     * @return Contents of <code>System.getProperty("os.name").toLowerCase()</code>
-     */
-    public String getOS()
-    {
-        return os;
-    }
-    
-    public boolean isWindows()
-    {
-        return os.contains("win");
-    }
-    
-    public boolean isMacOSX()
-    {
-        return os.contains("mac");
-    }
-    
-    public boolean isLinux()
-    {
-        return os.contains("nux");
     }
     
     public File getTempDirectory()
