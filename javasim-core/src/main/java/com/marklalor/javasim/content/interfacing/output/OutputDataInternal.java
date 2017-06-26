@@ -5,21 +5,22 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 
-public abstract class OutputDataBasic<T> implements OutputData<T>
+import com.marklalor.javasim.content.interfacing.typemaps.OutputDataType;
+
+public abstract class OutputDataInternal<T> implements OutputData<T>
 {
     private final T data;
-    
     private final String name;
     private final Optional<String> description;
+
+    private final Set<Consumer<OutputDataChangeEvent>> listeners;
     
-    private Set<Consumer<OutputDataChangeEvent>> listeners;
-    
-    public OutputDataBasic(T data, String name)
+    public OutputDataInternal(T data, String name)
     {
         this(data, name, null);
     }
 
-    public OutputDataBasic(T data, String name, String description)
+    public OutputDataInternal(T data, String name, String description)
     {
         this.data = data;
         
@@ -47,13 +48,17 @@ public abstract class OutputDataBasic<T> implements OutputData<T>
         return description;
     }
     
-    @Override
+    /*
+     * Internal properties.
+     */
+    
+    public abstract OutputDataType getOutputDataType();
+        
     public void addChangeListener(Consumer<OutputDataChangeEvent> listener)
     {
         this.listeners.add(listener);
     }
     
-    @Override
     public void markChanged(OutputDataChangeEvent event)
     {
         event.setOutput(this);

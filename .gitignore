@@ -1,15 +1,21 @@
 #Binaries.
 */bin/
-*/release/
+*/release
 */dist/
 javasim-core/osx/src
 */lib
-#Eclipse stuff.
+
+# Eclipse
 */.settings
 */.externalToolBuilders/ANT\ Builder.launch
-#OS X
+*/.classpath
+*/.project
+
+# macOS
 .DS_Store
-#I think Eclipse generates these with markdown preview.
+
+# I think Eclipse generates these with markdown preview.
 .LICENSE.md.html
 .README.md.html
-*/target/
+
+*/target

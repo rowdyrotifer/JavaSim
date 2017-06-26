@@ -2,8 +2,10 @@ package com.marklalor.javasim.content.interfacing.sim;
 
 import com.marklalor.javasim.content.interfacing.input.InputVariable;
 import com.marklalor.javasim.content.interfacing.input.SimInputs;
-import com.marklalor.javasim.content.interfacing.output.OutputData;
+import com.marklalor.javasim.content.interfacing.output.OutputDataInternal;
+import com.marklalor.javasim.content.interfacing.output.OutputDataWrapper;
 import com.marklalor.javasim.content.interfacing.sim.interfaces.SimInterface;
+import com.marklalor.javasim.content.interfacing.typemaps.OutputDataType;
 import com.marklalor.javasim.newsimulation.SimObject;
 
 public class SimObjectController implements SimController
@@ -20,10 +22,34 @@ public class SimObjectController implements SimController
         return simObject;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public <T> void registerOutputData(OutputData<T> data)
+    public <T> OutputDataInternal<?> createOutputData(OutputDataType type)
     {
-        getSimObject().getOutputController().getOutputData().add(data);
+        //getSimObject().getOutputController().getOutputData().add(data);
+        try
+        {
+            // Create the OutputDataInstance and wrap it up so that this instance
+            // can be swapped out later by the user interface.
+            OutputDataInternal<?> outputData = type.getClassType().newInstance();
+            OutputDataWrapper<?> wrapped = new OutputDataWrapper<>(outputData);
+            
+            // This is the unchecked cast. This will fail if the user sets
+            // their return value as a class not specified by the OutputDataType
+            return type.getClassType().cast(wrapped);
+        }
+        catch(InstantiationException e)
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        catch(IllegalAccessException e)
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        
+        throw new RuntimeException("Could not create output data object for " + type);
     }
 
     @Override
