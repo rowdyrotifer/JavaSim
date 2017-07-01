@@ -1,30 +1,18 @@
 package com.marklalor.javasim.sample.nephroid;
 
-import com.marklalor.javasim.JavaSim;
-import com.marklalor.javasim.content.interfacing.output.BufferedImageOutputData;
-import com.marklalor.javasim.content.interfacing.sim.SimController;
-import com.marklalor.javasim.content.interfacing.sim.Simulation;
-import com.marklalor.javasim.content.interfacing.sim.interfaces.SequentialOutputGenerator;
-import com.marklalor.javasim.content.interfacing.typemaps.OutputDataType;
+import com.marklalor.javasim.data.SimInput;
+import com.marklalor.javasim.data.SimInterface;
+import com.marklalor.javasim.data.SimOutput;
+import com.marklalor.javasim.data.input.InputInt32;
+import com.marklalor.javasim.data.output.OutputImage;
 
-public class Nephroid implements Simulation, SequentialOutputGenerator  
+@SimInterface(group="com.marklalor")
+public class Nephroid  
 {
-    public static void main(String[] args)
+    public void draw(
+            @SimInput(group="javasim", name="frame") InputInt32 frame,
+            @SimOutput(name="nephriod") OutputImage image)
     {
-        JavaSim.launch(Nephroid.class, args);
-    }
-    
-    private final BufferedImageOutputData output;
-
-    public void init(SimController controller)
-    {
-        controller.registerSimInterface(this);
-        output = (BufferedImageOutputData) controller.createOutputData(OutputDataType.CACHED_BUFFERED_IMAGE);
-    }
-
-    public void generateNextOutputData()
-    {
-        // TODO Auto-generated method stub
         
     }
 }

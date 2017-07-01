@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package javasim;
+
+option java_package = "com.marklalor.javasim.proto";
+option java_outer_classname = "ChunkProto";
+
+message Chunk
+{
+	uint32 number = 1;
+	uint32 total = 2;
+}

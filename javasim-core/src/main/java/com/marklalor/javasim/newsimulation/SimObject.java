@@ -2,9 +2,9 @@ package com.marklalor.javasim.newsimulation;
 
 import com.marklalor.javasim.content.interfacing.input.InputController;
 import com.marklalor.javasim.content.interfacing.output.OutputController;
-import com.marklalor.javasim.content.interfacing.sim.SimInterfaceRepository;
-import com.marklalor.javasim.content.interfacing.sim.SimObjectController;
-import com.marklalor.javasim.content.interfacing.sim.Simulation;
+import com.marklalor.javasim.simulation.interfaces.SimInterfaceRepository;
+import com.marklalor.javasim.simulation.interfaces.SimObjectController;
+import com.marklalor.javasim.simulation.interfaces.Simulation;
 
 /**
  * <p>

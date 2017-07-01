@@ -1,8 +1,8 @@
 package com.marklalor.javasim.content.interfacing.typemaps;
 
-import com.marklalor.javasim.content.interfacing.sim.interfaces.SequentialOutputGenerator;
-import com.marklalor.javasim.content.interfacing.sim.interfaces.SimExitable;
-import com.marklalor.javasim.content.interfacing.sim.interfaces.SimInterface;
+import com.marklalor.javasim.simulation.interfaces.interfaces.SequentialOutputGenerator;
+import com.marklalor.javasim.simulation.interfaces.interfaces.SimExitable;
+import com.marklalor.javasim.simulation.interfaces.interfaces.SimInterface;
 
 public enum SimInterfaceType
 {

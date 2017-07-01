@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package javasim;
+
+option java_package = "com.marklalor.javasim.proto";
+option java_outer_classname = "DataProto";
+
+message Data
+{
+	oneof value
+	{
+		bytes bytes_data = 1;
+		bool boolean_data = 2;
+		string string_data = 5;
+		uint32 int32_data = 3;
+		uint64 int64_data = 4;
+	}
+}

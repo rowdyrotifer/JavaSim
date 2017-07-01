@@ -2,7 +2,7 @@ package com.marklalor.javasim.newsimulation;
 
 import java.util.List;
 
-import com.marklalor.javasim.content.interfacing.sim.Simulation;
+import com.marklalor.javasim.simulation.interfaces.Simulation;
 
 public class SimulationAdministrator
 {

@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package javasim;
+
+option java_package = "com.marklalor.javasim.proto";
+option java_outer_classname = "UUIDProto";
+
+message UUID
+{
+	bytes value = 1;
+}

@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package javasim;
+
+option java_package = "com.marklalor.javasim.proto";
+option java_outer_classname = "DataTypeProto";
+
+
+enum DataType
+{
+	BYTES = 0;
+	BOOLEAN = 1;
+	STRING = 4;
+	INT32 = 2;
+	INT64 = 3;
+	PNG = 5;
+}
