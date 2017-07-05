@@ -1,6 +1,6 @@
 package com.marklalor.javasim.data.input;
 
-public interface InputBoolean
+public interface InputBoolean extends Input
 {
     public boolean get();
 }

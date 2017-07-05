@@ -14,10 +14,9 @@ option java_outer_classname = "DataMessageProto";
 message DataMessage
 {
 	uint32 session = 1;     // Session ID (multiple sessions may be at work).
-	string namespace = 2;   // e.g. "com.marklalor.myproject"
-	string id = 3;          // e.g. "myimage"
-	Range instances = 4;    // If instances represents > 1, then expect REPEATED Data for each instance
-	Chunk chunk = 5;        // If not 1/1, several data messages may be passed to build an entire object
-	DataType type = 6;      // Type of data being sent below
-	repeated Data data = 7; // THE Data! May be more than one if several instances are sent (see instances).
+	string identifier = 2;  // e.g. "com.marklalor.myproject.myimage"
+	Range instances = 3;    // If instances represents > 1, then expect REPEATED Data for each instance
+	Chunk chunk = 4;        // If not 1/1, several data messages may be passed in seperate messages to build object
+	DataType type = 5;      // Type of data being sent below
+	repeated Data data = 6; // THE Data! May be more than one if several instances are sent (see instances).
 }

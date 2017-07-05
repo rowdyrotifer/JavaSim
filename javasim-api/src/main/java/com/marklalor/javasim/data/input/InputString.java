@@ -2,7 +2,7 @@ package com.marklalor.javasim.data.input;
 
 import java.io.StringReader;
 
-public interface InputString
+public interface InputString extends Input
 {
     public String get();
     

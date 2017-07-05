@@ -69,7 +69,7 @@ public final class DataMessageProto {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:javasim.DataMessage)
       DataMessageOrBuilder {
-    // Use DataMessage.newBuilder() to construct.
+    // Use ProtoMessage.newBuilder() to construct.
     private DataMessage(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
     }

@@ -1,9 +1,6 @@
 package com.marklalor.javasim.data.output;
 
-import com.marklalor.javasim.data.Terminal;
-
-public interface OutputInt64
+public interface OutputInt64 extends Output
 {
-    @Terminal
     public void put(long value);
 }
