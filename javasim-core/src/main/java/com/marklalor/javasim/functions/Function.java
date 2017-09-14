@@ -1,16 +1,22 @@
 package com.marklalor.javasim.functions;
 
-import java.util.Collection;
+import java.util.Map;
 
-import com.marklalor.javasim.functions.identifier.FunctionIdentifier;
-import com.marklalor.javasim.model.DataInstance;
+import com.marklalor.javasim.functions.identifier.single.DataIdentifier;
+import com.marklalor.javasim.functions.identifier.single.FunctionIdentifier;
+import com.marklalor.javasim.functions.implementations.FunctionType;
+import com.marklalor.javasim.model.data.DataInstance;
 
+/**
+ * The heart and soul of the program. Transforms data by means of whatever
+ * function implementation your heart desires... and is implemented.
+ */
 public interface Function {
 
-	public FunctionIdentifier getIdentifier();
+	FunctionIdentifier getIdentifier();
 	
-	public FunctionType getFunctionType();
-
-	public Collection<DataInstance> apply(Collection<DataInstance> input);
+	Map<DataIdentifier, DataInstance> apply(Map<DataIdentifier, DataInstance> input);
+	
+	FunctionType getFunctionType();
 	
 }

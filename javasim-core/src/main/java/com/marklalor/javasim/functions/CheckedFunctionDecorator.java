@@ -1,15 +1,15 @@
 package com.marklalor.javasim.functions;
 
-import java.util.Collection;
-import java.util.stream.Collectors;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.HashMultiset;
-import com.marklalor.javasim.functions.identifier.DataIdentifier;
-import com.marklalor.javasim.functions.identifier.FunctionIdentifier;
-import com.marklalor.javasim.model.DataInstance;
+import com.marklalor.javasim.functions.identifier.FunctionContract;
+import com.marklalor.javasim.functions.identifier.single.FullyQualifiedDataBundleIdentifier;
+import com.marklalor.javasim.functions.identifier.single.FullyQualifiedDataIdentifier;
+import com.marklalor.javasim.functions.identifier.single.FunctionIdentifier;
+import com.marklalor.javasim.functions.implementations.FunctionType;
+import com.marklalor.javasim.functions.instance.FullyQualifiedBundleInstance;
 
 public class CheckedFunctionDecorator implements Function {
 	private static final Logger logger = LoggerFactory.getLogger(CheckedFunctionDecorator.class);
@@ -25,30 +25,30 @@ public class CheckedFunctionDecorator implements Function {
 	 * outputs abide to the function's FunctionContract.
 	 */
 	@Override
-	public Collection<DataInstance> apply(Collection<DataInstance> input) {
+	public FullyQualifiedBundleInstance apply(FullyQualifiedBundleInstance input) {
 		FunctionContract contract = getIdentifier().getContract();
 		
 		// Check inputs
-		if(unequal(input, contract.getInputs())) {
+		if (unequal(input, contract.getInputs())) {
 			logger.warn("Input check failed. {}", this.delegateFunction.getIdentifier());
 			throw new RuntimeException("The input did not match the function contract.");
 		}
 		
 		// Delegate call to decorated instance.
-		final Collection<DataInstance> realOutput = this.delegateFunction.apply(input);
+		final FullyQualifiedBundleInstance output = this.delegateFunction.apply(input);
 		
 		// Check outputs
-		if(unequal(realOutput, contract.getOutputs())) {
+		if (unequal(output, contract.getOutputs())) {
 			logger.warn("Input check failed. {}", this.delegateFunction.getIdentifier());
 			throw new RuntimeException("The output did not match the function contract.");
 		}
 		
-		return realOutput;
+		return output;
 	}
 
-	private static boolean unequal(Collection<DataInstance> c1, Collection<DataIdentifier> c2) {
-		HashMultiset<DataIdentifier> set1 = HashMultiset.create(c1.stream().map(DataInstance::getDataIdentifier).collect(Collectors.toList()));
-		HashMultiset<DataIdentifier> set2 = HashMultiset.create(c2);
+	private static boolean unequal(FullyQualifiedBundleInstance c1, FullyQualifiedDataBundleIdentifier functionBundleIdentifier) {
+		HashMultiset<FullyQualifiedDataIdentifier> set1 = HashMultiset.create(c1.getInstanceMap().keySet());
+		HashMultiset<FullyQualifiedDataIdentifier> set2 = HashMultiset.create(functionBundleIdentifier.getIdentifiers());
 		return !set1.equals(set2);
 	}
 
